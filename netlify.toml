@@ -1,2 +1,8 @@
 [build]
   publish = "."
+
+[[redirects]]
+  from = "/api/survey"
+  to = "https://n8n.srv835342.hstgr.cloud/webhook/firefly-survey"
+  status = 200
+  force = true
