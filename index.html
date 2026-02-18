@@ -2172,7 +2172,7 @@
                     </p>
                     <div class="success-details" id="successDetails"></div>
                     <div class="success-actions">
-                        <a href="#" class="btn-whatsapp" id="whatsappBtn" target="_blank">💬 WhatsApp Directo</a>
+                        <a href="#" class="btn-whatsapp" id="whatsappBtn" onclick="var u=this.getAttribute('data-url'); if(u){window.open(u,'_blank');} return false;">💬 WhatsApp Directo</a>
                         <button type="button" class="btn-close-survey" onclick="closeSurvey()">Cerrar / Close</button>
                     </div>
                 </div>
@@ -2296,7 +2296,7 @@
         // ── Survey ────────────────────────────────────────────────────────
         let currentStep = 1;
         const totalSteps = 6;
-        const surveyData = {};
+        let surveyData = {};
 
         const N8N_WEBHOOK_URL = '/api/survey';
 
@@ -2473,7 +2473,7 @@
             `;
 
             const msg = `Hola, acabo de completar la evaluación de Firefly. Me interesa la solución ${sol.name}. ¿Podemos agendar una llamada?`;
-            document.getElementById('whatsappBtn').href = `https://wa.me/5214151805030?text=${encodeURIComponent(msg)}`;
+            document.getElementById('whatsappBtn').setAttribute('data-url', `https://wa.me/5214151805030?text=${encodeURIComponent(msg)}`);
         }
 
         // Close on backdrop click
