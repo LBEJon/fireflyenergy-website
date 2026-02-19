@@ -75,7 +75,7 @@
             font-weight: 600;
             padding: 4px 12px;
             border-radius: 20px;
-            transition: all 0.3s var(--transition-smooth);
+            transition: opacity 0.3s var(--transition-smooth), background-color 0.3s var(--transition-smooth), color 0.3s var(--transition-smooth);
             opacity: 0.7;
         }
 
@@ -103,7 +103,7 @@
             width: 100%;
             z-index: 1000;
             border-bottom: 1px solid rgba(0,0,0,0.05);
-            transition: all 0.3s var(--transition-smooth);
+            transition: top 0.3s var(--transition-smooth), box-shadow 0.3s var(--transition-smooth);
         }
 
         .navbar.scrolled {
@@ -190,7 +190,7 @@
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
             font-size: 14px;
-            transition: all 0.3s var(--transition-smooth);
+            transition: transform 0.3s var(--transition-smooth), box-shadow 0.3s var(--transition-smooth), background-color 0.3s var(--transition-smooth);
             border: none;
             cursor: pointer;
             display: inline-flex;
@@ -214,7 +214,7 @@
             font-weight: 600;
             font-size: 14px;
             border: 2px solid var(--nordic-charcoal);
-            transition: all 0.3s var(--transition-smooth);
+            transition: background-color 0.3s var(--transition-smooth), color 0.3s var(--transition-smooth);
             cursor: pointer;
             display: inline-flex;
             align-items: center;
@@ -234,13 +234,71 @@
             border: none;
             cursor: pointer;
             padding: 8px;
+            z-index: 1003;
         }
 
         .mobile-menu-btn span {
             width: 24px;
             height: 2px;
             background: var(--nordic-charcoal);
-            transition: all 0.3s var(--transition-smooth);
+            transition: transform 0.3s var(--transition-smooth), opacity 0.3s var(--transition-smooth);
+        }
+
+        .mobile-menu-btn.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .mobile-menu-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu-btn.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 1002;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            opacity: 0;
+            transition: opacity 0.3s var(--transition-smooth);
+        }
+
+        .mobile-nav.open {
+            display: flex;
+            opacity: 1;
+        }
+
+        .mobile-nav a {
+            text-decoration: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--nordic-charcoal);
+            padding: 12px 24px;
+            border-radius: 8px;
+            transition: color 0.3s var(--transition-smooth), background-color 0.3s var(--transition-smooth);
+        }
+
+        .mobile-nav a:hover {
+            color: var(--firefly-green);
+            background: var(--light-green);
+        }
+
+        .mobile-nav .btn-primary {
+            margin-top: 16px;
+            font-size: 18px;
+            padding: 16px 32px;
         }
 
         /* Hero Section */
@@ -560,7 +618,7 @@
             border-radius: 20px;
             padding: 28px;
             position: relative;
-            transition: all 0.4s var(--transition-smooth);
+            transition: transform 0.4s var(--transition-smooth), box-shadow 0.4s var(--transition-smooth);
             border: 2px solid transparent;
             cursor: pointer;
         }
@@ -854,7 +912,7 @@
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
             font-size: 16px;
-            transition: all 0.3s var(--transition-smooth);
+            transition: transform 0.3s var(--transition-smooth), box-shadow 0.3s var(--transition-smooth), background-color 0.3s var(--transition-smooth);
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -957,11 +1015,44 @@
             to { opacity: 1; }
         }
 
+        /* Focus & Active States */
+        .btn-primary:focus-visible,
+        .btn-secondary:focus-visible,
+        .btn-dark:focus-visible {
+            outline: 2px solid var(--firefly-green);
+            outline-offset: 3px;
+        }
+
+        .btn-primary:active,
+        .btn-dark:active {
+            transform: scale(0.97);
+        }
+
+        .btn-secondary:active {
+            transform: scale(0.97);
+        }
+
+        .nav-link:focus-visible {
+            outline: 2px solid var(--firefly-green);
+            outline-offset: 4px;
+            border-radius: 4px;
+        }
+
+        .solution-card:focus-visible {
+            outline: 2px solid var(--firefly-green);
+            outline-offset: 4px;
+        }
+
+        .lang-option:focus-visible {
+            outline: 2px solid var(--firefly-green);
+            outline-offset: 2px;
+        }
+
         /* Scroll Reveal */
         .reveal {
             opacity: 0;
             transform: translateY(30px);
-            transition: all 0.8s var(--transition-smooth);
+            transition: opacity 0.8s var(--transition-smooth), transform 0.8s var(--transition-smooth);
         }
 
         .reveal.active {
@@ -1149,20 +1240,10 @@
             font-family: 'Montserrat', sans-serif;
         }
 
-        .step-title .lang-en {
-            font-size: 18px;
-            color: var(--slate);
-            font-weight: 500;
-        }
-
         .step-subtitle {
             font-size: 14px;
             color: var(--slate);
             line-height: 1.6;
-        }
-
-        .step-subtitle .lang-en {
-            color: #6b7280;
         }
 
         .options-grid {
@@ -1459,8 +1540,6 @@
             line-height: 1.6;
         }
 
-        .success-message .lang-en { font-size: 14px; color: #6b7280; }
-
         .success-details {
             background: var(--white);
             border-radius: 16px;
@@ -1624,6 +1703,34 @@
                 font-size: 36px;
             }
 
+            .comparison-row.header {
+                display: none;
+            }
+
+            .comparison-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 16px 20px;
+            }
+
+            .comparison-row .col-feature {
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: var(--slate);
+                font-weight: 700;
+            }
+
+            .comparison-row .col-generator::before {
+                content: 'Generator: ';
+                font-weight: 600;
+                color: var(--nordic-charcoal);
+            }
+
+            .comparison-row .col-firefly::before {
+                content: 'Firefly: ';
+            }
+
             .footer-grid {
                 grid-template-columns: 1fr;
             }
@@ -1668,6 +1775,15 @@
             </button>
         </div>
     </nav>
+
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-nav" id="mobileNav">
+        <a href="#solutions" class="mobile-nav-link">Solutions</a>
+        <a href="#technology" class="mobile-nav-link">Technology</a>
+        <a href="#about" class="mobile-nav-link">About</a>
+        <a href="#contact" class="mobile-nav-link">Contact</a>
+        <a href="#survey" class="btn-primary">Get Started</a>
+    </div>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -1920,8 +2036,8 @@
                 <!-- Step 1: Location -->
                 <div class="survey-step active" data-step="1">
                     <div class="step-header">
-                        <span class="step-badge">Paso 1 / Step 1</span>
-                        <h2 class="step-title">¿Dónde está tu propiedad?<br><span class="lang-en">Where is your property?</span></h2>
+                        <span class="step-badge">Step 1</span>
+                        <h2 class="step-title">Where is your property?</h2>
                     </div>
                     <div class="options-grid">
                         <label class="option-card">
@@ -1941,99 +2057,99 @@
                         </label>
                         <label class="option-card">
                             <input type="radio" name="location" value="other">
-                            <span class="option-content"><strong>Otro / Other</strong><span class="option-sub">Tell us where</span></span>
+                            <span class="option-content"><strong>Other</strong><span class="option-sub">Tell us where</span></span>
                             <span class="option-check">✓</span>
                         </label>
                     </div>
                     <div class="step-nav">
-                        <button type="button" class="btn-next" onclick="nextStep()">Continuar / Continue →</button>
+                        <button type="button" class="btn-next" onclick="nextStep()">Continue →</button>
                     </div>
                 </div>
 
                 <!-- Step 2: Property Type -->
                 <div class="survey-step" data-step="2">
                     <div class="step-header">
-                        <span class="step-badge">Paso 2 / Step 2</span>
-                        <h2 class="step-title">¿Qué tipo de propiedad?<br><span class="lang-en">What type of property?</span></h2>
+                        <span class="step-badge">Step 2</span>
+                        <h2 class="step-title">What type of property?</h2>
                     </div>
                     <div class="options-grid">
                         <label class="option-card">
                             <input type="radio" name="property_type" value="residential" required>
-                            <span class="option-content"><strong>Casa / Home</strong><span class="option-sub">Residential</span></span>
+                            <span class="option-content"><strong>Home</strong><span class="option-sub">Residential</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="property_type" value="commercial">
-                            <span class="option-content"><strong>Negocio / Business</strong><span class="option-sub">Commercial</span></span>
+                            <span class="option-content"><strong>Business</strong><span class="option-sub">Commercial</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="property_type" value="industrial">
-                            <span class="option-content"><strong>Industria / Industrial</strong><span class="option-sub">Large scale</span></span>
+                            <span class="option-content"><strong>Industrial</strong><span class="option-sub">Large scale</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="property_type" value="new-construction">
-                            <span class="option-content"><strong>Nueva construcción</strong><span class="option-sub">New construction</span></span>
+                            <span class="option-content"><strong>New Construction</strong><span class="option-sub">New construction</span></span>
                             <span class="option-check">✓</span>
                         </label>
                     </div>
                     <div class="step-nav">
-                        <button type="button" class="btn-back" onclick="prevStep()">← Atrás / Back</button>
-                        <button type="button" class="btn-next" onclick="nextStep()">Continuar / Continue →</button>
+                        <button type="button" class="btn-back" onclick="prevStep()">← Back</button>
+                        <button type="button" class="btn-next" onclick="nextStep()">Continue →</button>
                     </div>
                 </div>
 
                 <!-- Step 3: Current Setup -->
                 <div class="survey-step" data-step="3">
                     <div class="step-header">
-                        <span class="step-badge">Paso 3 / Step 3</span>
-                        <h2 class="step-title">¿Cuál es tu situación actual?<br><span class="lang-en">What's your current setup?</span></h2>
+                        <span class="step-badge">Step 3</span>
+                        <h2 class="step-title">What's your current setup?</h2>
                     </div>
                     <div class="options-grid">
                         <label class="option-card">
                             <input type="radio" name="current_setup" value="grid-only" required>
-                            <span class="option-content"><strong>Solo CFE / Grid only</strong><span class="option-sub">No backup power</span></span>
+                            <span class="option-content"><strong>Grid only</strong><span class="option-sub">No backup power</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="current_setup" value="generator">
-                            <span class="option-content"><strong>Generador / Generator</strong><span class="option-sub">Looking to upgrade</span></span>
+                            <span class="option-content"><strong>Generator</strong><span class="option-sub">Looking to upgrade</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="current_setup" value="existing-solar">
-                            <span class="option-content"><strong>Paneles solares / Solar panels</strong><span class="option-sub">Existing system</span></span>
+                            <span class="option-content"><strong>Solar panels</strong><span class="option-sub">Existing system</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="current_setup" value="new-build">
-                            <span class="option-content"><strong>Construcción nueva / New build</strong><span class="option-sub">Starting fresh</span></span>
+                            <span class="option-content"><strong>New build</strong><span class="option-sub">Starting fresh</span></span>
                             <span class="option-check">✓</span>
                         </label>
                     </div>
                     <div class="step-nav">
-                        <button type="button" class="btn-back" onclick="prevStep()">← Atrás / Back</button>
-                        <button type="button" class="btn-next" onclick="nextStep()">Continuar / Continue →</button>
+                        <button type="button" class="btn-back" onclick="prevStep()">← Back</button>
+                        <button type="button" class="btn-next" onclick="nextStep()">Continue →</button>
                     </div>
                 </div>
 
                 <!-- Step 4: What to back up -->
                 <div class="survey-step" data-step="4">
                     <div class="step-header">
-                        <span class="step-badge">Paso 4 / Step 4</span>
-                        <h2 class="step-title">¿Qué necesitas respaldar?<br><span class="lang-en">What do you need to back up?</span></h2>
+                        <span class="step-badge">Step 4</span>
+                        <h2 class="step-title">What do you need to back up?</h2>
                     </div>
 
                     <!-- Part 1: Appliance level -->
                     <div class="step-section">
-                        <p class="step-section-label">Aparatos / Appliances</p>
+                        <p class="step-section-label">Appliances</p>
                         <div class="options-grid appliance-grid">
                             <label class="option-card appliance-card">
                                 <input type="radio" name="appliance_level" value="basic" required>
                                 <span class="appliance-icon">🔌</span>
                                 <span class="option-content">
-                                    <strong>Básico / Basic</strong>
+                                    <strong>Basic</strong>
                                     <span class="option-sub">Fridge, lights, WiFi, outlets</span>
                                 </span>
                                 <span class="option-check">✓</span>
@@ -2042,7 +2158,7 @@
                                 <input type="radio" name="appliance_level" value="comfort">
                                 <span class="appliance-icon">❄️</span>
                                 <span class="option-content">
-                                    <strong>Confort / Comfort</strong>
+                                    <strong>Comfort</strong>
                                     <span class="option-sub">Basic + air conditioning, TVs, fans</span>
                                 </span>
                                 <span class="option-check">✓</span>
@@ -2051,7 +2167,7 @@
                                 <input type="radio" name="appliance_level" value="complete">
                                 <span class="appliance-icon">🏠</span>
                                 <span class="option-content">
-                                    <strong>Completo / Full home</strong>
+                                    <strong>Full home</strong>
                                     <span class="option-sub">All circuits, water pump, washer</span>
                                 </span>
                                 <span class="option-check">✓</span>
@@ -2061,7 +2177,7 @@
 
                     <!-- Part 2: Hours of backup -->
                     <div class="step-section">
-                        <p class="step-section-label">¿Cuántas horas de respaldo? / Hours of backup?</p>
+                        <p class="step-section-label">Hours of backup?</p>
                         <div class="hours-grid">
                             <label class="hours-pill">
                                 <input type="radio" name="backup_hours" value="5" required>
@@ -2095,83 +2211,83 @@
                     </div>
 
                     <div class="step-nav">
-                        <button type="button" class="btn-back" onclick="prevStep()">← Atrás / Back</button>
-                        <button type="button" class="btn-next" onclick="nextStep()">Continuar / Continue →</button>
+                        <button type="button" class="btn-back" onclick="prevStep()">← Back</button>
+                        <button type="button" class="btn-next" onclick="nextStep()">Continue →</button>
                     </div>
                 </div>
 
                 <!-- Step 5: Solar Interest -->
                 <div class="survey-step" data-step="5">
                     <div class="step-header">
-                        <span class="step-badge">Paso 5 / Step 5</span>
-                        <h2 class="step-title">¿Te interesa agregar paneles solares?<br><span class="lang-en">Interested in solar panels?</span></h2>
+                        <span class="step-badge">Step 5</span>
+                        <h2 class="step-title">Interested in solar panels?</h2>
                     </div>
                     <div class="options-grid">
                         <label class="option-card solar-yes">
                             <input type="radio" name="solar_interest" value="total-independence" required>
                             <span class="solar-icon">☀️</span>
-                            <span class="option-content"><strong>Sí - Independencia total</strong><span class="option-sub">Yes - Complete CFE independence</span></span>
+                            <span class="option-content"><strong>Yes - Complete independence</strong><span class="option-sub">Complete CFE independence</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="solar_interest" value="later">
                             <span class="solar-icon">🌅</span>
-                            <span class="option-content"><strong>Tal vez más adelante</strong><span class="option-sub">Maybe later</span></span>
+                            <span class="option-content"><strong>Maybe later</strong><span class="option-sub">Maybe later</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="solar_interest" value="just-backup">
                             <span class="solar-icon">🔋</span>
-                            <span class="option-content"><strong>No, solo respaldo</strong><span class="option-sub">No, just backup for now</span></span>
+                            <span class="option-content"><strong>No, just backup</strong><span class="option-sub">No, just backup for now</span></span>
                             <span class="option-check">✓</span>
                         </label>
                     </div>
                     <div class="step-nav">
-                        <button type="button" class="btn-back" onclick="prevStep()">← Atrás / Back</button>
-                        <button type="button" class="btn-next" onclick="nextStep()">Continuar / Continue →</button>
+                        <button type="button" class="btn-back" onclick="prevStep()">← Back</button>
+                        <button type="button" class="btn-next" onclick="nextStep()">Continue →</button>
                     </div>
                 </div>
 
                 <!-- Step 6: Contact Info -->
                 <div class="survey-step" data-step="6">
                     <div class="step-header">
-                        <span class="step-badge">Paso 6 / Step 6</span>
-                        <h2 class="step-title">Información de contacto<br><span class="lang-en">Contact information</span></h2>
-                        <p class="step-subtitle">Un especialista te contactará en menos de 24 horas.<br><span class="lang-en">A specialist will contact you within 24 hours.</span></p>
+                        <span class="step-badge">Step 6</span>
+                        <h2 class="step-title">Contact information</h2>
+                        <p class="step-subtitle">A specialist will contact you within 24 hours.</p>
                     </div>
                     <div class="form-fields">
                         <div class="form-group">
-                            <label for="name">Nombre completo / Full name *</label>
-                            <input type="text" id="name" name="name" required placeholder="Ej. Juan Pérez">
+                            <label for="name">Full name *</label>
+                            <input type="text" id="name" name="name" required placeholder="e.g. John Smith">
                         </div>
                         <div class="form-group">
-                            <label for="email">Correo electrónico / Email *</label>
-                            <input type="email" id="email" name="email" required placeholder="juan@ejemplo.com">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required placeholder="john@example.com">
                         </div>
                         <div class="form-group">
-                            <label for="phone">Teléfono / Phone number *</label>
+                            <label for="phone">Phone number *</label>
                             <input type="tel" id="phone" name="phone" required placeholder="+52 415 123 4567">
                         </div>
                         <div class="form-group checkbox-group">
                             <label class="checkbox-label">
                                 <input type="checkbox" name="whatsapp_same" value="yes" checked>
-                                <span>Este número tiene WhatsApp / This number has WhatsApp</span>
+                                <span>This number has WhatsApp</span>
                             </label>
                         </div>
                         <div class="form-group">
-                            <label>Idioma preferido / Preferred language</label>
+                            <label>Preferred language</label>
                             <div class="radio-group">
-                                <label class="radio-label"><input type="radio" name="language" value="español" checked><span>Español</span></label>
-                                <label class="radio-label"><input type="radio" name="language" value="english"><span>English</span></label>
-                                <label class="radio-label"><input type="radio" name="language" value="both"><span>Ambos / Both</span></label>
+                                <label class="radio-label"><input type="radio" name="language" value="english" checked><span>English</span></label>
+                                <label class="radio-label"><input type="radio" name="language" value="español"><span>Español</span></label>
+                                <label class="radio-label"><input type="radio" name="language" value="both"><span>Both</span></label>
                             </div>
                         </div>
                     </div>
                     <div class="step-nav">
-                        <button type="button" class="btn-back" onclick="prevStep()">← Atrás / Back</button>
+                        <button type="button" class="btn-back" onclick="prevStep()">← Back</button>
                         <button type="submit" class="btn-submit">
-                            <span class="submit-text">Enviar / Submit</span>
-                            <span class="submit-loading" style="display: none;">Enviando...</span>
+                            <span class="submit-text">Submit</span>
+                            <span class="submit-loading" style="display: none;">Submitting...</span>
                         </button>
                     </div>
                 </div>
@@ -2179,15 +2295,14 @@
                 <!-- Success Message -->
                 <div class="survey-step success-step" data-step="success">
                     <div class="success-icon">✓</div>
-                    <h2 class="success-title">¡Gracias! / Thank you!</h2>
+                    <h2 class="success-title">Thank you!</h2>
                     <p class="success-message">
-                        Hemos recibido tu información. Un especialista te contactará pronto.<br>
-                        <span class="lang-en">We've received your information. A specialist will contact you soon.</span>
+                        We've received your information. A specialist will contact you soon.
                     </p>
                     <div class="success-details" id="successDetails"></div>
                     <div class="success-actions">
-                        <a href="#" class="btn-whatsapp" id="whatsappBtn" onclick="var u=this.getAttribute('data-url'); if(u){window.open(u,'_blank');} return false;">💬 WhatsApp Directo</a>
-                        <button type="button" class="btn-close-survey" onclick="closeSurvey()">Cerrar / Close</button>
+                        <a href="#" class="btn-whatsapp" id="whatsappBtn" onclick="var u=this.getAttribute('data-url'); if(u){window.open(u,'_blank');} return false;">💬 Direct WhatsApp</a>
+                        <button type="button" class="btn-close-survey" onclick="closeSurvey()">Close</button>
                     </div>
                 </div>
 
@@ -2241,13 +2356,48 @@
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; 2024 Firefly by Nordic Electric. San Miguel de Allende, México.</p>
+                <p>&copy; 2026 Firefly by Nordic Electric. San Miguel de Allende, México.</p>
                 <p>Privacy Policy | Terms of Service</p>
             </div>
         </div>
     </footer>
 
     <script>
+        // ── Mobile menu ──────────────────────────────────────────────────
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const mobileNav = document.getElementById('mobileNav');
+
+        function toggleMobileMenu() {
+            const isOpen = mobileNav.classList.contains('open');
+            if (isOpen) {
+                mobileNav.classList.remove('open');
+                mobileMenuBtn.classList.remove('active');
+                document.body.style.overflow = '';
+            } else {
+                mobileNav.classList.add('open');
+                mobileMenuBtn.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+
+        // Close on link click
+        mobileNav.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileNav.classList.remove('open');
+                mobileMenuBtn.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && mobileNav.classList.contains('open')) {
+                toggleMobileMenu();
+            }
+        });
+
         // ── Navbar scroll effect ──────────────────────────────────────────
         const navbar = document.getElementById('navbar');
         const langBar = document.getElementById('langBar');
@@ -2262,20 +2412,17 @@
             }
         });
 
-        // ── Scroll reveal ─────────────────────────────────────────────────
-        const reveals = document.querySelectorAll('.reveal');
-
-        const revealOnScroll = () => {
-            reveals.forEach(element => {
-                const elementTop = element.getBoundingClientRect().top;
-                if (elementTop < window.innerHeight - 150) {
-                    element.classList.add('active');
+        // ── Scroll reveal (IntersectionObserver) ─────────────────────────
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    revealObserver.unobserve(entry.target);
                 }
             });
-        };
+        }, { threshold: 0.15 });
 
-        window.addEventListener('scroll', revealOnScroll);
-        revealOnScroll();
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
         // ── Smooth scroll (skip #survey — handled by modal) ───────────────
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -2459,31 +2606,31 @@
 
             const sol = surveyData.recommended_solution || {};
             const solarLabel = {
-                'total-independence': 'Alta / High',
-                'later': 'Futura / Future',
-                'just-backup': 'Respaldo / Backup'
+                'total-independence': 'High',
+                'later': 'Future',
+                'just-backup': 'Backup'
             }[surveyData.solar_interest] || '—';
 
             document.getElementById('successDetails').innerHTML = `
                 <div class="detail-row">
-                    <span class="detail-label">Solución recomendada</span>
+                    <span class="detail-label">Recommended solution</span>
                     <span class="detail-value">${sol.name || 'Consultation'}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Especificaciones</span>
+                    <span class="detail-label">Specifications</span>
                     <span class="detail-value">${sol.specs || 'TBD'}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Capacidad estimada</span>
+                    <span class="detail-label">Estimated capacity</span>
                     <span class="detail-value">${sol.kwh || 'TBD'} kWh</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Interés solar</span>
+                    <span class="detail-label">Solar interest</span>
                     <span class="detail-value">${solarLabel}</span>
                 </div>
             `;
 
-            const msg = `Hola, acabo de completar la evaluación de Firefly. Me interesa la solución ${sol.name}. ¿Podemos agendar una llamada?`;
+            const msg = `Hi, I just completed the Firefly energy assessment. I'm interested in the ${sol.name} solution. Can we schedule a call?`;
             document.getElementById('whatsappBtn').setAttribute('data-url', `https://wa.me/5214151805030?text=${encodeURIComponent(msg)}`);
         }
 
