@@ -271,6 +271,35 @@
             box-shadow: 0 0 0 4px rgba(164, 210, 51, 0.1);
         }
 
+        .phone-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        .country-code-toggle {
+            flex-shrink: 0;
+        }
+
+        .country-code-toggle .radio-group {
+            display: flex;
+            flex-direction: row;
+            gap: 6px;
+        }
+
+        .country-code-toggle .radio-label {
+            padding: 10px 12px;
+            font-size: 13px;
+            border-radius: 10px;
+            white-space: nowrap;
+            justify-content: center;
+        }
+
+        .phone-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
         .checkbox-group { flex-direction: row; align-items: center; gap: 12px; }
 
         .checkbox-label {
@@ -599,6 +628,10 @@
                             <span class="option-check">✓</span>
                         </label>
                     </div>
+                    <div class="form-group" id="otherLocationGroup" style="display:none; margin-bottom:32px;">
+                        <label for="other_location">¿Dónde? / Where?</label>
+                        <input type="text" id="other_location" name="other_location" placeholder="Ej. Ciudad de México / e.g. Mexico City">
+                    </div>
                     <div class="step-nav">
                         <button type="button" class="btn-next" onclick="nextStep()">Continuar / Continue →</button>
                     </div>
@@ -758,13 +791,13 @@
                 <div class="survey-step" data-step="5">
                     <div class="step-header">
                         <span class="step-badge">Paso 5 / Step 5</span>
-                        <h2 class="step-title">¿Te interesa agregar paneles solares?<br><span class="lang-en">Interested in solar panels?</span></h2>
+                        <h2 class="step-title" id="solarTitle">¿Te interesa agregar paneles solares?<br><span class="lang-en">Interested in solar panels?</span></h2>
                     </div>
                     <div class="options-grid">
                         <label class="option-card solar-yes">
                             <input type="radio" name="solar_interest" value="total-independence" required>
                             <span class="solar-icon">☀️</span>
-                            <span class="option-content"><strong>Sí - Independencia total / Yes - Complete independence</strong><span class="option-sub">Independencia total de CFE / Complete CFE independence</span></span>
+                            <span class="option-content"><strong id="solarOptionTitle">Sí - Independencia total / Yes - Complete independence</strong><span class="option-sub" id="solarOptionSub">Independencia total de CFE / Complete CFE independence</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
@@ -802,9 +835,19 @@
                             <label for="email">Correo electrónico / Email *</label>
                             <input type="email" id="email" name="email" required placeholder="juan@ejemplo.com / john@example.com">
                         </div>
-                        <div class="form-group">
-                            <label for="phone">Teléfono / Phone number *</label>
-                            <input type="tel" id="phone" name="phone" required placeholder="+52 415 123 4567">
+                        <div>
+                            <label style="font-size:14px;font-weight:600;color:var(--nordic-charcoal);margin-bottom:8px;display:block;font-family:'Montserrat',sans-serif;">Teléfono / Phone number *</label>
+                            <div class="phone-row">
+                                <div class="country-code-toggle">
+                                    <div class="radio-group">
+                                        <label class="radio-label"><input type="radio" name="country_code" value="+52" checked><span>+52 MX</span></label>
+                                        <label class="radio-label"><input type="radio" name="country_code" value="+1"><span>+1 US</span></label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <input type="tel" id="phone" name="phone" required placeholder="415 123 4567">
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group checkbox-group">
                             <label class="checkbox-label">
@@ -856,6 +899,38 @@
         let surveyData = {};
 
         const N8N_WEBHOOK_URL = 'https://n8n.srv835342.hstgr.cloud/webhook/firefly-survey';
+
+        // Show/hide "Other" location field
+        document.querySelectorAll('input[name="location"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const group = document.getElementById('otherLocationGroup');
+                if (this.value === 'other') {
+                    group.style.display = 'flex';
+                    document.getElementById('other_location').focus();
+                } else {
+                    group.style.display = 'none';
+                    document.getElementById('other_location').value = '';
+                }
+            });
+        });
+
+        // Adapt Step 5 solar question when user already has solar panels
+        document.querySelectorAll('input[name="current_setup"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const title = document.getElementById('solarTitle');
+                const optTitle = document.getElementById('solarOptionTitle');
+                const optSub = document.getElementById('solarOptionSub');
+                if (this.value === 'existing-solar') {
+                    title.innerHTML = '¿Te gustaría conectar tus paneles existentes?<br><span class="lang-en">Connect your existing panels to the new system?</span>';
+                    optTitle.textContent = 'Sí - Conectar paneles existentes / Yes - Connect existing panels';
+                    optSub.textContent = 'Integrar sistema actual / Integrate current system';
+                } else {
+                    title.innerHTML = '¿Te interesa agregar paneles solares?<br><span class="lang-en">Interested in solar panels?</span>';
+                    optTitle.textContent = 'Sí - Independencia total / Yes - Complete independence';
+                    optSub.textContent = 'Independencia total de CFE / Complete CFE independence';
+                }
+            });
+        });
 
         function closeSurvey() {
             // On standalone page, reset the survey for a fresh start
