@@ -3,7 +3,20 @@
 .mcp.json
 .playwright-mcp
 .wrangler
-*.png
+# Exclude screenshot PNGs but keep the logo
+16Kwh Battery.png
+Instal Photo.png
+Inverter Front.png
+Inverter Profile.png
+comparison-table*.png
+current-*.png
+es-*.png
+four-tiers*.png
+mobile-*.png
+solutions-*.png
+survey-step*.png
+survey-*.png
+updated-*.png
 *.mjs
 *.toml
 netlify.toml
