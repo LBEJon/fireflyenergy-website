@@ -1,0 +1,11 @@
+.git
+.claude
+.mcp.json
+.playwright-mcp
+.wrangler
+*.png
+*.mjs
+*.toml
+netlify.toml
+CLAUDE.md
+node_modules
