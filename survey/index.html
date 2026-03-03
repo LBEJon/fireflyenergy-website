@@ -1038,20 +1038,20 @@
         function calculateRecommendation() {
             const matrix = {
                 'basic': {
-                    '5':      { name: 'Essentials',      specs: '5kWh • 5.2kW Single-Phase • 120V',    kwh: 5  },
-                    '12':     { name: 'Good',            specs: '10kWh • 6.5kW Split-Phase • 120/220V', kwh: 10 },
-                    '24':     { name: 'Complete',        specs: '16kWh • 12kW Split-Phase • 120/220V',  kwh: 16 },
+                    '5':      { name: '5KW + 5KWh',     specs: '5kWh • 5.2kW Single-Phase • 120V',    kwh: 5  },
+                    '12':     { name: '6.5KW + 10KWh',  specs: '10kWh • 6.5kW Split-Phase • 120/220V', kwh: 10 },
+                    '24':     { name: '12KW + 16KWh',   specs: '16kWh • 12kW Split-Phase • 120/220V',  kwh: 16 },
                     '24plus': { name: 'Custom Solution', specs: 'Scalable 16–96kWh',                   kwh: '16+' }
                 },
                 'comfort': {
-                    '5':      { name: 'Good',            specs: '10kWh • 6.5kW Split-Phase • 120/220V', kwh: 10 },
-                    '12':     { name: 'Better',          specs: '10kWh • 12kW Split-Phase • 120/220V',  kwh: 10 },
-                    '24':     { name: 'Complete',        specs: '16kWh • 12kW Split-Phase • 120/220V',  kwh: 16 },
+                    '5':      { name: '6.5KW + 10KWh',  specs: '10kWh • 6.5kW Split-Phase • 120/220V', kwh: 10 },
+                    '12':     { name: '10KW + 10KWh',   specs: '10kWh • 12kW Split-Phase • 120/220V',  kwh: 10 },
+                    '24':     { name: '12KW + 16KWh',   specs: '16kWh • 12kW Split-Phase • 120/220V',  kwh: 16 },
                     '24plus': { name: 'Custom Solution', specs: 'Scalable 32–96kWh',                   kwh: '32+' }
                 },
                 'complete': {
-                    '5':      { name: 'Better',          specs: '10kWh • 12kW Split-Phase • 120/220V',  kwh: 10 },
-                    '12':     { name: 'Complete',        specs: '16kWh • 12kW Split-Phase • 120/220V',  kwh: 16 },
+                    '5':      { name: '10KW + 10KWh',   specs: '10kWh • 12kW Split-Phase • 120/220V',  kwh: 10 },
+                    '12':     { name: '12KW + 16KWh',   specs: '16kWh • 12kW Split-Phase • 120/220V',  kwh: 16 },
                     '24':     { name: 'Custom Solution', specs: 'Scalable 32kWh+',                     kwh: '32+' },
                     '24plus': { name: 'Custom Solution', specs: 'Scalable up to 96kWh',                kwh: '96' }
                 }
