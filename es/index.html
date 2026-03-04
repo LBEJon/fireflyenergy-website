@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Firefly | Independencia Energética para San Miguel de Allende</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --firefly-green: #A4D233;
@@ -37,7 +40,12 @@
             overflow-x: hidden;
         }
 
-        h1, h2, h3, h4, h5, h6 {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
             font-family: 'Montserrat', sans-serif;
             font-weight: 700;
             line-height: 1.2;
@@ -102,13 +110,13 @@
             top: 36px;
             width: 100%;
             z-index: 1000;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             transition: top 0.3s var(--transition-smooth), box-shadow 0.3s var(--transition-smooth);
         }
 
         .navbar.scrolled {
             top: 0;
-            box-shadow: 0 4px 30px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
         }
 
         .nav-container {
@@ -390,80 +398,411 @@
 
         /* ── Flow Diagram (hero) ── */
         .flow-diagram-card {
-            background: #fff;
+            position: relative;
+            background: rgba(20, 22, 26, 0.85);
+            /* Glassier background */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            /* Subtle edge highlight */
             border-radius: 20px;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06);
+            box-shadow:
+                0 30px 60px rgba(0, 0, 0, 0.6),
+                /* Deeper shadow */
+                0 10px 20px rgba(0, 0, 0, 0.4),
+                inset 0 1px 2px rgba(255, 255, 255, 0.1),
+                /* Crisper inner bevel */
+                inset 0 0 40px rgba(0, 0, 0, 0.5);
+            /* Inner vignette */
             overflow: hidden;
-            max-width: 100%;
+            width: 100%;
+            max-width: 1000px;
             margin: 0 auto;
+            z-index: 1;
         }
-        .flow-diagram-header {
-            display: flex; align-items: center; gap: 14px;
-            padding: 20px 28px 0;
-        }
-        .flow-diagram-header img { height: 40px; width: auto; }
-        .flow-diagram-header .flow-title {
-            font-family: 'Montserrat', sans-serif; font-weight: 700;
-            font-size: 18px; color: var(--nordic-charcoal); letter-spacing: 1px;
-        }
-        .flow-diagram-header .flow-title span { color: var(--firefly-green); }
-        .flow-diagram-area { padding: 4px 16px 0; }
-        .flow-svg { width: 100%; height: auto; display: block; }
 
-        /* Node cards */
-        .fd-card { fill: #F7F8F9; stroke: #D0D1D3; stroke-width: 1.5; transition: fill 0.8s, stroke 0.8s, opacity 0.8s; }
-        .fd-card.active { stroke: #A4D233; stroke-width: 2; fill: #F2F8E6; }
-        .fd-card.dimmed { opacity: 0.3; stroke: #D0D1D3; fill: #F0F0F0; }
-        .fd-card.optional { stroke-dasharray: 6 4; }
-        .fd-card.optional.active { stroke: #D09010; fill: #FFFCF2; }
-        .fd-card.optional.dimmed { opacity: 0.2; }
-        .fd-label { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 11px; fill: #3A3D42; text-anchor: middle; transition: opacity 0.8s; }
-        .fd-dimmed-text { opacity: 0.25; }
+        /* Subtle ambient glow behind the card */
+        .flow-diagram-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, rgba(164, 210, 51, 0.3), rgba(0, 168, 225, 0.1), transparent 60%);
+            z-index: -1;
+            border-radius: 22px;
+            filter: blur(15px);
+            opacity: 0.5;
+        }
+
+        .flow-diagram-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 24px 32px;
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.4), transparent);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        /* Glowing line under header */
+        .flow-diagram-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 30%;
+            height: 1px;
+            background: linear-gradient(90deg, var(--firefly-green), transparent);
+            box-shadow: 0 0 10px var(--firefly-green);
+        }
+
+        .flow-diagram-header img {
+            height: 72px;
+            /* Much larger logo */
+            width: auto;
+            /* Invert to pure white for dark background, add stronger green glow */
+            filter: brightness(0) invert(1) drop-shadow(0 0 16px rgba(164, 210, 51, 0.8));
+        }
+
+        .flow-diagram-header .flow-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            /* Bolder */
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.95);
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            /* Text depth */
+        }
+
+        .flow-diagram-header .flow-title span {
+            color: var(--firefly-green);
+            text-shadow: 0 0 15px rgba(164, 210, 51, 0.4);
+            /* Neon text glow */
+        }
+
+        .flow-diagram-area {
+            padding: 24px 16px 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Custom scrollbar for horizontal scrolling area */
+        .flow-diagram-area::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .flow-diagram-area::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 3px;
+        }
+
+        .flow-diagram-area::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
+        }
+
+        .flow-diagram-area::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .flow-svg {
+            width: 100%;
+            min-width: 860px;
+            /* Forces scroll on mobile natively keeping layout intact */
+            height: auto;
+            display: block;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+            /* Adds massive depth to the entire flow */
+        }
+
+        /* Pulse animation for active node glowing border */
+        @keyframes borderPulse {
+            0% {
+                filter: drop-shadow(0 0 10px rgba(164, 210, 51, 0.3));
+            }
+
+            50% {
+                filter: drop-shadow(0 0 25px rgba(164, 210, 51, 0.6));
+            }
+
+            100% {
+                filter: drop-shadow(0 0 10px rgba(164, 210, 51, 0.3));
+            }
+        }
+
+        /* Node cards using SVG gradients */
+        .fd-card {
+            fill: url(#card-bg-gradient);
+            /* Replaced solid fill with gradient */
+            stroke: var(--card-border);
+            stroke-width: 1.5;
+            transition: fill 0.8s, stroke 0.8s, opacity 0.8s, filter 0.8s;
+        }
+
+        .fd-card.active {
+            stroke: rgba(164, 210, 51, 0.8);
+            stroke-width: 2;
+            fill: url(#card-bg-gradient-active);
+            animation: borderPulse 4s infinite ease-in-out;
+        }
+
+        .fd-card.dimmed {
+            opacity: 0.2;
+            stroke: rgba(255, 255, 255, 0.03);
+            fill: url(#card-bg-gradient);
+            filter: grayscale(100%) blur(1px);
+        }
+
+        .fd-card.optional {
+            stroke-dasharray: 6 4;
+            fill: url(#card-bg-gradient);
+        }
+
+        .fd-card.optional.active {
+            stroke: rgba(255, 184, 28, 0.8);
+            fill: url(#card-bg-gradient-solar);
+            filter: drop-shadow(0 0 20px rgba(255, 184, 28, 0.25));
+        }
+
+        .fd-card.optional.dimmed {
+            opacity: 0.15;
+            filter: grayscale(100%) blur(1px);
+        }
+
+        .fd-label {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 11px;
+            fill: rgba(255, 255, 255, 0.85);
+            text-anchor: middle;
+            transition: opacity 0.8s;
+            letter-spacing: 0.5px;
+        }
+
+        .fd-dimmed-text {
+            opacity: 0.25;
+        }
 
         /* Flow paths */
-        .fd-path { fill: none; stroke: #D0D1D3; stroke-width: 3; stroke-linecap: round; transition: stroke 0.8s, opacity 0.8s; }
-        .fd-path.active { stroke: #A4D233; filter: drop-shadow(0 0 6px rgba(164,210,51,0.3)); }
-        .fd-path.active-solar { stroke: #FFB81C; filter: drop-shadow(0 0 6px rgba(255,184,28,0.25)); }
-        .fd-path.active-grid { stroke: #00A8E1; filter: drop-shadow(0 0 6px rgba(0,168,225,0.25)); }
-        .fd-path.active-battery { stroke: #A4D233; filter: drop-shadow(0 0 6px rgba(164,210,51,0.3)); }
-        .fd-path.dimmed { stroke: #E0E1E3; opacity: 0.3; }
-        .fd-path.cut { stroke: #D03030; stroke-dasharray: 8 6; opacity: 0.45; }
+        .fd-path {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.05);
+            /* Darker base so actives pop more */
+            stroke-width: 5;
+            /* Slightly thicker */
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.8s, opacity 0.8s, filter 0.8s, stroke-width 0.8s;
+        }
+
+        /* Flow Path glow animations */
+        @keyframes pathFlow {
+            0% {
+                stroke-dashoffset: 40;
+            }
+
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .fd-path.active {
+            stroke: #A4D233;
+            stroke-width: 6;
+            /* Expand when active */
+            filter: drop-shadow(0 0 12px rgba(164, 210, 51, 0.8)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
+            stroke-dasharray: 10 10;
+            /* Dashed flowing effect */
+            animation: pathFlow 1s linear infinite;
+        }
+
+        .fd-path.active-solar {
+            stroke: #FFB81C;
+            stroke-width: 6;
+            filter: drop-shadow(0 0 12px rgba(255, 184, 28, 0.8)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
+            stroke-dasharray: 10 10;
+            animation: pathFlow 1s linear infinite;
+        }
+
+        .fd-path.active-grid {
+            stroke: #00A8E1;
+            stroke-width: 6;
+            filter: drop-shadow(0 0 12px rgba(0, 168, 225, 0.8)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
+            stroke-dasharray: 10 10;
+            animation: pathFlow 1s linear infinite;
+        }
+
+        .fd-path.active-battery {
+            stroke: #A4D233;
+            stroke-width: 6;
+            filter: drop-shadow(0 0 12px rgba(164, 210, 51, 0.8)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
+            stroke-dasharray: 10 10;
+            animation: pathFlow 1s linear infinite reverse;
+            /* Reverse flow for discharging later via JS/CSS combo */
+        }
+
+        .fd-path.active-battery.charging {
+            animation-direction: normal;
+        }
+
+        .fd-path.dimmed {
+            stroke: rgba(255, 255, 255, 0.03);
+            stroke-width: 3;
+            opacity: 0.2;
+            stroke-dasharray: none;
+            animation: none;
+        }
+
+        .fd-path.cut {
+            stroke: #D03030;
+            stroke-dasharray: 8 6;
+            stroke-width: 3;
+            opacity: 0.5;
+            filter: drop-shadow(0 0 8px rgba(208, 48, 48, 0.6));
+            animation: none;
+        }
 
         /* Particles */
-        .fd-particle { r: 5; opacity: 0; transition: opacity 0.5s; }
-        .fd-particle.visible { opacity: 1; }
-        .fd-particle.solar { fill: #FFB81C; filter: url(#fd-glow-gold); }
-        .fd-particle.grid { fill: #00A8E1; filter: url(#fd-glow-blue); }
-        .fd-particle.green { fill: #A4D233; filter: url(#fd-glow-green); }
-        .fd-particle.battery { fill: #A4D233; filter: url(#fd-glow-green); }
+        .fd-particle {
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .fd-particle.visible {
+            opacity: 1;
+        }
+
+        /* Upgraded particles rendering */
+        .fd-particle-core {
+            r: 4;
+        }
+
+        .fd-particle-halo {
+            r: 10;
+            opacity: 0.6;
+        }
+
+        .fd-particle.solar .fd-particle-core {
+            fill: #FFF9E6;
+            filter: drop-shadow(0 0 2px #fff);
+        }
+
+        .fd-particle.solar .fd-particle-halo {
+            fill: #FFCF5F;
+            filter: url(#fd-glow-gold);
+        }
+
+        .fd-particle.grid .fd-particle-core {
+            fill: #E6F7FF;
+            filter: drop-shadow(0 0 2px #fff);
+        }
+
+        .fd-particle.grid .fd-particle-halo {
+            fill: #66CFFF;
+            filter: url(#fd-glow-blue);
+        }
+
+        .fd-particle.green .fd-particle-core,
+        .fd-particle.battery .fd-particle-core {
+            fill: #F4FCE1;
+            filter: drop-shadow(0 0 2px #fff);
+        }
+
+        .fd-particle.green .fd-particle-halo,
+        .fd-particle.battery .fd-particle-halo {
+            fill: #A4D233;
+            filter: url(#fd-glow-green);
+        }
 
         /* Outage X */
-        .fd-outage-x { stroke: #D03030; stroke-width: 4; stroke-linecap: round; opacity: 0; transition: opacity 0.8s; }
-        .fd-outage-x.show { opacity: 0.85; }
+        .fd-outage-x {
+            stroke: #FF4A4A;
+            stroke-width: 5;
+            stroke-linecap: round;
+            opacity: 0;
+            transition: opacity 0.8s;
+            filter: drop-shadow(0 0 8px rgba(255, 74, 74, 0.6));
+        }
+
+        .fd-outage-x.show {
+            opacity: 0.9;
+        }
 
         /* State banner */
         .flow-state-banner {
-            text-align: center; padding: 14px 0 12px;
-            transition: background 0.8s; border-top: 1px solid #E8E9EB;
+            text-align: center;
+            padding: 16px 0 14px;
+            transition: background 0.8s;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 8px;
         }
-        .flow-state-banner .flow-state-title {
-            font-family: 'Montserrat', sans-serif; font-weight: 700;
-            font-size: 16px; letter-spacing: 2px; margin-bottom: 3px; transition: color 0.8s;
-        }
-        .flow-state-banner .flow-state-desc {
-            font-family: 'Open Sans', sans-serif; font-weight: 400;
-            font-size: 12px; color: #4A4E54;
-        }
-        .flow-state-banner.state-normal { background: linear-gradient(90deg, rgba(164,210,51,0.06), rgba(0,168,225,0.04)); }
-        .flow-state-banner.state-normal .flow-state-title { color: #7AB800; }
-        .flow-state-banner.state-outage { background: linear-gradient(90deg, rgba(208,48,48,0.06), rgba(255,184,28,0.06)); }
-        .flow-state-banner.state-outage .flow-state-title { color: #D07020; }
-        .flow-state-banner.state-backup { background: linear-gradient(90deg, rgba(164,210,51,0.08), rgba(164,210,51,0.03)); }
-        .flow-state-banner.state-backup .flow-state-title { color: #7AB800; }
 
-        .flow-dots { display: flex; justify-content: center; gap: 10px; padding-bottom: 12px; }
-        .flow-dot { width: 7px; height: 7px; border-radius: 50%; background: #D0D1D3; transition: background 0.4s, transform 0.4s; }
-        .flow-dot.on { background: #A4D233; transform: scale(1.4); }
+        .flow-state-banner .flow-state-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+            transition: color 0.8s, text-shadow 0.8s;
+        }
+
+        .flow-state-banner .flow-state-desc {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 400;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .flow-state-banner.state-normal {
+            background: linear-gradient(90deg, rgba(164, 210, 51, 0.08), rgba(0, 168, 225, 0.04));
+        }
+
+        .flow-state-banner.state-normal .flow-state-title {
+            color: #A4D233;
+            text-shadow: 0 0 12px rgba(164, 210, 51, 0.3);
+        }
+
+        .flow-state-banner.state-outage {
+            background: linear-gradient(90deg, rgba(255, 74, 74, 0.08), rgba(255, 184, 28, 0.08));
+        }
+
+        .flow-state-banner.state-outage .flow-state-title {
+            color: #FFB81C;
+            text-shadow: 0 0 12px rgba(255, 184, 28, 0.3);
+        }
+
+        .flow-state-banner.state-backup {
+            background: linear-gradient(90deg, rgba(164, 210, 51, 0.1), rgba(164, 210, 51, 0.04));
+        }
+
+        .flow-state-banner.state-backup .flow-state-title {
+            color: #A4D233;
+            text-shadow: 0 0 12px rgba(164, 210, 51, 0.3);
+        }
+
+        .flow-dots {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding-bottom: 24px;
+        }
+
+        .flow-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            transition: background 0.4s, transform 0.4s, box-shadow 0.4s;
+        }
+
+        .flow-dot.on {
+            background: #A4D233;
+            transform: scale(1.4);
+            box-shadow: 0 0 8px rgba(164, 210, 51, 0.6);
+        }
 
         /* Solutions Section */
         .solutions {
@@ -525,7 +864,7 @@
 
         .solution-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
         }
 
         .solution-card.featured {
@@ -575,7 +914,7 @@
 
         .solution-specs li {
             padding: 8px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             font-size: 14px;
             color: var(--slate);
             display: flex;
@@ -665,7 +1004,7 @@
             background: var(--white);
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
         }
 
         .comparison-row {
@@ -760,7 +1099,7 @@
 
         .trust-text {
             font-size: 18px;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             margin-bottom: 40px;
             line-height: 1.8;
         }
@@ -786,7 +1125,7 @@
 
         .trust-stat-label {
             font-size: 14px;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255, 255, 255, 0.6);
             margin-top: 4px;
         }
 
@@ -828,7 +1167,7 @@
         .btn-dark:hover {
             background: var(--slate);
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         /* Footer */
@@ -856,13 +1195,13 @@
         }
 
         .footer-brand .logo-sub {
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
         }
 
         .footer-desc {
             margin-top: 16px;
             font-size: 14px;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255, 255, 255, 0.6);
             line-height: 1.8;
         }
 
@@ -885,7 +1224,7 @@
         }
 
         .footer-links a {
-            color: rgba(255,255,255,0.6);
+            color: rgba(255, 255, 255, 0.6);
             text-decoration: none;
             font-size: 14px;
             transition: color 0.3s var(--transition-smooth);
@@ -896,13 +1235,13 @@
         }
 
         .footer-bottom {
-            border-top: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding-top: 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 13px;
-            color: rgba(255,255,255,0.4);
+            color: rgba(255, 255, 255, 0.4);
         }
 
         /* Animations */
@@ -911,6 +1250,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -918,8 +1258,13 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         /* Focus & Active States */
@@ -991,8 +1336,7 @@
                 justify-content: center;
             }
 
-            .hero-visual {
-            }
+            .hero-visual {}
 
             .solutions-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -1046,8 +1390,15 @@
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(50px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .survey-progress {
@@ -1055,7 +1406,7 @@
             top: 0;
             background: var(--cloud);
             padding: 20px 24px;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             z-index: 10;
             display: flex;
             justify-content: space-between;
@@ -1065,7 +1416,7 @@
         .progress-bar {
             flex: 1;
             height: 6px;
-            background: rgba(0,0,0,0.1);
+            background: rgba(0, 0, 0, 0.1);
             border-radius: 3px;
             overflow: hidden;
             margin-right: 16px;
@@ -1092,7 +1443,7 @@
             right: 16px;
             width: 40px;
             height: 40px;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255, 255, 255, 0.9);
             border: none;
             border-radius: 50%;
             cursor: pointer;
@@ -1227,7 +1578,9 @@
             flex-shrink: 0;
         }
 
-        .tier-options { gap: 16px; }
+        .tier-options {
+            gap: 16px;
+        }
 
         .tier-card {
             flex-direction: column;
@@ -1244,7 +1597,10 @@
             font-family: 'Montserrat', sans-serif;
         }
 
-        .tier-name { font-size: 20px !important; margin-bottom: 8px !important; }
+        .tier-name {
+            font-size: 20px !important;
+            margin-bottom: 8px !important;
+        }
 
         .tier-desc {
             font-size: 13px;
@@ -1290,7 +1646,10 @@
             background: linear-gradient(135deg, var(--light-green) 0%, var(--white) 100%);
         }
 
-        .solar-icon { font-size: 32px; margin-right: 8px; }
+        .solar-icon {
+            font-size: 32px;
+            margin-right: 8px;
+        }
 
         .form-fields {
             display: flex;
@@ -1299,7 +1658,10 @@
             margin-bottom: 32px;
         }
 
-        .form-group { display: flex; flex-direction: column; }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
 
         .form-group label {
             font-size: 14px;
@@ -1326,7 +1688,11 @@
             box-shadow: 0 0 0 4px rgba(164, 210, 51, 0.1);
         }
 
-        .checkbox-group { flex-direction: row; align-items: center; gap: 12px; }
+        .checkbox-group {
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
+        }
 
         .checkbox-label {
             display: flex;
@@ -1344,7 +1710,11 @@
             cursor: pointer;
         }
 
-        .radio-group { display: flex; gap: 16px; flex-wrap: wrap; }
+        .radio-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
 
         .radio-label {
             display: flex;
@@ -1360,8 +1730,13 @@
             transition: all 0.3s ease;
         }
 
-        .radio-label:hover { border-color: var(--firefly-green); }
-        .radio-label input[type="radio"] { accent-color: var(--firefly-green); }
+        .radio-label:hover {
+            border-color: var(--firefly-green);
+        }
+
+        .radio-label input[type="radio"] {
+            accent-color: var(--firefly-green);
+        }
 
         .radio-label:has(input[type="radio"]:checked) {
             border-color: var(--firefly-green);
@@ -1376,7 +1751,9 @@
             justify-content: space-between;
         }
 
-        .btn-back, .btn-next, .btn-submit {
+        .btn-back,
+        .btn-next,
+        .btn-submit {
             padding: 14px 28px;
             border-radius: 12px;
             font-family: 'Montserrat', sans-serif;
@@ -1393,7 +1770,10 @@
             border: 2px solid #e5e7eb;
         }
 
-        .btn-back:hover { border-color: var(--firefly-green); color: var(--nordic-charcoal); }
+        .btn-back:hover {
+            border-color: var(--firefly-green);
+            color: var(--nordic-charcoal);
+        }
 
         .btn-next {
             background: var(--firefly-green);
@@ -1414,9 +1794,15 @@
             flex: 1;
         }
 
-        .btn-submit:hover { background: var(--slate); transform: translateY(-2px); }
+        .btn-submit:hover {
+            background: var(--slate);
+            transform: translateY(-2px);
+        }
 
-        .success-step { text-align: center; padding: 48px 24px; }
+        .success-step {
+            text-align: center;
+            padding: 48px 24px;
+        }
 
         .success-icon {
             width: 80px;
@@ -1433,11 +1819,20 @@
         }
 
         @keyframes scaleIn {
-            from { transform: scale(0); }
-            to { transform: scale(1); }
+            from {
+                transform: scale(0);
+            }
+
+            to {
+                transform: scale(1);
+            }
         }
 
-        .success-title { font-size: 28px; margin-bottom: 16px; color: var(--nordic-charcoal); }
+        .success-title {
+            font-size: 28px;
+            margin-bottom: 16px;
+            color: var(--nordic-charcoal);
+        }
 
         .success-message {
             font-size: 16px;
@@ -1461,8 +1856,15 @@
             border-bottom: 1px solid #e5e7eb;
         }
 
-        .detail-row:last-child { border-bottom: none; }
-        .detail-label { font-size: 13px; color: #6b7280; font-weight: 500; }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 500;
+        }
 
         .detail-value {
             font-size: 14px;
@@ -1471,7 +1873,11 @@
             font-family: 'Montserrat', sans-serif;
         }
 
-        .success-actions { display: flex; flex-direction: column; gap: 12px; }
+        .success-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
         .btn-whatsapp {
             background: #25D366;
@@ -1487,7 +1893,10 @@
             text-align: center;
         }
 
-        .btn-whatsapp:hover { background: #128C7E; transform: translateY(-2px); }
+        .btn-whatsapp:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+        }
 
         .btn-close-survey {
             background: transparent;
@@ -1503,7 +1912,10 @@
             width: 100%;
         }
 
-        .btn-close-survey:hover { border-color: var(--nordic-charcoal); color: var(--nordic-charcoal); }
+        .btn-close-survey:hover {
+            border-color: var(--nordic-charcoal);
+            color: var(--nordic-charcoal);
+        }
 
         /* Step 4 two-part layout */
         .step-section {
@@ -1595,9 +2007,19 @@
         }
 
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
         }
 
         @media (max-width: 640px) {
@@ -1647,8 +2069,203 @@
                 text-align: center;
             }
         }
+
+        /* Calculator Section */
+        .calculator {
+            padding: 80px 24px;
+            background: var(--nordic-charcoal);
+            color: var(--white);
+        }
+
+        .calculator .section-title {
+            color: var(--white);
+        }
+
+        .calculator .section-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .calculator-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .system-toggle-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        @media (min-width: 768px) {
+            .system-toggle-group {
+                flex-direction: row;
+            }
+        }
+
+        .system-toggle-label {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            color: var(--white);
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .system-toggle-label:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .system-toggle-label input[type="radio"] {
+            display: none;
+        }
+
+        .system-toggle-label:has(input[type="radio"]:checked) {
+            background: rgba(164, 210, 51, 0.1);
+            border-color: var(--firefly-green);
+            color: var(--firefly-green);
+            box-shadow: 0 4px 15px rgba(164, 210, 51, 0.2);
+        }
+
+        .calc-group label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .calc-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .calc-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--firefly-green);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .calc-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 15px rgba(164, 210, 51, 0.4);
+        }
+
+        .slider-val {
+            min-width: 100px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--firefly-green);
+        }
+
+        .slider-val span {
+            font-size: 28px;
+        }
+
+        .calc-help {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 8px;
+        }
+
+        .calculator-results {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 32px;
+            display: flex;
+            gap: 24px;
+            transition: transform 0.3s var(--transition-smooth), border-color 0.3s var(--transition-smooth);
+        }
+
+        .result-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--firefly-green);
+        }
+
+        .result-icon {
+            font-size: 48px;
+            line-height: 1;
+        }
+
+        .result-info h3 {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+        }
+
+        .result-number {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--firefly-green);
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .result-number span:last-child {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .result-info p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 968px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
     </style>
 </head>
+
 <body>
     <!-- Language Toggle -->
     <div class="lang-bar" id="langBar">
@@ -1665,7 +2282,7 @@
             <a href="#" class="logo">
                 <img src="/firefly_logo_transparent.png" alt="Firefly by Nordic Electric">
             </a>
-            
+
             <div class="nav-links">
                 <a href="#solutions" class="nav-link">Soluciones</a>
                 <a href="#technology" class="nav-link">Tecnología</a>
@@ -1698,13 +2315,14 @@
             <div class="hero-content">
                 <div class="hero-badge">México está creciendo; la red eléctrica no.</div>
                 <h1 class="hero-title">Independencia Energética, <span>Diseñada para Ti</span></h1>
-                <p class="hero-subtitle">Respaldo de baterías moderno del equipo que ha energizado San Miguel de Allende por 20 años. Silencioso. Sin interrupciones. Escalable.</p>
+                <p class="hero-subtitle">Respaldo de baterías moderno del equipo que ha energizado San Miguel de Allende
+                    por 20 años. Silencioso. Sin interrupciones. Escalable.</p>
                 <div class="hero-ctas">
                     <a href="/es/survey/" class="btn-primary">Encuentra Tu Solución →</a>
                     <a href="#how-it-works" class="btn-secondary">Cómo Funciona</a>
                 </div>
             </div>
-            
+
             <div class="hero-visual">
                 <div class="flow-diagram-card">
                     <div class="flow-diagram-header">
@@ -1714,164 +2332,404 @@
                     <div class="flow-diagram-area">
                         <svg class="flow-svg" viewBox="0 0 960 470">
                             <defs>
-                                <filter id="fd-glow-gold"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                                <filter id="fd-glow-blue"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                                <filter id="fd-glow-green"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                                <filter id="fd-shadow" x="-4%" y="-4%" width="108%" height="112%"><feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.06"/></filter>
-                                <clipPath id="fd-bat-clip"><rect x="652" y="283" width="88" height="100" rx="8"/></clipPath>
+                                /* Deep realistic inner shadow for 3D cards */
+                                <filter id="card-inner-shadow" x="-5%" y="-5%" width="110%" height="110%">
+                                    <feComponentTransfer in="SourceAlpha">
+                                        <feFuncA type="linear" slope="0.6" />
+                                    </feComponentTransfer>
+                                    <feGaussianBlur stdDeviation="3" result="blur" />
+                                    <feOffset dx="0" dy="4" />
+                                    <feComposite operator="out" in2="SourceAlpha" />
+                                    <feComposite operator="in" in2="SourceGraphic" />
+                                    <feBlend mode="multiply" in2="SourceGraphic" />
+                                </filter>
+
+                                <!-- Rich glassy gradients for nodes -->
+                                <linearGradient id="card-bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="rgba(40, 44, 52, 0.4)" />
+                                    <stop offset="100%" stop-color="rgba(15, 17, 20, 0.8)" />
+                                </linearGradient>
+
+                                <linearGradient id="card-bg-gradient-active" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="rgba(164, 210, 51, 0.15)" />
+                                    <stop offset="50%" stop-color="rgba(40, 44, 52, 0.4)" />
+                                    <stop offset="100%" stop-color="rgba(15, 17, 20, 0.8)" />
+                                </linearGradient>
+
+                                <linearGradient id="card-bg-gradient-solar" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="rgba(255, 184, 28, 0.15)" />
+                                    <stop offset="50%" stop-color="rgba(40, 44, 52, 0.4)" />
+                                    <stop offset="100%" stop-color="rgba(15, 17, 20, 0.8)" />
+                                </linearGradient>
+
+                                <radialGradient id="inverter-glow" cx="50%" cy="50%" r="50%">
+                                    <stop offset="0%" stop-color="rgba(164,210,51,0.25)" />
+                                    <stop offset="60%" stop-color="rgba(164,210,51,0.05)" />
+                                    <stop offset="100%" stop-color="transparent" />
+                                </radialGradient>
+
+                                <filter id="fd-glow-gold">
+                                    <feGaussianBlur stdDeviation="5" result="b" />
+                                    <feMerge>
+                                        <feMergeNode in="b" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                                <filter id="fd-glow-blue">
+                                    <feGaussianBlur stdDeviation="5" result="b" />
+                                    <feMerge>
+                                        <feMergeNode in="b" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                                <filter id="fd-glow-green">
+                                    <feGaussianBlur stdDeviation="6" result="b" />
+                                    <feMerge>
+                                        <feMergeNode in="b" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                                <filter id="fd-shadow" x="-10%" y="-10%" width="120%" height="130%">
+                                    <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000"
+                                        flood-opacity="0.5" />
+                                    <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000"
+                                        flood-opacity="0.3" />
+                                </filter>
+                                <clipPath id="fd-bat-clip">
+                                    <rect x="652" y="283" width="88" height="100" rx="8" />
+                                </clipPath>
                             </defs>
 
                             <!-- FLOW PATHS -->
-                            <path id="fp-solar-inv" class="fd-path" d="M 265,100 C 330,100 360,185 385,185"/>
-                            <path id="fp-grid-inv" class="fd-path" d="M 265,330 C 330,330 360,240 385,240"/>
-                            <path id="fp-inv-house" class="fd-path" d="M 600,200 C 650,200 680,155 720,155"/>
-                            <path id="fp-inv-bat" class="fd-path" d="M 530,285 C 530,330 600,350 645,350"/>
-                            <path id="fp-bat-inv" class="fd-path" d="M 645,330 C 600,330 530,310 530,265"/>
+                            <path id="fp-solar-inv" class="fd-path" d="M 265,100 C 330,100 360,185 385,185" />
+                            <path id="fp-grid-inv" class="fd-path" d="M 265,330 C 330,330 360,240 385,240" />
+                            <path id="fp-inv-house" class="fd-path" d="M 600,200 C 650,200 680,155 720,155" />
+                            <path id="fp-inv-bat" class="fd-path" d="M 530,285 C 530,330 600,350 645,350" />
+                            <path id="fp-bat-inv" class="fd-path" d="M 645,330 C 600,330 530,310 530,265" />
 
-                            <!-- PANELES SOLARES (Opcional) -->
+                            <!-- PARTICLES (Moved below paths, above nodes for z-index) -->
+                            <g class="fd-particle solar" id="fps1">
+                                <circle class="fd-particle-halo" cx="0" cy="0" />
+                                <circle class="fd-particle-core" cx="0" cy="0" />
+                                <animateMotion dur="2.5s" repeatCount="indefinite">
+                                    <mpath href="#fp-solar-inv" />
+                                </animateMotion>
+                            </g>
+                            <g class="fd-particle solar" id="fps2">
+                                <circle class="fd-particle-halo" cx="0" cy="0" />
+                                <circle class="fd-particle-core" cx="0" cy="0" />
+                                <animateMotion dur="2.5s" repeatCount="indefinite" begin="0.83s">
+                                    <mpath href="#fp-solar-inv" />
+                                </animateMotion>
+                            </g>
+                            <g class="fd-particle solar" id="fps3">
+                                <circle class="fd-particle-halo" cx="0" cy="0" />
+                                <circle class="fd-particle-core" cx="0" cy="0" />
+                                <animateMotion dur="2.5s" repeatCount="indefinite" begin="1.66s">
+                                    <mpath href="#fp-solar-inv" />
+                                </animateMotion>
+                            </g>
+
+                            <g class="fd-particle grid" id="fpg1">
+                                <circle class="fd-particle-halo" cx="0" cy="0" />
+                                <circle class="fd-particle-core" cx="0" cy="0" />
+                                <animateMotion dur="2s" repeatCount="indefinite">
+                                    <mpath href="#fp-grid-inv" />
+                                </animateMotion>
+                            </g>
+                            <g class="fd-particle grid" id="fpg2">
+                                <circle class="fd-particle-halo" cx="0" cy="0" />
+                                <circle class="fd-particle-core" cx="0" cy="0" />
+                                <animateMotion dur="2s" repeatCount="indefinite" begin="0.66s">
+                                    <mpath href="#fp-grid-inv" />
+                                </animateMotion>
+                            </g>
+                            <g class="fd-particle grid" id="fpg3">
+                                <circle class="fd-particle-halo" cx="0" cy="0" />
+                                <circle class="fd-particle-core" cx="0" cy="0" />
+                                <animateMotion dur="2s" repeatCount="indefinite" begin="1.33s">
+                                    <mpath href="#fp-grid-inv" />
+                                </animateMotion>
+                            </g>
+
+                            <g class="fd-particle green" id="fph1">
+                                <circle class="fd-particle-halo" cx="0" cy="0" />
+                                <circle class="fd-particle-core" cx="0" cy="0" />
+                                <animateMotion dur="1.8s" repeatCount="indefinite">
+                                    <mpath href="#fp-inv-house" />
+                                </animateMotion>
+                            </g>
+                            <g class="fd-particle green" id="fph2">
+                                <circle class="fd-particle-halo" cx="0" cy="0" />
+                                <circle class="fd-particle-core" cx="0" cy="0" />
+                                <animateMotion dur="1.8s" repeatCount="indefinite" begin="0.6s">
+                                    <mpath href="#fp-inv-house" />
+                                </animateMotion>
+                            </g>
+                            <g class="fd-particle green" id="fph3">
+                                <circle class="fd-particle-halo" cx="0" cy="0" />
+                                <circle class="fd-particle-core" cx="0" cy="0" />
+                                <animateMotion dur="1.8s" repeatCount="indefinite" begin="1.2s">
+                                    <mpath href="#fp-inv-house" />
+                                </animateMotion>
+                            </g>
+
+                            <g class="fd-particle battery" id="fpc1">
+                                <circle class="fd-particle-halo" cx="0" cy="0" />
+                                <circle class="fd-particle-core" cx="0" cy="0" />
+                                <animateMotion dur="2s" repeatCount="indefinite">
+                                    <mpath href="#fp-inv-bat" />
+                                </animateMotion>
+                            </g>
+                            <g class="fd-particle battery" id="fpc2">
+                                <circle class="fd-particle-halo" cx="0" cy="0" />
+                                <circle class="fd-particle-core" cx="0" cy="0" />
+                                <animateMotion dur="2s" repeatCount="indefinite" begin="1s">
+                                    <mpath href="#fp-inv-bat" />
+                                </animateMotion>
+                            </g>
+
+                            <g class="fd-particle battery" id="fpd1">
+                                <circle class="fd-particle-halo" cx="0" cy="0" />
+                                <circle class="fd-particle-core" cx="0" cy="0" />
+                                <animateMotion dur="2s" repeatCount="indefinite">
+                                    <mpath href="#fp-bat-inv" />
+                                </animateMotion>
+                            </g>
+                            <g class="fd-particle battery" id="fpd2">
+                                <circle class="fd-particle-halo" cx="0" cy="0" />
+                                <circle class="fd-particle-core" cx="0" cy="0" />
+                                <animateMotion dur="2s" repeatCount="indefinite" begin="1s">
+                                    <mpath href="#fp-bat-inv" />
+                                </animateMotion>
+                            </g>
+
+                            <!-- PANELES SOLARES (Optional) -->
                             <g id="fd-solar">
-                                <rect class="fd-card optional active" x="48" y="42" width="218" height="120" rx="14" filter="url(#fd-shadow)"/>
-                                <rect x="168" y="46" width="90" height="20" rx="10" fill="#FFB81C" opacity="0.15"/>
-                                <text font-family="Montserrat" font-weight="600" font-size="8" fill="#D09010" text-anchor="middle" x="213" y="59" letter-spacing="1">OPCIONAL</text>
-                                <circle cx="115" cy="93" r="20" fill="#FFB81C" opacity="0.85"/>
+                                <rect class="fd-card optional active" x="48" y="42" width="218" height="120" rx="14"
+                                    filter="url(#fd-shadow)" />
+                                <rect x="168" y="46" width="90" height="20" rx="10" fill="#FFCF5F" opacity="0.15" />
+                                <text font-family="Montserrat" font-weight="600" font-size="8" fill="#FFCF5F"
+                                    text-anchor="middle" x="213" y="59" letter-spacing="1">OPCIONAL</text>
+                                <circle cx="115" cy="93" r="20" fill="#FFB81C" opacity="0.85" />
                                 <g stroke="#FFB81C" stroke-width="2.5" stroke-linecap="round" opacity="0.55">
-                                    <line x1="115" y1="65" x2="115" y2="58"/><line x1="115" y1="121" x2="115" y2="128"/>
-                                    <line x1="87" y1="93" x2="80" y2="93"/><line x1="143" y1="93" x2="150" y2="93"/>
-                                    <line x1="97" y1="75" x2="92" y2="70"/><line x1="133" y1="75" x2="138" y2="70"/>
-                                    <line x1="97" y1="111" x2="92" y2="116"/><line x1="133" y1="111" x2="138" y2="116"/>
+                                    <line x1="115" y1="65" x2="115" y2="58" />
+                                    <line x1="115" y1="121" x2="115" y2="128" />
+                                    <line x1="87" y1="93" x2="80" y2="93" />
+                                    <line x1="143" y1="93" x2="150" y2="93" />
+                                    <line x1="97" y1="75" x2="92" y2="70" />
+                                    <line x1="133" y1="75" x2="138" y2="70" />
+                                    <line x1="97" y1="111" x2="92" y2="116" />
+                                    <line x1="133" y1="111" x2="138" y2="116" />
                                 </g>
-                                <rect x="173" y="77" width="56" height="36" rx="3" fill="none" stroke="#D09010" stroke-width="2" opacity="0.65"/>
-                                <line x1="192" y1="77" x2="192" y2="113" stroke="#D09010" stroke-width="1" opacity="0.35"/>
-                                <line x1="210" y1="77" x2="210" y2="113" stroke="#D09010" stroke-width="1" opacity="0.35"/>
-                                <line x1="173" y1="95" x2="229" y2="95" stroke="#D09010" stroke-width="1" opacity="0.35"/>
-                                <line x1="201" y1="113" x2="201" y2="122" stroke="#D09010" stroke-width="2" opacity="0.4"/>
-                                <line x1="190" y1="122" x2="212" y2="122" stroke="#D09010" stroke-width="2" opacity="0.4"/>
+                                <rect x="173" y="77" width="56" height="36" rx="3" fill="none" stroke="#D09010"
+                                    stroke-width="2" opacity="0.65" />
+                                <line x1="192" y1="77" x2="192" y2="113" stroke="#D09010" stroke-width="1"
+                                    opacity="0.35" />
+                                <line x1="210" y1="77" x2="210" y2="113" stroke="#D09010" stroke-width="1"
+                                    opacity="0.35" />
+                                <line x1="173" y1="95" x2="229" y2="95" stroke="#D09010" stroke-width="1"
+                                    opacity="0.35" />
+                                <line x1="201" y1="113" x2="201" y2="122" stroke="#D09010" stroke-width="2"
+                                    opacity="0.4" />
+                                <line x1="190" y1="122" x2="212" y2="122" stroke="#D09010" stroke-width="2"
+                                    opacity="0.4" />
                                 <text class="fd-label" x="157" y="150">PANELES SOLARES</text>
                             </g>
 
-                            <!-- RED ELÉCTRICA -->
+                            <!-- POWER GRID -->
                             <g id="fd-grid">
-                                <rect class="fd-card active" x="48" y="270" width="218" height="120" rx="14" filter="url(#fd-shadow)"/>
+                                <rect class="fd-card active" x="48" y="270" width="218" height="120" rx="14"
+                                    filter="url(#fd-shadow)" />
                                 <g transform="translate(115,288)" stroke="#0088B8" stroke-linecap="round">
-                                    <line x1="0" y1="0" x2="-11" y2="52" stroke-width="2.5"/>
-                                    <line x1="0" y1="0" x2="11" y2="52" stroke-width="2.5"/>
-                                    <line x1="-5" y1="20" x2="5" y2="20" stroke-width="1.8"/>
-                                    <line x1="-7" y1="33" x2="7" y2="33" stroke-width="1.8"/>
-                                    <line x1="-3" y1="9" x2="-22" y2="6" stroke-width="2"/>
-                                    <line x1="3" y1="9" x2="22" y2="6" stroke-width="2"/>
-                                    <line x1="-22" y1="6" x2="22" y2="6" stroke-width="2"/>
+                                    <line x1="0" y1="0" x2="-11" y2="52" stroke-width="2.5" />
+                                    <line x1="0" y1="0" x2="11" y2="52" stroke-width="2.5" />
+                                    <line x1="-5" y1="20" x2="5" y2="20" stroke-width="1.8" />
+                                    <line x1="-7" y1="33" x2="7" y2="33" stroke-width="1.8" />
+                                    <line x1="-3" y1="9" x2="-22" y2="6" stroke-width="2" />
+                                    <line x1="3" y1="9" x2="22" y2="6" stroke-width="2" />
+                                    <line x1="-22" y1="6" x2="22" y2="6" stroke-width="2" />
                                 </g>
-                                <rect x="170" y="295" width="60" height="44" rx="6" fill="#F0F8FF" stroke="#00A8E1" stroke-width="1.5" opacity="0.8"/>
-                                <text font-family="Montserrat" font-weight="700" font-size="12" fill="#0088B8" text-anchor="middle" x="200" y="314">CFE</text>
-                                <text font-family="Montserrat" font-weight="500" font-size="9" fill="#0088B8" text-anchor="middle" x="200" y="328" opacity="0.6">RED CA</text>
-                                <text class="fd-label" x="157" y="376">RED ELÉCTRICA</text>
-                                <line class="fd-outage-x" id="fd-x1" x1="108" y1="296" x2="172" y2="360"/>
-                                <line class="fd-outage-x" id="fd-x2" x1="172" y1="296" x2="108" y2="360"/>
+                                <rect x="170" y="295" width="60" height="44" rx="6" fill="rgba(0,168,225,0.1)"
+                                    stroke="#66CFFF" stroke-width="1.5" opacity="1" />
+                                <text font-family="Montserrat" font-weight="700" font-size="12" fill="#66CFFF"
+                                    text-anchor="middle" x="200" y="314">CFE</text>
+                                <text font-family="Montserrat" font-weight="500" font-size="9" fill="#66CFFF"
+                                    text-anchor="middle" x="200" y="328" opacity="0.8">RED CA</text>
+                                <text class="fd-label" x="157" y="376">POWER GRID</text>
+                                <line class="fd-outage-x" id="fd-x1" x1="108" y1="296" x2="172" y2="360" />
+                                <line class="fd-outage-x" id="fd-x2" x1="172" y1="296" x2="108" y2="360" />
                             </g>
 
                             <!-- INVERSOR HÍBRIDO FIREFLY -->
                             <g id="fd-inverter">
-                                <rect class="fd-card active" x="378" y="120" width="225" height="170" rx="16" filter="url(#fd-shadow)"/>
-                                <image href="../inverter-profile.png" x="393" y="130" width="85" height="115" preserveAspectRatio="xMidYMid meet"/>
-                                <text font-family="Montserrat" font-weight="700" font-size="13" fill="#A4D233" x="493" y="162">FIREFLY</text>
-                                <text font-family="Montserrat" font-weight="700" font-size="13" fill="#3A3D42" x="493" y="180">INVERSOR</text>
-                                <text font-family="Montserrat" font-weight="700" font-size="13" fill="#3A3D42" x="493" y="198">HÍBRIDO</text>
-                                <rect x="488" y="208" width="80" height="24" rx="5" fill="#F2F8E6" stroke="#A4D233" stroke-width="1"/>
-                                <text font-family="Montserrat" font-weight="600" font-size="13" fill="#7AB800" text-anchor="middle" x="528" y="225">CD → CA</text>
-                                <text font-family="Montserrat" font-weight="600" font-size="12" fill="#939598" x="493" y="252">5kW – 12kW</text>
+                                <!-- Ambient radial glow behind the central inverter -->
+                                <circle cx="490.5" cy="205" r="150" fill="url(#inverter-glow)"
+                                    class="fd-ambient-glow" />
+
+                                <rect class="fd-card active" x="378" y="120" width="225" height="170" rx="16"
+                                    filter="url(#fd-shadow)" />
+                                <!-- Adds an inner border for 3D glassy effect -->
+                                <rect x="379" y="121" width="223" height="168" rx="15" fill="none"
+                                    stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+
+                                <image href="../inverter-profile.png" x="393" y="130" width="85" height="115"
+                                    preserveAspectRatio="xMidYMid meet" />
+                                <text font-family="Montserrat" font-weight="800" font-size="14" fill="#A4D233" x="493"
+                                    y="160" filter="drop-shadow(0 0 5px rgba(164,210,51,0.5))">FIREFLY</text>
+                                <text font-family="Montserrat" font-weight="700" font-size="14"
+                                    fill="rgba(255,255,255,0.95)" x="493" y="178">HÍBRIDO</text>
+                                <text font-family="Montserrat" font-weight="700" font-size="14"
+                                    fill="rgba(255,255,255,0.95)" x="493" y="196">INVERSOR</text>
+                                <rect x="488" y="208" width="80" height="24" rx="5" fill="rgba(164,210,51,0.15)"
+                                    stroke="#A4D233" stroke-width="1.5"
+                                    filter="drop-shadow(0 0 4px rgba(164,210,51,0.3))" />
+                                <text font-family="Montserrat" font-weight="600" font-size="13" fill="#A4D233"
+                                    text-anchor="middle" x="528" y="225"
+                                    filter="drop-shadow(0 0 2px rgba(164,210,51,0.8))">CD → CA</text>
+                                <text font-family="Montserrat" font-weight="600" font-size="12" fill="#A0A5AA" x="493"
+                                    y="252">5kW –
+                                    12kW</text>
                                 <text class="fd-label" x="490" y="280">INVERSOR HÍBRIDO FIREFLY</text>
                             </g>
 
                             <!-- ALMACENAMIENTO DE BATERÍA -->
                             <g id="fd-battery">
-                                <rect class="fd-card active" x="640" y="275" width="268" height="160" rx="14" filter="url(#fd-shadow)"/>
-                                <image href="../battery-16kwh.png" x="652" y="283" width="88" height="100" preserveAspectRatio="xMidYMid meet" clip-path="url(#fd-bat-clip)"/>
-                                <rect x="654" y="393" width="84" height="16" rx="4" fill="#F0F0F0" stroke="#D0D1D3" stroke-width="1"/>
-                                <rect class="fd-bat-bar" id="fb1" x="658" y="396" width="17" height="10" rx="2" fill="#A4D233" opacity="0.15"/>
-                                <rect class="fd-bat-bar" id="fb2" x="678" y="396" width="17" height="10" rx="2" fill="#A4D233" opacity="0.15"/>
-                                <rect class="fd-bat-bar" id="fb3" x="698" y="396" width="17" height="10" rx="2" fill="#A4D233" opacity="0.15"/>
-                                <rect class="fd-bat-bar" id="fb4" x="718" y="396" width="17" height="10" rx="2" fill="#A4D233" opacity="0.15"/>
-                                <text font-family="Montserrat" font-weight="700" font-size="13" fill="#3A3D42" x="758" y="305">ALMACENAMIENTO</text>
-                                <text font-family="Montserrat" font-weight="700" font-size="13" fill="#3A3D42" x="758" y="323">DE BATERÍA</text>
-                                <text font-family="Montserrat" font-weight="600" font-size="13" fill="#A4D233" x="758" y="347">LiFePO4</text>
-                                <text font-family="Open Sans" font-weight="400" font-size="12" fill="#939598" x="758" y="365">5kWh – 16kWh</text>
-                                <text font-family="Open Sans" font-weight="400" font-size="12" fill="#939598" x="758" y="382">Energía de Respaldo</text>
+                                <rect class="fd-card active" x="640" y="275" width="268" height="160" rx="14"
+                                    filter="url(#fd-shadow)" />
+                                <image href="../battery-16kwh.png" x="652" y="283" width="88" height="100"
+                                    preserveAspectRatio="xMidYMid meet" clip-path="url(#fd-bat-clip)" />
+                                <rect x="654" y="393" width="84" height="16" rx="4" fill="rgba(255,255,255,0.05)"
+                                    stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+                                <rect class="fd-bat-bar" id="fb1" x="658" y="396" width="17" height="10" rx="2"
+                                    fill="#A4D233" opacity="0.15" />
+                                <rect class="fd-bat-bar" id="fb2" x="678" y="396" width="17" height="10" rx="2"
+                                    fill="#A4D233" opacity="0.15" />
+                                <rect class="fd-bat-bar" id="fb3" x="698" y="396" width="17" height="10" rx="2"
+                                    fill="#A4D233" opacity="0.15" />
+                                <rect class="fd-bat-bar" id="fb4" x="718" y="396" width="17" height="10" rx="2"
+                                    fill="#A4D233" opacity="0.15" />
+                                <text font-family="Montserrat" font-weight="700" font-size="13"
+                                    fill="rgba(255,255,255,0.9)" x="758" y="305">DE BATERÍA</text>
+                                <text font-family="Montserrat" font-weight="700" font-size="13"
+                                    fill="rgba(255,255,255,0.9)" x="758" y="323">ALMACENAMIENTO</text>
+                                <text font-family="Montserrat" font-weight="600" font-size="13" fill="#A4D233" x="758"
+                                    y="347">LiFePO4</text>
+                                <text font-family="Montserrat" font-weight="600" font-size="12" fill="#A0A5AA" x="758"
+                                    y="365">5kWh
+                                    –
+                                    16kWh</text>
+                                <text font-family="Montserrat" font-weight="600" font-size="12" fill="#A0A5AA" x="758"
+                                    y="382">Backup
+                                    Power</text>
                                 <text class="fd-label" x="774" y="422">ALMACENAMIENTO DE BATERÍA</text>
                             </g>
 
                             <!-- TU HOGAR (Spanish colonial) -->
                             <g id="fd-house">
-                                <rect class="fd-card active" x="715" y="70" width="195" height="150" rx="14" filter="url(#fd-shadow)"/>
+                                <rect class="fd-card active" x="715" y="70" width="195" height="150" rx="14"
+                                    filter="url(#fd-shadow)" />
                                 <g transform="translate(764,84)">
-                                    <rect x="0" y="10" width="98" height="74" fill="#4A4E54" opacity="0.04"/>
-                                    <rect x="0" y="10" width="98" height="74" fill="none" stroke="#4A4E54" stroke-width="2"/>
-                                    <rect x="-2" y="7" width="102" height="5" rx="1" fill="none" stroke="#4A4E54" stroke-width="1.4"/>
-                                    <line x1="0" y1="9" x2="98" y2="9" stroke="#C4713B" stroke-width="1.5" opacity="0.35"/>
-                                    <ellipse cx="82" cy="5" rx="9" ry="6" fill="none" stroke="#4A4E54" stroke-width="1.3"/>
-                                    <ellipse cx="82" cy="5" rx="8" ry="5" fill="#4A4E54" opacity="0.04"/>
-                                    <line x1="82" y1="-2" x2="82" y2="0" stroke="#4A4E54" stroke-width="1.2" stroke-linecap="round"/>
-                                    <rect x="8" y="24" width="16" height="14" fill="none" stroke="#4A4E54" stroke-width="1.2"/>
-                                    <path d="M 8,24 Q 16,16 24,24" fill="none" stroke="#4A4E54" stroke-width="1.2"/>
-                                    <rect class="fd-win-glow" x="8" y="17" width="16" height="21" fill="#FFB81C" opacity="0.25"/>
-                                    <line x1="16" y1="24" x2="16" y2="38" stroke="#4A4E54" stroke-width="0.6" opacity="0.4"/>
-                                    <rect x="41" y="24" width="16" height="14" fill="none" stroke="#4A4E54" stroke-width="1.2"/>
-                                    <path d="M 41,24 Q 49,16 57,24" fill="none" stroke="#4A4E54" stroke-width="1.2"/>
-                                    <rect class="fd-win-glow" x="41" y="17" width="16" height="21" fill="#FFB81C" opacity="0.25"/>
-                                    <line x1="49" y1="24" x2="49" y2="38" stroke="#4A4E54" stroke-width="0.6" opacity="0.4"/>
-                                    <rect x="74" y="24" width="16" height="14" fill="none" stroke="#4A4E54" stroke-width="1.2"/>
-                                    <path d="M 74,24 Q 82,16 90,24" fill="none" stroke="#4A4E54" stroke-width="1.2"/>
-                                    <rect class="fd-win-glow" x="74" y="17" width="16" height="21" fill="#FFB81C" opacity="0.25"/>
-                                    <line x1="82" y1="24" x2="82" y2="38" stroke="#4A4E54" stroke-width="0.6" opacity="0.4"/>
-                                    <rect x="4" y="40" width="90" height="3" fill="none" stroke="#4A4E54" stroke-width="1"/>
-                                    <line x1="12" y1="40" x2="12" y2="43" stroke="#4A4E54" stroke-width="0.7"/>
-                                    <line x1="20" y1="40" x2="20" y2="43" stroke="#4A4E54" stroke-width="0.7"/>
-                                    <line x1="28" y1="40" x2="28" y2="43" stroke="#4A4E54" stroke-width="0.7"/>
-                                    <line x1="36" y1="40" x2="36" y2="43" stroke="#4A4E54" stroke-width="0.7"/>
-                                    <line x1="44" y1="40" x2="44" y2="43" stroke="#4A4E54" stroke-width="0.7"/>
-                                    <line x1="52" y1="40" x2="52" y2="43" stroke="#4A4E54" stroke-width="0.7"/>
-                                    <line x1="60" y1="40" x2="60" y2="43" stroke="#4A4E54" stroke-width="0.7"/>
-                                    <line x1="68" y1="40" x2="68" y2="43" stroke="#4A4E54" stroke-width="0.7"/>
-                                    <line x1="76" y1="40" x2="76" y2="43" stroke="#4A4E54" stroke-width="0.7"/>
-                                    <line x1="84" y1="40" x2="84" y2="43" stroke="#4A4E54" stroke-width="0.7"/>
-                                    <line x1="0" y1="46" x2="98" y2="46" stroke="#4A4E54" stroke-width="1" opacity="0.3"/>
-                                    <rect x="34" y="56" width="30" height="28" fill="none" stroke="#4A4E54" stroke-width="1.8"/>
-                                    <path d="M 34,56 Q 49,40 64,56" fill="none" stroke="#4A4E54" stroke-width="1.8"/>
-                                    <rect class="fd-win-glow" x="35" y="48" width="28" height="35" fill="#FFB81C" opacity="0.12"/>
-                                    <line x1="49" y1="56" x2="49" y2="84" stroke="#4A4E54" stroke-width="1" opacity="0.5"/>
-                                    <circle cx="45" cy="70" r="1.4" fill="#4A4E54" opacity="0.6"/>
-                                    <circle cx="53" cy="70" r="1.4" fill="#4A4E54" opacity="0.6"/>
-                                    <rect x="6" y="56" width="18" height="16" fill="none" stroke="#4A4E54" stroke-width="1.2"/>
-                                    <rect class="fd-win-glow" x="6" y="56" width="18" height="16" fill="#FFB81C" opacity="0.2"/>
-                                    <line x1="12" y1="56" x2="12" y2="72" stroke="#4A4E54" stroke-width="0.6" opacity="0.4"/>
-                                    <line x1="18" y1="56" x2="18" y2="72" stroke="#4A4E54" stroke-width="0.6" opacity="0.4"/>
-                                    <rect x="74" y="56" width="18" height="16" fill="none" stroke="#4A4E54" stroke-width="1.2"/>
-                                    <rect class="fd-win-glow" x="74" y="56" width="18" height="16" fill="#FFB81C" opacity="0.2"/>
-                                    <line x1="80" y1="56" x2="80" y2="72" stroke="#4A4E54" stroke-width="0.6" opacity="0.4"/>
-                                    <line x1="86" y1="56" x2="86" y2="72" stroke="#4A4E54" stroke-width="0.6" opacity="0.4"/>
-                                    <line x1="-6" y1="86" x2="104" y2="86" stroke="#A4D233" stroke-width="1.5" opacity="0.35" stroke-linecap="round"/>
+                                    <rect x="0" y="10" width="98" height="74" fill="rgba(255,255,255,0.6)"
+                                        opacity="0.04" />
+                                    <rect x="0" y="10" width="98" height="74" fill="none" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="2" />
+                                    <rect x="-2" y="7" width="102" height="5" rx="1" fill="none"
+                                        stroke="rgba(255,255,255,0.6)" stroke-width="1.4" />
+                                    <line x1="0" y1="9" x2="98" y2="9" stroke="#C4713B" stroke-width="1.5"
+                                        opacity="0.35" />
+                                    <ellipse cx="82" cy="5" rx="9" ry="6" fill="none" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="1.3" />
+                                    <ellipse cx="82" cy="5" rx="8" ry="5" fill="rgba(255,255,255,0.6)" opacity="0.04" />
+                                    <line x1="82" y1="-2" x2="82" y2="0" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="1.2" stroke-linecap="round" />
+                                    <rect x="8" y="24" width="16" height="14" fill="none" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="1.2" />
+                                    <path d="M 8,24 Q 16,16 24,24" fill="none" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="1.2" />
+                                    <rect class="fd-win-glow" x="8" y="17" width="16" height="21" fill="#FFB81C"
+                                        opacity="0.25" />
+                                    <line x1="16" y1="24" x2="16" y2="38" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="0.6" opacity="0.4" />
+                                    <rect x="41" y="24" width="16" height="14" fill="none"
+                                        stroke="rgba(255,255,255,0.6)" stroke-width="1.2" />
+                                    <path d="M 41,24 Q 49,16 57,24" fill="none" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="1.2" />
+                                    <rect class="fd-win-glow" x="41" y="17" width="16" height="21" fill="#FFB81C"
+                                        opacity="0.25" />
+                                    <line x1="49" y1="24" x2="49" y2="38" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="0.6" opacity="0.4" />
+                                    <rect x="74" y="24" width="16" height="14" fill="none"
+                                        stroke="rgba(255,255,255,0.6)" stroke-width="1.2" />
+                                    <path d="M 74,24 Q 82,16 90,24" fill="none" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="1.2" />
+                                    <rect class="fd-win-glow" x="74" y="17" width="16" height="21" fill="#FFB81C"
+                                        opacity="0.25" />
+                                    <line x1="82" y1="24" x2="82" y2="38" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="0.6" opacity="0.4" />
+                                    <rect x="4" y="40" width="90" height="3" fill="none" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="1" />
+                                    <line x1="12" y1="40" x2="12" y2="43" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="0.7" />
+                                    <line x1="20" y1="40" x2="20" y2="43" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="0.7" />
+                                    <line x1="28" y1="40" x2="28" y2="43" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="0.7" />
+                                    <line x1="36" y1="40" x2="36" y2="43" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="0.7" />
+                                    <line x1="44" y1="40" x2="44" y2="43" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="0.7" />
+                                    <line x1="52" y1="40" x2="52" y2="43" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="0.7" />
+                                    <line x1="60" y1="40" x2="60" y2="43" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="0.7" />
+                                    <line x1="68" y1="40" x2="68" y2="43" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="0.7" />
+                                    <line x1="76" y1="40" x2="76" y2="43" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="0.7" />
+                                    <line x1="84" y1="40" x2="84" y2="43" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="0.7" />
+                                    <line x1="0" y1="46" x2="98" y2="46" stroke="rgba(255,255,255,0.6)" stroke-width="1"
+                                        opacity="0.3" />
+                                    <rect x="34" y="56" width="30" height="28" fill="none"
+                                        stroke="rgba(255,255,255,0.6)" stroke-width="1.8" />
+                                    <path d="M 34,56 Q 49,40 64,56" fill="none" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="1.8" />
+                                    <rect class="fd-win-glow" x="35" y="48" width="28" height="35" fill="#FFB81C"
+                                        opacity="0.12" />
+                                    <line x1="49" y1="56" x2="49" y2="84" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="1" opacity="0.5" />
+                                    <circle cx="45" cy="70" r="1.4" fill="rgba(255,255,255,0.6)" opacity="0.6" />
+                                    <circle cx="53" cy="70" r="1.4" fill="rgba(255,255,255,0.6)" opacity="0.6" />
+                                    <rect x="6" y="56" width="18" height="16" fill="none" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="1.2" />
+                                    <rect class="fd-win-glow" x="6" y="56" width="18" height="16" fill="#FFB81C"
+                                        opacity="0.2" />
+                                    <line x1="12" y1="56" x2="12" y2="72" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="0.6" opacity="0.4" />
+                                    <line x1="18" y1="56" x2="18" y2="72" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="0.6" opacity="0.4" />
+                                    <rect x="74" y="56" width="18" height="16" fill="none"
+                                        stroke="rgba(255,255,255,0.6)" stroke-width="1.2" />
+                                    <rect class="fd-win-glow" x="74" y="56" width="18" height="16" fill="#FFB81C"
+                                        opacity="0.2" />
+                                    <line x1="80" y1="56" x2="80" y2="72" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="0.6" opacity="0.4" />
+                                    <line x1="86" y1="56" x2="86" y2="72" stroke="rgba(255,255,255,0.6)"
+                                        stroke-width="0.6" opacity="0.4" />
+                                    <line x1="-6" y1="86" x2="104" y2="86" stroke="#A4D233" stroke-width="1.5"
+                                        opacity="0.35" stroke-linecap="round" />
                                 </g>
                                 <text class="fd-label" x="812" y="210">TU HOGAR</text>
                             </g>
 
-                            <!-- PARTICLES -->
-                            <circle class="fd-particle solar" id="fps1"><animateMotion dur="2s" repeatCount="indefinite"><mpath href="#fp-solar-inv"/></animateMotion></circle>
-                            <circle class="fd-particle solar" id="fps2"><animateMotion dur="2s" repeatCount="indefinite" begin="0.66s"><mpath href="#fp-solar-inv"/></animateMotion></circle>
-                            <circle class="fd-particle solar" id="fps3"><animateMotion dur="2s" repeatCount="indefinite" begin="1.33s"><mpath href="#fp-solar-inv"/></animateMotion></circle>
-                            <circle class="fd-particle grid" id="fpg1"><animateMotion dur="2s" repeatCount="indefinite"><mpath href="#fp-grid-inv"/></animateMotion></circle>
-                            <circle class="fd-particle grid" id="fpg2"><animateMotion dur="2s" repeatCount="indefinite" begin="0.66s"><mpath href="#fp-grid-inv"/></animateMotion></circle>
-                            <circle class="fd-particle grid" id="fpg3"><animateMotion dur="2s" repeatCount="indefinite" begin="1.33s"><mpath href="#fp-grid-inv"/></animateMotion></circle>
-                            <circle class="fd-particle green" id="fph1"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#fp-inv-house"/></animateMotion></circle>
-                            <circle class="fd-particle green" id="fph2"><animateMotion dur="1.6s" repeatCount="indefinite" begin="0.53s"><mpath href="#fp-inv-house"/></animateMotion></circle>
-                            <circle class="fd-particle green" id="fph3"><animateMotion dur="1.6s" repeatCount="indefinite" begin="1.06s"><mpath href="#fp-inv-house"/></animateMotion></circle>
-                            <circle class="fd-particle battery" id="fpc1"><animateMotion dur="1.8s" repeatCount="indefinite"><mpath href="#fp-inv-bat"/></animateMotion></circle>
-                            <circle class="fd-particle battery" id="fpc2"><animateMotion dur="1.8s" repeatCount="indefinite" begin="0.9s"><mpath href="#fp-inv-bat"/></animateMotion></circle>
-                            <circle class="fd-particle battery" id="fpd1"><animateMotion dur="1.8s" repeatCount="indefinite"><mpath href="#fp-bat-inv"/></animateMotion></circle>
-                            <circle class="fd-particle battery" id="fpd2"><animateMotion dur="1.8s" repeatCount="indefinite" begin="0.9s"><mpath href="#fp-bat-inv"/></animateMotion></circle>
+
                         </svg>
                     </div>
                     <div class="flow-state-banner state-normal" id="flow-banner">
-                        <div class="flow-state-title" id="flow-title">OPERACIÓN NORMAL</div>
-                        <div class="flow-state-desc" id="flow-desc">La energía solar y la red alimentan tu hogar mientras cargan la batería</div>
+                        <div class="flow-state-title" id="flow-title">NORMAL OPERATION</div>
+                        <div class="flow-state-desc" id="flow-desc">Solar and grid power your home while charging the
+                            battery</div>
                     </div>
                     <div class="flow-dots">
                         <div class="flow-dot on" id="fd0"></div>
@@ -1883,13 +2741,102 @@
         </div>
     </section>
 
+    <!-- Calculator Section -->
+    <section class="calculator" id="calculator">
+        <div class="section-container">
+            <div class="calculator-grid reveal">
+                <div class="calculator-content">
+                    <span class="section-label">Diseña Tu Sistema</span>
+                    <h2 class="section-title">Calcula Tus Necesidades</h2>
+                    <p class="section-subtitle" style="margin-left: 0;">Descubre exactamente cuánto respaldo de batería
+                        y
+                        energía solar necesitas para tu hogar. Selecciona tu uso diario y el tiempo de respaldo deseado
+                        para visualizar tu configuración óptima.</p>
+
+                    <div class="calculator-inputs">
+                        <div class="calc-group">
+                            <label>Selecciona el Tipo de Sistema</label>
+                            <div class="system-toggle-group">
+                                <label class="system-toggle-label">
+                                    <input type="radio" name="system-type" value="supplement" checked>
+                                    <span class="toggle-text">Complementar con Solar</span>
+                                </label>
+                                <label class="system-toggle-label">
+                                    <input type="radio" name="system-type" value="independence">
+                                    <span class="toggle-text">Independencia Total</span>
+                                </label>
+                                <label class="system-toggle-label">
+                                    <input type="radio" name="system-type" value="cfe-only">
+                                    <span class="toggle-text">Solo CFE</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="calc-group" id="solar-offset-group" style="display: none;">
+                            <label for="solar-offset">Porcentaje de Compensación Solar (%)</label>
+                            <div class="slider-container">
+                                <input type="range" id="solar-offset" min="1" max="100" value="50" class="calc-slider">
+                                <div class="slider-val"><span id="offset-val">50</span>%</div>
+                            </div>
+                            <p class="calc-help">¿Qué porcentaje de tu recibo de CFE deseas compensar con energía solar?
+                            </p>
+                        </div>
+
+                        <div class="calc-group">
+                            <label for="daily-usage">Uso Diario de Energía (kWh)</label>
+                            <div class="slider-container">
+                                <input type="range" id="daily-usage" min="5" max="100" value="30" class="calc-slider">
+                                <div class="slider-val"><span id="usage-val">30</span> kWh</div>
+                            </div>
+                            <p class="calc-help">Verifica tu uso diario típico de kWh en tu recibo de CFE dividiendo el
+                                uso bimestral entre 60.</p>
+                        </div>
+
+                        <div class="calc-group">
+                            <label for="backup-hours">Tiempo de Respaldo Deseado (Horas)</label>
+                            <div class="slider-container">
+                                <input type="range" id="backup-hours" min="4" max="72" value="24" class="calc-slider">
+                                <div class="slider-val"><span id="backup-val">24</span> hrs</div>
+                            </div>
+                            <p class="calc-help">¿Cuántas horas deseas operar puramente con batería sin red o solar?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calculator-results">
+                    <div class="result-card battery-result">
+                        <div class="result-icon">🔋</div>
+                        <div class="result-info">
+                            <h3>Capacidad de Batería Recomendada</h3>
+                            <div class="result-number"><span id="battery-result">30</span> <span>kWh</span></div>
+                            <p>Para soportar cómodamente tu uso por <span id="hours-text">24</span> horas basado en
+                                cargas de energía típicas.</p>
+                        </div>
+                    </div>
+
+                    <div class="result-card solar-result" id="solar-result-card">
+                        <div class="result-icon">☀️</div>
+                        <div class="result-info">
+                            <h3>Paneles Solares Requeridos (580W)</h3>
+                            <div class="result-number"><span id="panels-result">12</span> <span>Paneles</span></div>
+                            <p id="panels-desc">Para generar <span id="usage-text">30</span> kWh diarios, optimizando
+                                para las horas pico de sol de San Miguel de Allende.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
     <!-- Solutions Section -->
     <section class="solutions" id="solutions">
         <div class="section-container">
             <div class="section-header reveal">
                 <span class="section-label">Nuestras Soluciones</span>
                 <h2 class="section-title">Cuatro Niveles de Control</h2>
-                <p class="section-subtitle">Comienza con respaldo de energía. Agrega solar cuando estés listo. Escala a independencia total.</p>
+                <p class="section-subtitle">Comienza con respaldo de energía. Agrega solar cuando estés listo. Escala a
+                    independencia total.</p>
             </div>
 
             <div class="solutions-grid">
@@ -1913,7 +2860,7 @@
 
                 <div class="solution-card reveal">
                     <span class="solution-tier">Nivel 2</span>
-                    <h3 class="solution-name">Good</h3>
+                    <h3 class="solution-name">Bueno</h3>
                     <ul class="solution-specs">
                         <li><span>Batería</span> <strong>10kWh</strong></li>
                         <li><span>Inversor</span> <strong>6.5kW Bifásico</strong></li>
@@ -1932,7 +2879,7 @@
                 <div class="solution-card featured reveal">
                     <span class="solution-badge">Recomendado</span>
                     <span class="solution-tier">Nivel 3</span>
-                    <h3 class="solution-name">Better</h3>
+                    <h3 class="solution-name">Mejor</h3>
                     <ul class="solution-specs">
                         <li><span>Batería</span> <strong>10kWh</strong></li>
                         <li><span>Inversor</span> <strong>10kW Bifásico</strong></li>
@@ -1967,7 +2914,8 @@
                 </div>
             </div>
 
-            <p class="solutions-note reveal">Todas las soluciones ofrecen capacidades expandibles y están listas para solar.</p>
+            <p class="solutions-note reveal">Todas las soluciones ofrecen capacidades expandibles y están listas para
+                solar.</p>
         </div>
     </section>
 
@@ -1978,7 +2926,9 @@
                 <div class="comparison-content reveal">
                     <span class="section-label">Por Qué Baterías</span>
                     <h2>Por Qué Firefly Supera a los Generadores</h2>
-                    <p style="color: var(--slate); margin-top: 16px;">Los generadores tradicionales fueron diseñados para apagones ocasionales. Firefly está diseñado para la realidad de la red de México—frecuente, impredecible y cada vez más común.</p>
+                    <p style="color: var(--slate); margin-top: 16px;">Los generadores tradicionales fueron diseñados
+                        para apagones ocasionales. Firefly está diseñado para la realidad de la red de México—frecuente,
+                        impredecible y cada vez más común.</p>
                 </div>
 
                 <div class="comparison-table reveal">
@@ -2027,7 +2977,9 @@
         <div class="trust-content">
             <div class="trust-badge">20 Años de Experiencia Local</div>
             <h2 class="trust-title">Construido por Nordic Electric.<br>Diseñado para San Miguel.</h2>
-            <p class="trust-text">Durante dos décadas, Nordic Electric ha energizado los hogares y la infraestructura de San Miguel de Allende. Firefly representa nuestra respuesta a una red cambiante—resiliencia energética moderna respaldada por experiencia local, soporte bilingüe y tecnología compatible con CFE.</p>
+            <p class="trust-text">Durante dos décadas, Nordic Electric ha energizado los hogares y la infraestructura de
+                San Miguel de Allende. Firefly representa nuestra respuesta a una red cambiante—resiliencia energética
+                moderna respaldada por experiencia local, soporte bilingüe y tecnología compatible con CFE.</p>
 
             <div class="trust-stats">
                 <div class="trust-stat">
@@ -2083,22 +3035,26 @@
                     <div class="options-grid">
                         <label class="option-card">
                             <input type="radio" name="location" value="sma-centro" required>
-                            <span class="option-content"><strong>San Miguel de Allende (Centro)</strong><span class="option-sub">Centro Histórico</span></span>
+                            <span class="option-content"><strong>San Miguel de Allende (Centro)</strong><span
+                                    class="option-sub">Centro Histórico</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="location" value="sma-surrounding">
-                            <span class="option-content"><strong>San Miguel de Allende (Áreas cercanas)</strong><span class="option-sub">Zonas aledañas</span></span>
+                            <span class="option-content"><strong>San Miguel de Allende (Áreas cercanas)</strong><span
+                                    class="option-sub">Zonas aledañas</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="location" value="queretaro-gto">
-                            <span class="option-content"><strong>Querétaro / Guanajuato</strong><span class="option-sub">Regiones cercanas</span></span>
+                            <span class="option-content"><strong>Querétaro / Guanajuato</strong><span
+                                    class="option-sub">Regiones cercanas</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="location" value="other">
-                            <span class="option-content"><strong>Otro</strong><span class="option-sub">Dinos dónde</span></span>
+                            <span class="option-content"><strong>Otro</strong><span class="option-sub">Dinos
+                                    dónde</span></span>
                             <span class="option-check">✓</span>
                         </label>
                     </div>
@@ -2116,22 +3072,26 @@
                     <div class="options-grid">
                         <label class="option-card">
                             <input type="radio" name="property_type" value="residential" required>
-                            <span class="option-content"><strong>Casa</strong><span class="option-sub">Residencial</span></span>
+                            <span class="option-content"><strong>Casa</strong><span
+                                    class="option-sub">Residencial</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="property_type" value="commercial">
-                            <span class="option-content"><strong>Negocio</strong><span class="option-sub">Comercial</span></span>
+                            <span class="option-content"><strong>Negocio</strong><span
+                                    class="option-sub">Comercial</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="property_type" value="industrial">
-                            <span class="option-content"><strong>Industria</strong><span class="option-sub">Gran escala</span></span>
+                            <span class="option-content"><strong>Industria</strong><span class="option-sub">Gran
+                                    escala</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="property_type" value="new-construction">
-                            <span class="option-content"><strong>Nueva construcción</strong><span class="option-sub">Construcción nueva</span></span>
+                            <span class="option-content"><strong>Nueva construcción</strong><span
+                                    class="option-sub">Construcción nueva</span></span>
                             <span class="option-check">✓</span>
                         </label>
                     </div>
@@ -2150,22 +3110,26 @@
                     <div class="options-grid">
                         <label class="option-card">
                             <input type="radio" name="current_setup" value="grid-only" required>
-                            <span class="option-content"><strong>Solo CFE</strong><span class="option-sub">Sin respaldo</span></span>
+                            <span class="option-content"><strong>Solo CFE</strong><span class="option-sub">Sin
+                                    respaldo</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="current_setup" value="generator">
-                            <span class="option-content"><strong>Generador</strong><span class="option-sub">Buscando mejorar</span></span>
+                            <span class="option-content"><strong>Generador</strong><span class="option-sub">Buscando
+                                    mejorar</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="current_setup" value="existing-solar">
-                            <span class="option-content"><strong>Paneles solares</strong><span class="option-sub">Sistema existente</span></span>
+                            <span class="option-content"><strong>Paneles solares</strong><span
+                                    class="option-sub">Sistema existente</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="current_setup" value="new-build">
-                            <span class="option-content"><strong>Construcción nueva</strong><span class="option-sub">Desde cero</span></span>
+                            <span class="option-content"><strong>Construcción nueva</strong><span
+                                    class="option-sub">Desde cero</span></span>
                             <span class="option-check">✓</span>
                         </label>
                     </div>
@@ -2267,19 +3231,22 @@
                         <label class="option-card solar-yes">
                             <input type="radio" name="solar_interest" value="total-independence" required>
                             <span class="solar-icon">☀️</span>
-                            <span class="option-content"><strong>Sí - Independencia total</strong><span class="option-sub">Independencia total de CFE</span></span>
+                            <span class="option-content"><strong>Sí - Independencia total</strong><span
+                                    class="option-sub">Independencia total de CFE</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="solar_interest" value="later">
                             <span class="solar-icon">🌅</span>
-                            <span class="option-content"><strong>Tal vez más adelante</strong><span class="option-sub">Quizás después</span></span>
+                            <span class="option-content"><strong>Tal vez más adelante</strong><span
+                                    class="option-sub">Quizás después</span></span>
                             <span class="option-check">✓</span>
                         </label>
                         <label class="option-card">
                             <input type="radio" name="solar_interest" value="just-backup">
                             <span class="solar-icon">🔋</span>
-                            <span class="option-content"><strong>No, solo respaldo</strong><span class="option-sub">Solo respaldo por ahora</span></span>
+                            <span class="option-content"><strong>No, solo respaldo</strong><span class="option-sub">Solo
+                                    respaldo por ahora</span></span>
                             <span class="option-check">✓</span>
                         </label>
                     </div>
@@ -2318,9 +3285,12 @@
                         <div class="form-group">
                             <label>Idioma preferido</label>
                             <div class="radio-group">
-                                <label class="radio-label"><input type="radio" name="language" value="español" checked><span>Español</span></label>
-                                <label class="radio-label"><input type="radio" name="language" value="english"><span>English</span></label>
-                                <label class="radio-label"><input type="radio" name="language" value="both"><span>Ambos</span></label>
+                                <label class="radio-label"><input type="radio" name="language" value="español"
+                                        checked><span>Español</span></label>
+                                <label class="radio-label"><input type="radio" name="language"
+                                        value="english"><span>English</span></label>
+                                <label class="radio-label"><input type="radio" name="language"
+                                        value="both"><span>Ambos</span></label>
                             </div>
                         </div>
                     </div>
@@ -2342,7 +3312,9 @@
                     </p>
                     <div class="success-details" id="successDetails"></div>
                     <div class="success-actions">
-                        <a href="#" class="btn-whatsapp" id="whatsappBtn" onclick="var u=this.getAttribute('data-url'); if(u){window.open(u,'_blank');} return false;">💬 WhatsApp Directo</a>
+                        <a href="#" class="btn-whatsapp" id="whatsappBtn"
+                            onclick="var u=this.getAttribute('data-url'); if(u){window.open(u,'_blank');} return false;">💬
+                            WhatsApp Directo</a>
                         <button type="button" class="btn-close-survey" onclick="closeSurvey()">Cerrar</button>
                     </div>
                 </div>
@@ -2357,9 +3329,12 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a href="/es/" class="logo">
-                        <img src="/firefly_logo_transparent.png" alt="Firefly por Nordic Electric" style="filter: brightness(0) invert(1);">
+                        <img src="/firefly_logo_transparent.png" alt="Firefly por Nordic Electric"
+                            style="filter: brightness(0) invert(1);">
                     </a>
-                    <p class="footer-desc">Resiliencia energética moderna para San Miguel de Allende. Respaldo silencioso de baterías, integración solar e independencia energética completa—respaldado por 20 años de experiencia local.</p>
+                    <p class="footer-desc">Resiliencia energética moderna para San Miguel de Allende. Respaldo
+                        silencioso de baterías, integración solar e independencia energética completa—respaldado por 20
+                        años de experiencia local.</p>
                 </div>
 
                 <div class="footer-column">
@@ -2578,22 +3553,22 @@
             // Nivel de aparatos × horas de respaldo → sistema recomendado
             const matrix = {
                 'basic': {
-                    '5':      { name: 'Esencial',              specs: '5kWh • 5.2kW Monofásico • 120V',     kwh: 5  },
-                    '12':     { name: 'Good',                  specs: '10kWh • 6.5kW Bifásico • 120/220V',  kwh: 10 },
-                    '24':     { name: 'Completo',              specs: '16kWh • 12kW Bifásico • 120/220V',   kwh: 16 },
-                    '24plus': { name: 'Solución Personalizada', specs: 'Escalable 16–96kWh',                kwh: '16+' }
+                    '5': { name: 'Esencial', specs: '5kWh • 5.2kW Monofásico • 120V', kwh: 5 },
+                    '12': { name: 'Good', specs: '10kWh • 6.5kW Bifásico • 120/220V', kwh: 10 },
+                    '24': { name: 'Completo', specs: '16kWh • 12kW Bifásico • 120/220V', kwh: 16 },
+                    '24plus': { name: 'Solución Personalizada', specs: 'Escalable 16–96kWh', kwh: '16+' }
                 },
                 'comfort': {
-                    '5':      { name: 'Good',                  specs: '10kWh • 6.5kW Bifásico • 120/220V',  kwh: 10 },
-                    '12':     { name: 'Better',                specs: '10kWh • 10kW Bifásico • 120/220V',   kwh: 10 },
-                    '24':     { name: 'Completo',              specs: '16kWh • 12kW Bifásico • 120/220V',   kwh: 16 },
-                    '24plus': { name: 'Solución Personalizada', specs: 'Escalable 32–96kWh',                kwh: '32+' }
+                    '5': { name: 'Good', specs: '10kWh • 6.5kW Bifásico • 120/220V', kwh: 10 },
+                    '12': { name: 'Better', specs: '10kWh • 10kW Bifásico • 120/220V', kwh: 10 },
+                    '24': { name: 'Completo', specs: '16kWh • 12kW Bifásico • 120/220V', kwh: 16 },
+                    '24plus': { name: 'Solución Personalizada', specs: 'Escalable 32–96kWh', kwh: '32+' }
                 },
                 'complete': {
-                    '5':      { name: 'Better',                specs: '10kWh • 10kW Bifásico • 120/220V',   kwh: 10 },
-                    '12':     { name: 'Completo',              specs: '16kWh • 12kW Bifásico • 120/220V',   kwh: 16 },
-                    '24':     { name: 'Solución Personalizada', specs: 'Escalable 32kWh+',                  kwh: '32+' },
-                    '24plus': { name: 'Solución Personalizada', specs: 'Escalable hasta 96kWh',             kwh: '96' }
+                    '5': { name: 'Better', specs: '10kWh • 10kW Bifásico • 120/220V', kwh: 10 },
+                    '12': { name: 'Completo', specs: '16kWh • 12kW Bifásico • 120/220V', kwh: 16 },
+                    '24': { name: 'Solución Personalizada', specs: 'Escalable 32kWh+', kwh: '32+' },
+                    '24plus': { name: 'Solución Personalizada', specs: 'Escalable hasta 96kWh', kwh: '96' }
                 }
             };
 
@@ -2603,7 +3578,7 @@
                 : { name: 'Solución Personalizada', specs: 'Adaptado a tus necesidades', kwh: 'TBD' };
         }
 
-        document.getElementById('fireflySurvey').addEventListener('submit', async function(e) {
+        document.getElementById('fireflySurvey').addEventListener('submit', async function (e) {
             e.preventDefault();
 
             const submitBtn = document.querySelector('.btn-submit');
@@ -2670,12 +3645,12 @@
         }
 
         // Close on backdrop click
-        document.getElementById('surveyModal').addEventListener('click', function(e) {
+        document.getElementById('surveyModal').addEventListener('click', function (e) {
             if (e.target === this) closeSurvey();
         });
 
         // Escape key to close
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && document.getElementById('surveyModal').classList.contains('active')) {
                 closeSurvey();
             }
@@ -2684,91 +3659,118 @@
 
     <!-- Flow Diagram Animation -->
     <script>
-    (function() {
-        const FD_STATES = [
-            { key: 'normal', cls: 'state-normal', title: 'OPERACIÓN NORMAL',
-              desc: 'La energía solar y la red alimentan tu hogar mientras cargan la batería',
-              solarOn: true, gridOn: true, houseOn: true, chargingOn: true, dischargingOn: false, outage: false,
-              pathSolar: 'active-solar', pathGrid: 'active-grid', pathHouse: 'active',
-              pathInvBat: 'active-battery', pathBatInv: 'dimmed', bat: 'charging' },
-            { key: 'outage', cls: 'state-outage', title: 'APAGÓN',
-              desc: 'La red se cae — la batería toma el control al instante, la vida continúa sin interrupciones',
-              solarOn: true, gridOn: false, houseOn: true, chargingOn: false, dischargingOn: true, outage: true,
-              pathSolar: 'active-solar', pathGrid: 'cut', pathHouse: 'active',
-              pathInvBat: 'dimmed', pathBatInv: 'active-battery', bat: 'discharging' },
-            { key: 'backup', cls: 'state-backup', title: 'RESPALDO COMPLETO DE BATERÍA',
-              desc: 'Sin sol, sin red — la energía almacenada mantiene todo funcionando durante la noche',
-              solarOn: false, gridOn: false, houseOn: true, chargingOn: false, dischargingOn: true, outage: true,
-              pathSolar: 'dimmed', pathGrid: 'cut', pathHouse: 'active',
-              pathInvBat: 'dimmed', pathBatInv: 'active-battery', bat: 'discharging' }
-        ];
+        (function () {
+            const FD_STATES = [
+                {
+                    key: 'normal', cls: 'state-normal', title: 'OPERACIÓN NORMAL',
+                    desc: 'La energía solar y la red alimentan tu hogar mientras cargan la batería',
+                    solarOn: true, gridOn: true, houseOn: true, chargingOn: true, dischargingOn: false, outage: false,
+                    pathSolar: 'active-solar', pathGrid: 'active-grid', pathHouse: 'active',
+                    pathInvBat: 'active-battery', pathBatInv: 'dimmed', bat: 'charging'
+                },
+                {
+                    key: 'outage', cls: 'state-outage', title: 'APAGÓN',
+                    desc: 'La red se cae — la batería toma el control al instante, la vida continúa sin interrupciones',
+                    solarOn: true, gridOn: false, houseOn: true, chargingOn: false, dischargingOn: true, outage: true,
+                    pathSolar: 'active-solar', pathGrid: 'cut', pathHouse: 'active',
+                    pathInvBat: 'dimmed', pathBatInv: 'active-battery', bat: 'discharging'
+                },
+                {
+                    key: 'backup', cls: 'state-backup', title: 'RESPALDO COMPLETO DE BATERÍA',
+                    desc: 'Sin sol, sin red — la energía almacenada mantiene todo funcionando durante la noche',
+                    solarOn: false, gridOn: false, houseOn: true, chargingOn: false, dischargingOn: true, outage: true,
+                    pathSolar: 'dimmed', pathGrid: 'cut', pathHouse: 'active',
+                    pathInvBat: 'dimmed', pathBatInv: 'active-battery', bat: 'discharging'
+                }
+            ];
 
-        let fdCur = 0, fdBatFrame = 0;
+            let fdCur = 0, fdBatFrame = 0;
 
-        function fdApply(idx) {
-            const s = FD_STATES[idx];
-            const banner = document.getElementById('flow-banner');
-            if (!banner) return;
-            banner.className = 'flow-state-banner ' + s.cls;
-            document.getElementById('flow-title').textContent = s.title;
-            document.getElementById('flow-desc').textContent = s.desc;
-            for (let i = 0; i < 3; i++) document.getElementById('fd' + i).className = 'flow-dot' + (i === idx ? ' on' : '');
+            function fdApply(idx) {
+                const s = FD_STATES[idx];
+                const banner = document.getElementById('flow-banner');
+                if (!banner) return;
+                banner.className = 'flow-state-banner ' + s.cls;
+                document.getElementById('flow-title').textContent = s.title;
+                document.getElementById('flow-desc').textContent = s.desc;
+                for (let i = 0; i < 3; i++) document.getElementById('fd' + i).className = 'flow-dot' + (i === idx ? ' on' : '');
 
-            document.getElementById('fp-solar-inv').className.baseVal = 'fd-path ' + s.pathSolar;
-            document.getElementById('fp-grid-inv').className.baseVal = 'fd-path ' + s.pathGrid;
-            document.getElementById('fp-inv-house').className.baseVal = 'fd-path ' + s.pathHouse;
-            document.getElementById('fp-inv-bat').className.baseVal = 'fd-path ' + s.pathInvBat;
-            document.getElementById('fp-bat-inv').className.baseVal = 'fd-path ' + s.pathBatInv;
+                document.getElementById('fp-solar-inv').className.baseVal = 'fd-path ' + s.pathSolar;
+                document.getElementById('fp-grid-inv').className.baseVal = 'fd-path ' + s.pathGrid;
+                document.getElementById('fp-inv-house').className.baseVal = 'fd-path ' + s.pathHouse;
 
-            ['fps1','fps2','fps3'].forEach(id => document.getElementById(id).classList.toggle('visible', s.solarOn));
-            ['fpg1','fpg2','fpg3'].forEach(id => document.getElementById(id).classList.toggle('visible', s.gridOn));
-            ['fph1','fph2','fph3'].forEach(id => document.getElementById(id).classList.toggle('visible', s.houseOn));
-            ['fpc1','fpc2'].forEach(id => document.getElementById(id).classList.toggle('visible', s.chargingOn));
-            ['fpd1','fpd2'].forEach(id => document.getElementById(id).classList.toggle('visible', s.dischargingOn));
+                const fpInvBat = document.getElementById('fp-inv-bat');
+                fpInvBat.className.baseVal = 'fd-path ' + s.pathInvBat;
+                if (s.bat === 'charging') fpInvBat.classList.add('charging');
+                else fpInvBat.classList.remove('charging');
 
-            const sc = document.querySelector('#fd-solar .fd-card');
-            sc.className.baseVal = 'fd-card optional ' + (s.solarOn ? 'active' : 'dimmed');
-            document.querySelector('#fd-solar .fd-label').classList.toggle('fd-dimmed-text', !s.solarOn);
+                const fpBatInv = document.getElementById('fp-bat-inv');
+                fpBatInv.className.baseVal = 'fd-path ' + s.pathBatInv;
+                if (s.bat === 'charging') fpBatInv.classList.add('charging');
+                else fpBatInv.classList.remove('charging');
 
-            document.querySelector('#fd-grid .fd-card').className.baseVal = 'fd-card ' + (s.gridOn ? 'active' : 'dimmed');
-            document.querySelector('#fd-grid .fd-label').classList.toggle('fd-dimmed-text', !s.gridOn);
+                // Toggle ambient glow based on state
+                const glow = document.querySelector('.fd-ambient-glow');
+                if (glow) {
+                    if (s.outage) {
+                        glow.setAttribute('fill', 'url(#inverter-glow-outage)'); // fallback to standard if not defined, but you can define more radial gradients
+                        glow.style.opacity = 0.5;
+                    } else {
+                        glow.setAttribute('fill', 'url(#inverter-glow)');
+                        glow.style.opacity = 1;
+                    }
+                }
 
-            document.getElementById('fd-x1').classList.toggle('show', s.outage);
-            document.getElementById('fd-x2').classList.toggle('show', s.outage);
+                ['fps1', 'fps2', 'fps3'].forEach(id => document.getElementById(id).classList.toggle('visible', s.solarOn));
+                ['fpg1', 'fpg2', 'fpg3'].forEach(id => document.getElementById(id).classList.toggle('visible', s.gridOn));
+                ['fph1', 'fph2', 'fph3'].forEach(id => document.getElementById(id).classList.toggle('visible', s.houseOn));
+                ['fpc1', 'fpc2'].forEach(id => document.getElementById(id).classList.toggle('visible', s.chargingOn));
+                ['fpd1', 'fpd2'].forEach(id => document.getElementById(id).classList.toggle('visible', s.dischargingOn));
 
-            document.querySelectorAll('.fd-win-glow').forEach(w => {
-                w.setAttribute('opacity', s.houseOn ? (w.dataset.baseOp || '0.25') : '0.02');
-            });
+                const sc = document.querySelector('#fd-solar .fd-card');
+                sc.className.baseVal = 'fd-card optional ' + (s.solarOn ? 'active' : 'dimmed');
+                document.querySelector('#fd-solar .fd-label').classList.toggle('fd-dimmed-text', !s.solarOn);
 
-            document.querySelectorAll('#fd-solar line, #fd-solar circle, #fd-solar rect:not(.fd-card)').forEach(el => {
-                el.style.transition = 'opacity 0.8s'; el.style.opacity = s.solarOn ? '' : '0.12';
-            });
-            document.querySelectorAll('#fd-solar text:not(.fd-label)').forEach(el => {
-                el.style.transition = 'opacity 0.8s'; el.style.opacity = s.solarOn ? '' : '0.2';
-            });
-            document.querySelectorAll('#fd-grid line:not(.fd-outage-x), #fd-grid rect:not(.fd-card), #fd-grid text:not(.fd-label)').forEach(el => {
-                el.style.transition = 'opacity 0.8s'; el.style.opacity = s.gridOn ? '' : '0.12';
-            });
-        }
+                document.querySelector('#fd-grid .fd-card').className.baseVal = 'fd-card ' + (s.gridOn ? 'active' : 'dimmed');
+                document.querySelector('#fd-grid .fd-label').classList.toggle('fd-dimmed-text', !s.gridOn);
 
-        function fdAnimBat() {
-            const bars = ['fb1','fb2','fb3','fb4'];
-            const s = FD_STATES[fdCur];
-            if (s.bat === 'charging') {
-                const fill = fdBatFrame % 5;
-                bars.forEach((id, i) => document.getElementById(id).setAttribute('opacity', i < fill ? '0.85' : '0.1'));
-            } else {
-                const keep = 4 - (fdBatFrame % 4);
-                bars.forEach((id, i) => document.getElementById(id).setAttribute('opacity', i < keep ? '0.85' : '0.06'));
+                document.getElementById('fd-x1').classList.toggle('show', s.outage);
+                document.getElementById('fd-x2').classList.toggle('show', s.outage);
+
+                document.querySelectorAll('.fd-win-glow').forEach(w => {
+                    w.setAttribute('opacity', s.houseOn ? (w.dataset.baseOp || '0.25') : '0.02');
+                });
+
+                document.querySelectorAll('#fd-solar line, #fd-solar circle, #fd-solar rect:not(.fd-card)').forEach(el => {
+                    el.style.transition = 'opacity 0.8s'; el.style.opacity = s.solarOn ? '' : '0.12';
+                });
+                document.querySelectorAll('#fd-solar text:not(.fd-label)').forEach(el => {
+                    el.style.transition = 'opacity 0.8s'; el.style.opacity = s.solarOn ? '' : '0.2';
+                });
+                document.querySelectorAll('#fd-grid line:not(.fd-outage-x), #fd-grid rect:not(.fd-card), #fd-grid text:not(.fd-label)').forEach(el => {
+                    el.style.transition = 'opacity 0.8s'; el.style.opacity = s.gridOn ? '' : '0.12';
+                });
             }
-            fdBatFrame++;
-        }
 
-        document.querySelectorAll('.fd-win-glow').forEach(w => { w.dataset.baseOp = w.getAttribute('opacity'); });
-        fdApply(0);
-        setInterval(fdAnimBat, 700);
-        setInterval(function() { fdCur = (fdCur + 1) % FD_STATES.length; fdBatFrame = 0; fdApply(fdCur); }, 5000);
-    })();
+            function fdAnimBat() {
+                const bars = ['fb1', 'fb2', 'fb3', 'fb4'];
+                const s = FD_STATES[fdCur];
+                if (s.bat === 'charging') {
+                    const fill = fdBatFrame % 5;
+                    bars.forEach((id, i) => document.getElementById(id).setAttribute('opacity', i < fill ? '0.85' : '0.1'));
+                } else {
+                    const keep = 4 - (fdBatFrame % 4);
+                    bars.forEach((id, i) => document.getElementById(id).setAttribute('opacity', i < keep ? '0.85' : '0.06'));
+                }
+                fdBatFrame++;
+            }
+
+            document.querySelectorAll('.fd-win-glow').forEach(w => { w.dataset.baseOp = w.getAttribute('opacity'); });
+            fdApply(0);
+            setInterval(fdAnimBat, 700);
+            setInterval(function () { fdCur = (fdCur + 1) % FD_STATES.length; fdBatFrame = 0; fdApply(fdCur); }, 5000);
+        })();
     </script>
 </body>
+
 </html>
