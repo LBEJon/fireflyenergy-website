@@ -2462,6 +2462,7 @@
                             <!-- FLOW PATHS -->
                             <path id="fp-solar-inv" class="fd-path" d="M 265,100 C 330,100 360,185 385,185" />
                             <path id="fp-grid-inv" class="fd-path" d="M 265,330 C 330,330 360,240 385,240" />
+                            <path id="fp-inv-grid" class="fd-path" d="M 385,240 C 360,240 330,330 265,330" />
                             <path id="fp-inv-house" class="fd-path" d="M 600,200 C 650,200 680,155 720,155" />
                             <path id="fp-inv-bat" class="fd-path" d="M 530,285 C 530,330 600,350 645,350" />
                             <path id="fp-bat-inv" class="fd-path" d="M 645,330 C 600,330 530,310 530,265" />
@@ -2508,6 +2509,27 @@
                                 <circle class="fd-particle-core" cx="0" cy="0" />
                                 <animateMotion dur="2s" repeatCount="indefinite" begin="1.33s">
                                     <mpath href="#fp-grid-inv" />
+                                </animateMotion>
+                            </g>
+                            <g class="fd-particle grid" id="fpg4">
+                                <circle class="fd-particle-halo" cx="0" cy="0" />
+                                <circle class="fd-particle-core" cx="0" cy="0" />
+                                <animateMotion dur="2s" repeatCount="indefinite">
+                                    <mpath href="#fp-inv-grid" />
+                                </animateMotion>
+                            </g>
+                            <g class="fd-particle grid" id="fpg5">
+                                <circle class="fd-particle-halo" cx="0" cy="0" />
+                                <circle class="fd-particle-core" cx="0" cy="0" />
+                                <animateMotion dur="2s" repeatCount="indefinite" begin="0.66s">
+                                    <mpath href="#fp-inv-grid" />
+                                </animateMotion>
+                            </g>
+                            <g class="fd-particle grid" id="fpg6">
+                                <circle class="fd-particle-halo" cx="0" cy="0" />
+                                <circle class="fd-particle-core" cx="0" cy="0" />
+                                <animateMotion dur="2s" repeatCount="indefinite" begin="1.33s">
+                                    <mpath href="#fp-inv-grid" />
                                 </animateMotion>
                             </g>
 
@@ -2790,6 +2812,7 @@
                             <!-- FLOW PATHS -->
                             <path id="m-fp-solar-inv" class="fd-path" d="M 80,100 C 80,145 130,140 130,160" />
                             <path id="m-fp-grid-inv" class="fd-path" d="M 240,100 C 240,145 190,140 190,160" />
+                            <path id="m-fp-inv-grid" class="fd-path" d="M 190,160 C 190,140 240,145 240,100" />
 
                             <path id="m-fp-inv-bat" class="fd-path" d="M 120,300 L 120,375" />
                             <path id="m-fp-bat-inv" class="fd-path" d="M 140,375 L 140,300" />
@@ -4123,20 +4146,23 @@
                     key: 'normal', cls: 'state-normal', title: 'NORMAL OPERATION',
                     desc: 'Solar and grid power your home while charging the battery',
                     solarOn: true, gridOn: true, houseOn: true, chargingOn: true, dischargingOn: false, outage: false,
+                    gridExport: false,
                     pathSolar: 'active-solar', pathGrid: 'active-grid', pathHouse: 'active',
                     pathInvBat: 'active-battery', pathBatInv: 'dimmed', bat: 'charging'
                 },
                 {
-                    key: 'outage', cls: 'state-outage', title: 'POWER OUTAGE',
-                    desc: 'Grid goes down — battery instantly takes over, life continues uninterrupted',
-                    solarOn: true, gridOn: false, houseOn: true, chargingOn: false, dischargingOn: true, outage: true,
-                    pathSolar: 'active-solar', pathGrid: 'cut', pathHouse: 'active',
-                    pathInvBat: 'dimmed', pathBatInv: 'active-battery', bat: 'discharging'
+                    key: 'export', cls: 'state-normal', title: 'MAXIMUM SOLAR SAVINGS',
+                    desc: 'Excess solar energy charges the battery and exports back to the grid',
+                    solarOn: true, gridOn: true, houseOn: true, chargingOn: true, dischargingOn: false, outage: false,
+                    gridExport: true,
+                    pathSolar: 'active-solar', pathGrid: 'dimmed', pathHouse: 'active',
+                    pathInvBat: 'active-battery', pathBatInv: 'dimmed', bat: 'charging'
                 },
                 {
-                    key: 'backup', cls: 'state-backup', title: 'FULL BATTERY BACKUP',
-                    desc: 'No sun, no grid — stored energy keeps everything running through the night',
+                    key: 'backup', cls: 'state-outage', title: 'POWER OUTAGE / OFF-GRID',
+                    desc: 'Grid goes down — battery instantly takes over, life continues uninterrupted',
                     solarOn: false, gridOn: false, houseOn: true, chargingOn: false, dischargingOn: true, outage: true,
+                    gridExport: false,
                     pathSolar: 'dimmed', pathGrid: 'cut', pathHouse: 'active',
                     pathInvBat: 'dimmed', pathBatInv: 'active-battery', bat: 'discharging'
                 }
@@ -4169,6 +4195,7 @@
 
                 setCls('fp-solar-inv', 'fd-path ' + s.pathSolar);
                 setCls('fp-grid-inv', 'fd-path ' + s.pathGrid);
+                setCls('fp-inv-grid', 'fd-path ' + (s.gridExport ? 'active-grid' : 'dimmed'));
                 setCls('fp-inv-house', 'fd-path ' + s.pathHouse);
 
                 const fpBatArr = ['fp-inv-bat', 'm-fp-inv-bat'];
@@ -4203,7 +4230,8 @@
                 });
 
                 ['fps1', 'fps2', 'fps3'].forEach(id => toggleCls(id, 'visible', s.solarOn));
-                ['fpg1', 'fpg2', 'fpg3'].forEach(id => toggleCls(id, 'visible', s.gridOn));
+                ['fpg1', 'fpg2', 'fpg3'].forEach(id => toggleCls(id, 'visible', s.gridOn && !s.gridExport));
+                ['fpg4', 'fpg5', 'fpg6'].forEach(id => toggleCls(id, 'visible', s.gridExport));
                 ['fph1', 'fph2', 'fph3'].forEach(id => toggleCls(id, 'visible', s.houseOn));
                 ['fpc1', 'fpc2'].forEach(id => toggleCls(id, 'visible', s.chargingOn));
                 ['fpd1', 'fpd2'].forEach(id => toggleCls(id, 'visible', s.dischargingOn));
