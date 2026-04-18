@@ -24,7 +24,8 @@ const MIME_TYPES = {
 };
 
 const server = createServer(async (req, res) => {
-  let filePath = join(__dirname, req.url === '/' ? 'index.html' : req.url);
+  const urlPath = req.url.split('?')[0].split('#')[0];
+  let filePath = join(__dirname, urlPath === '/' ? 'index.html' : urlPath);
 
   // Serve index.html for directory paths
   if (!extname(filePath)) {

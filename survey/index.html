@@ -526,7 +526,7 @@
 
         .appliance-grid {
             gap: 10px;
-            margin-bottom: 0;
+            margin-bottom: 32px;
         }
 
         .appliance-card {
@@ -542,6 +542,7 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
+            margin-bottom: 32px;
         }
 
         .hours-pill {
@@ -559,9 +560,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 16px 8px;
-            background: var(--white);
-            border: 2px solid transparent;
+            padding: 20px 12px;
+            background: var(--cloud);
+            border: 2px solid #E6E7E4;
             border-radius: 14px;
             text-align: center;
             transition: all 0.3s var(--transition-smooth);
@@ -632,7 +633,7 @@
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
-                <span class="progress-text">Step <span id="currentStep">1</span> of 6</span>
+                <span class="progress-text">Step <span id="currentStep">1</span> of 7</span>
             </div>
 
             <form id="fireflySurvey" class="survey-form">
@@ -747,75 +748,37 @@
                     <div class="step-header">
                         <span class="step-badge">Step 4</span>
                         <h2 class="step-title">What do you need to back up?</h2>
+                        <p class="step-subtitle">Pick the appliance level that best matches the loads you want running during an outage.</p>
                     </div>
 
-                    <!-- Part 1: Appliance level -->
-                    <div class="step-section">
-                        <p class="step-section-label">Appliances</p>
-                        <div class="options-grid appliance-grid">
-                            <label class="option-card appliance-card">
-                                <input type="radio" name="appliance_level" value="basic" required>
-                                <span class="appliance-icon">🔌</span>
-                                <span class="option-content">
-                                    <strong>Basic</strong>
-                                    <span class="option-sub">Fridge, lights, WiFi, outlets</span>
-                                </span>
-                                <span class="option-check">✓</span>
-                            </label>
-                            <label class="option-card appliance-card">
-                                <input type="radio" name="appliance_level" value="comfort">
-                                <span class="appliance-icon">❄️</span>
-                                <span class="option-content">
-                                    <strong>Comfort</strong>
-                                    <span class="option-sub">Basic + AC, TVs, fans</span>
-                                </span>
-                                <span class="option-check">✓</span>
-                            </label>
-                            <label class="option-card appliance-card">
-                                <input type="radio" name="appliance_level" value="complete">
-                                <span class="appliance-icon">🏠</span>
-                                <span class="option-content">
-                                    <strong>Full home</strong>
-                                    <span class="option-sub">All circuits, water pump, washer</span>
-                                </span>
-                                <span class="option-check">✓</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Part 2: Hours of backup -->
-                    <div class="step-section">
-                        <p class="step-section-label">Hours of backup</p>
-                        <div class="hours-grid">
-                            <label class="hours-pill">
-                                <input type="radio" name="backup_hours" value="5" required>
-                                <span class="hours-content">
-                                    <span class="hours-value">~5 hrs</span>
-                                    <span class="hours-label">Short outage</span>
-                                </span>
-                            </label>
-                            <label class="hours-pill">
-                                <input type="radio" name="backup_hours" value="12">
-                                <span class="hours-content">
-                                    <span class="hours-value">~12 hrs</span>
-                                    <span class="hours-label">Half day</span>
-                                </span>
-                            </label>
-                            <label class="hours-pill">
-                                <input type="radio" name="backup_hours" value="24">
-                                <span class="hours-content">
-                                    <span class="hours-value">~24 hrs</span>
-                                    <span class="hours-label">Full day</span>
-                                </span>
-                            </label>
-                            <label class="hours-pill">
-                                <input type="radio" name="backup_hours" value="24plus">
-                                <span class="hours-content">
-                                    <span class="hours-value">24+ hrs</span>
-                                    <span class="hours-label">Independence</span>
-                                </span>
-                            </label>
-                        </div>
+                    <div class="options-grid appliance-grid">
+                        <label class="option-card appliance-card">
+                            <input type="radio" name="appliance_level" value="basic" required>
+                            <span class="appliance-icon">🔌</span>
+                            <span class="option-content">
+                                <strong>Basic</strong>
+                                <span class="option-sub">Fridge, lights, WiFi, outlets</span>
+                            </span>
+                            <span class="option-check">✓</span>
+                        </label>
+                        <label class="option-card appliance-card">
+                            <input type="radio" name="appliance_level" value="comfort">
+                            <span class="appliance-icon">❄️</span>
+                            <span class="option-content">
+                                <strong>Comfort</strong>
+                                <span class="option-sub">Basic + AC, TVs, fans</span>
+                            </span>
+                            <span class="option-check">✓</span>
+                        </label>
+                        <label class="option-card appliance-card">
+                            <input type="radio" name="appliance_level" value="complete">
+                            <span class="appliance-icon">🏠</span>
+                            <span class="option-content">
+                                <strong>Full home</strong>
+                                <span class="option-sub">All circuits, water pump, washer</span>
+                            </span>
+                            <span class="option-check">✓</span>
+                        </label>
                     </div>
 
                     <div class="step-nav">
@@ -824,10 +787,55 @@
                     </div>
                 </div>
 
-                <!-- Step 5: Solar Interest -->
+                <!-- Step 5: Hours of backup -->
                 <div class="survey-step" data-step="5">
                     <div class="step-header">
                         <span class="step-badge">Step 5</span>
+                        <h2 class="step-title">How long do you want to run on backup?</h2>
+                        <p class="step-subtitle">This sets how much battery storage you'll need.</p>
+                    </div>
+
+                    <div class="hours-grid">
+                        <label class="hours-pill">
+                            <input type="radio" name="backup_hours" value="5" required>
+                            <span class="hours-content">
+                                <span class="hours-value">~5 hrs</span>
+                                <span class="hours-label">Short outage</span>
+                            </span>
+                        </label>
+                        <label class="hours-pill">
+                            <input type="radio" name="backup_hours" value="12">
+                            <span class="hours-content">
+                                <span class="hours-value">~12 hrs</span>
+                                <span class="hours-label">Half day</span>
+                            </span>
+                        </label>
+                        <label class="hours-pill">
+                            <input type="radio" name="backup_hours" value="24">
+                            <span class="hours-content">
+                                <span class="hours-value">~24 hrs</span>
+                                <span class="hours-label">Full day</span>
+                            </span>
+                        </label>
+                        <label class="hours-pill">
+                            <input type="radio" name="backup_hours" value="24plus">
+                            <span class="hours-content">
+                                <span class="hours-value">24+ hrs</span>
+                                <span class="hours-label">Independence</span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="step-nav">
+                        <button type="button" class="btn-back" onclick="prevStep()">← Back</button>
+                        <button type="button" class="btn-next" onclick="nextStep()">Continue →</button>
+                    </div>
+                </div>
+
+                <!-- Step 6: Solar Interest -->
+                <div class="survey-step" data-step="6">
+                    <div class="step-header">
+                        <span class="step-badge">Step 6</span>
                         <h2 class="step-title" id="solarTitle">Interested in solar panels?</h2>
                     </div>
                     <div class="options-grid">
@@ -856,10 +864,10 @@
                     </div>
                 </div>
 
-                <!-- Step 6: Contact Info -->
-                <div class="survey-step" data-step="6">
+                <!-- Step 7: Contact Info -->
+                <div class="survey-step" data-step="7">
                     <div class="step-header">
-                        <span class="step-badge">Step 6</span>
+                        <span class="step-badge">Step 7</span>
                         <h2 class="step-title">Contact information</h2>
                         <p class="step-subtitle">A specialist will contact you within 24 hours.</p>
                     </div>
@@ -928,7 +936,7 @@
 
     <script>
         let currentStep = 1;
-        const totalSteps = 6;
+        const totalSteps = 7;
         let surveyData = {};
 
         const N8N_WEBHOOK_URL = 'https://n8n.srv835342.hstgr.cloud/webhook/firefly-survey';
@@ -1016,7 +1024,7 @@
                 }
             });
 
-            if (currentStep === 4) calculateRecommendation();
+            if (currentStep === 5) calculateRecommendation();
 
             if (currentStep < totalSteps) {
                 stepEl.classList.remove('active');
@@ -1071,7 +1079,7 @@
             submitBtn.querySelector('.submit-loading').style.display = 'inline';
             submitBtn.disabled = true;
 
-            document.querySelector('.survey-step[data-step="6"]').querySelectorAll('input').forEach(input => {
+            document.querySelector('.survey-step[data-step="7"]').querySelectorAll('input').forEach(input => {
                 if (input.type === 'radio' && input.checked) surveyData[input.name] = input.value;
                 else if (input.type === 'checkbox') surveyData[input.name] = input.checked ? input.value : 'no';
                 else if (input.type !== 'radio') surveyData[input.name] = input.value;

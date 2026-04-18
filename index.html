@@ -1834,7 +1834,7 @@
 
         .footer-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
+            grid-template-columns: 2fr 1fr 1fr;
             gap: 40px;
             margin-bottom: 48px;
         }
@@ -2582,7 +2582,7 @@
 
         .appliance-grid {
             gap: 10px;
-            margin-bottom: 0;
+            margin-bottom: 32px;
         }
 
         .appliance-card {
@@ -2598,6 +2598,7 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
+            margin-bottom: 32px;
         }
 
         .hours-pill {
@@ -4285,7 +4286,7 @@
                                     <div class="package-price" id="package-price">$188,674 MXN<span class="iva-tag">+IVA</span></div>
                                     <div class="package-price-sub" id="package-price-sub">Includes basic installation</div>
                                 </div>
-                                <a href="#" id="package-cta" onclick="openSurvey();return false;" class="package-cta">Schedule My Site Evaluation →</a>
+                                <a href="#" id="package-cta" onclick="goToQuickForm();return false;" class="package-cta">Schedule My Site Evaluation →</a>
                             </div>
                         </div>
                     </div>
@@ -4338,7 +4339,7 @@
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
-                <span class="progress-text">Step <span id="currentStep">1</span> of 6</span>
+                <span class="progress-text">Step <span id="currentStep">1</span> of 7</span>
             </div>
 
             <button class="survey-close" onclick="closeSurvey()" aria-label="Close survey">
@@ -4468,75 +4469,37 @@
                     <div class="step-header">
                         <span class="step-badge">Step 4</span>
                         <h2 class="step-title">What do you need to back up?</h2>
+                        <p class="step-subtitle">Pick the appliance level that best matches the loads you want running during an outage.</p>
                     </div>
 
-                    <!-- Part 1: Appliance level -->
-                    <div class="step-section">
-                        <p class="step-section-label">Appliances</p>
-                        <div class="options-grid appliance-grid">
-                            <label class="option-card appliance-card">
-                                <input type="radio" name="appliance_level" value="basic" required>
-                                <span class="appliance-icon">🔌</span>
-                                <span class="option-content">
-                                    <strong>Basic</strong>
-                                    <span class="option-sub">Fridge, lights, WiFi, outlets</span>
-                                </span>
-                                <span class="option-check">✓</span>
-                            </label>
-                            <label class="option-card appliance-card">
-                                <input type="radio" name="appliance_level" value="comfort">
-                                <span class="appliance-icon">❄️</span>
-                                <span class="option-content">
-                                    <strong>Comfort</strong>
-                                    <span class="option-sub">Basic + air conditioning, TVs, fans</span>
-                                </span>
-                                <span class="option-check">✓</span>
-                            </label>
-                            <label class="option-card appliance-card">
-                                <input type="radio" name="appliance_level" value="complete">
-                                <span class="appliance-icon">🏠</span>
-                                <span class="option-content">
-                                    <strong>Full home</strong>
-                                    <span class="option-sub">All circuits, water pump, washer</span>
-                                </span>
-                                <span class="option-check">✓</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Part 2: Hours of backup -->
-                    <div class="step-section">
-                        <p class="step-section-label">Hours of backup?</p>
-                        <div class="hours-grid">
-                            <label class="hours-pill">
-                                <input type="radio" name="backup_hours" value="5" required>
-                                <span class="hours-content">
-                                    <span class="hours-value">~5 hrs</span>
-                                    <span class="hours-label">Short outage</span>
-                                </span>
-                            </label>
-                            <label class="hours-pill">
-                                <input type="radio" name="backup_hours" value="12">
-                                <span class="hours-content">
-                                    <span class="hours-value">~12 hrs</span>
-                                    <span class="hours-label">Half day</span>
-                                </span>
-                            </label>
-                            <label class="hours-pill">
-                                <input type="radio" name="backup_hours" value="24">
-                                <span class="hours-content">
-                                    <span class="hours-value">~24 hrs</span>
-                                    <span class="hours-label">Full day</span>
-                                </span>
-                            </label>
-                            <label class="hours-pill">
-                                <input type="radio" name="backup_hours" value="24plus">
-                                <span class="hours-content">
-                                    <span class="hours-value">24+ hrs</span>
-                                    <span class="hours-label">Independence</span>
-                                </span>
-                            </label>
-                        </div>
+                    <div class="options-grid appliance-grid">
+                        <label class="option-card appliance-card">
+                            <input type="radio" name="appliance_level" value="basic" required>
+                            <span class="appliance-icon">🔌</span>
+                            <span class="option-content">
+                                <strong>Basic</strong>
+                                <span class="option-sub">Fridge, lights, WiFi, outlets</span>
+                            </span>
+                            <span class="option-check">✓</span>
+                        </label>
+                        <label class="option-card appliance-card">
+                            <input type="radio" name="appliance_level" value="comfort">
+                            <span class="appliance-icon">❄️</span>
+                            <span class="option-content">
+                                <strong>Comfort</strong>
+                                <span class="option-sub">Basic + air conditioning, TVs, fans</span>
+                            </span>
+                            <span class="option-check">✓</span>
+                        </label>
+                        <label class="option-card appliance-card">
+                            <input type="radio" name="appliance_level" value="complete">
+                            <span class="appliance-icon">🏠</span>
+                            <span class="option-content">
+                                <strong>Full home</strong>
+                                <span class="option-sub">All circuits, water pump, washer</span>
+                            </span>
+                            <span class="option-check">✓</span>
+                        </label>
                     </div>
 
                     <div class="step-nav">
@@ -4545,10 +4508,55 @@
                     </div>
                 </div>
 
-                <!-- Step 5: Solar Interest -->
+                <!-- Step 5: Hours of backup -->
                 <div class="survey-step" data-step="5">
                     <div class="step-header">
                         <span class="step-badge">Step 5</span>
+                        <h2 class="step-title">How long do you want to run on backup?</h2>
+                        <p class="step-subtitle">This sets how much battery storage you'll need.</p>
+                    </div>
+
+                    <div class="hours-grid">
+                        <label class="hours-pill">
+                            <input type="radio" name="backup_hours" value="5" required>
+                            <span class="hours-content">
+                                <span class="hours-value">~5 hrs</span>
+                                <span class="hours-label">Short outage</span>
+                            </span>
+                        </label>
+                        <label class="hours-pill">
+                            <input type="radio" name="backup_hours" value="12">
+                            <span class="hours-content">
+                                <span class="hours-value">~12 hrs</span>
+                                <span class="hours-label">Half day</span>
+                            </span>
+                        </label>
+                        <label class="hours-pill">
+                            <input type="radio" name="backup_hours" value="24">
+                            <span class="hours-content">
+                                <span class="hours-value">~24 hrs</span>
+                                <span class="hours-label">Full day</span>
+                            </span>
+                        </label>
+                        <label class="hours-pill">
+                            <input type="radio" name="backup_hours" value="24plus">
+                            <span class="hours-content">
+                                <span class="hours-value">24+ hrs</span>
+                                <span class="hours-label">Independence</span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="step-nav">
+                        <button type="button" class="btn-back" onclick="prevStep()">← Back</button>
+                        <button type="button" class="btn-next" onclick="nextStep()">Continue →</button>
+                    </div>
+                </div>
+
+                <!-- Step 6: Solar Interest -->
+                <div class="survey-step" data-step="6">
+                    <div class="step-header">
+                        <span class="step-badge">Step 6</span>
                         <h2 class="step-title">Interested in solar panels?</h2>
                     </div>
                     <div class="options-grid">
@@ -4580,10 +4588,10 @@
                     </div>
                 </div>
 
-                <!-- Step 6: Contact Info -->
-                <div class="survey-step" data-step="6">
+                <!-- Step 7: Contact Info -->
+                <div class="survey-step" data-step="7">
                     <div class="step-header">
-                        <span class="step-badge">Step 6</span>
+                        <span class="step-badge">Step 7</span>
                         <h2 class="step-title">Contact information</h2>
                         <p class="step-subtitle">A specialist will contact you within 24 hours.</p>
                     </div>
@@ -4661,22 +4669,9 @@
                 </div>
 
                 <div class="footer-column">
-                    <h4 class="footer-title">Solutions</h4>
-                    <ul class="footer-links">
-                        <li><a href="#">Essentials (5kWh)</a></li>
-                        <li><a href="#">Good (10kWh)</a></li>
-                        <li><a href="#">Better (10kWh)</a></li>
-                        <li><a href="#">Complete (16kWh)</a></li>
-                        <li><a href="#">Custom Systems</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-column">
                     <h4 class="footer-title">Company</h4>
                     <ul class="footer-links">
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Our Story</a></li>
-                        <li><a href="#">Technology</a></li>
+                        <li><a href="#about">About Us</a></li>
                         <li><a href="#">Careers</a></li>
                         <li><a href="#">Contact</a></li>
                     </ul>
@@ -4786,7 +4781,7 @@
 
         // ── Survey ────────────────────────────────────────────────────────
         let currentStep = 1;
-        const totalSteps = 6;
+        const totalSteps = 7;
         let surveyData = {};
 
         const N8N_WEBHOOK_URL = '/api/survey';
@@ -4853,7 +4848,7 @@
                 }
             });
 
-            if (currentStep === 4) calculateRecommendation();
+            if (currentStep === 5) calculateRecommendation();
 
             if (currentStep < totalSteps) {
                 stepEl.classList.remove('active');
@@ -4909,8 +4904,8 @@
             submitBtn.querySelector('.submit-loading').style.display = 'inline';
             submitBtn.disabled = true;
 
-            // Collect step 6 data
-            document.querySelector('.survey-step[data-step="6"]').querySelectorAll('input').forEach(input => {
+            // Collect step 7 data
+            document.querySelector('.survey-step[data-step="7"]').querySelectorAll('input').forEach(input => {
                 if (input.type === 'radio' && input.checked) surveyData[input.name] = input.value;
                 else if (input.type === 'checkbox') surveyData[input.name] = input.checked ? input.value : 'no';
                 else if (input.type !== 'radio') surveyData[input.name] = input.value;
@@ -5192,6 +5187,25 @@
             systemTypes.forEach(radio => radio.addEventListener('change', updateCalculator));
             // init
             updateCalculator();
+        }
+
+        // Calculator CTA → short contact form, passing the estimator config
+        function goToQuickForm() {
+            const usage = usageSlider ? usageSlider.value : '';
+            const hours = backupSlider ? backupSlider.value : '';
+            const offset = offsetSlider ? offsetSlider.value : '';
+            let type = 'independence';
+            systemTypes.forEach(r => { if (r.checked) type = r.value; });
+
+            const params = new URLSearchParams({
+                type, usage, hours, offset,
+                system: document.getElementById('package-name')?.textContent || '',
+                inverter: document.getElementById('package-inverter')?.textContent || '',
+                battery: document.getElementById('package-battery')?.textContent || '',
+                solar: document.getElementById('package-solar')?.textContent || '',
+                price: document.getElementById('package-price')?.textContent || ''
+            });
+            window.location.href = 'survey/quick.html?' + params.toString();
         }
     </script>
 

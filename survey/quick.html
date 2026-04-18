@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Firefly Energy — Get Your Quote</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+    --nordic-charcoal: #1E2022;
+    --slate: #4A4E54;
+    --white: #FFFFFF;
+    --cream: #FAF9F6;
+    --cloud: #F5F6F7;
+    --firefly-green: #A4D233;
+    --energy-lime: #C6EB5C;
+    --light-green: #E8F5D6;
+    --hairline: #E6E7E4;
+    --muted: #6B7075;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    background: var(--cloud);
+    color: var(--nordic-charcoal);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+}
+
+.topbar {
+    background: var(--white);
+    border-bottom: 1px solid var(--hairline);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.topbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--nordic-charcoal);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 1.0625rem;
+    letter-spacing: -0.01em;
+}
+
+.topbar-logo img {
+    height: 32px;
+    width: auto;
+}
+
+.lang-toggle {
+    display: flex;
+    gap: 4px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.lang-toggle a {
+    padding: 6px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--muted);
+    transition: background 0.2s;
+}
+
+.lang-toggle a.active {
+    background: var(--nordic-charcoal);
+    color: var(--white);
+}
+
+.page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+}
+
+.intro {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.intro-eyebrow {
+    display: inline-block;
+    background: var(--nordic-charcoal);
+    color: var(--firefly-green);
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 16px;
+}
+
+.intro h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(26px, 4vw, 36px);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+}
+
+.intro p {
+    color: var(--slate);
+    font-size: 1rem;
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.summary-card {
+    background: linear-gradient(135deg, #1E2022 0%, #2A2D30 100%);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 24px;
+    color: var(--white);
+    box-shadow: 0 20px 40px -20px rgba(30, 32, 34, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 240px;
+    height: 240px;
+    background: radial-gradient(circle, rgba(164, 210, 51, 0.12), transparent 70%);
+    pointer-events: none;
+}
+
+.summary-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--firefly-green);
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.summary-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+    position: relative;
+}
+
+.summary-sub {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.summary-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.9375rem;
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-row .label {
+    color: rgba(255, 255, 255, 0.6);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.summary-row .value {
+    color: var(--white);
+    font-weight: 600;
+    text-align: right;
+}
+
+.summary-row .value.highlight {
+    color: var(--firefly-green);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+}
+
+.form-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 32px;
+    border: 1px solid var(--hairline);
+}
+
+.form-card h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.375rem;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    margin-bottom: 6px;
+}
+
+.form-card .form-sub {
+    color: var(--slate);
+    font-size: 0.9375rem;
+    margin-bottom: 24px;
+}
+
+.field {
+    margin-bottom: 18px;
+}
+
+.field label {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--slate);
+    margin-bottom: 8px;
+}
+
+.field input,
+.field select {
+    width: 100%;
+    padding: 14px 16px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    color: var(--nordic-charcoal);
+    background: var(--cloud);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.field input:focus,
+.field select:focus {
+    outline: none;
+    border-color: var(--firefly-green);
+    background: var(--white);
+}
+
+.field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+@media (max-width: 520px) {
+    .field-row { grid-template-columns: 1fr; }
+}
+
+.section-divider {
+    border-top: 1px solid var(--hairline);
+    margin: 28px 0 22px;
+}
+
+.section-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--nordic-charcoal);
+    margin-bottom: 14px;
+}
+
+.option-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+@media (max-width: 520px) {
+    .option-grid { grid-template-columns: 1fr; }
+}
+
+.option-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    background: var(--cloud);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.option-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.option-card:hover {
+    border-color: rgba(164, 210, 51, 0.5);
+}
+
+.option-card.selected {
+    border-color: var(--firefly-green);
+    background: var(--light-green);
+}
+
+.option-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.option-content strong {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--nordic-charcoal);
+    letter-spacing: -0.005em;
+}
+
+.option-content .option-sub {
+    font-size: 0.8125rem;
+    color: var(--muted);
+}
+
+.option-check {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--hairline);
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    color: transparent;
+    transition: all 0.2s;
+    margin-left: 10px;
+}
+
+.option-card.selected .option-check {
+    background: var(--firefly-green);
+    border-color: var(--firefly-green);
+    color: var(--nordic-charcoal);
+}
+
+.other-location {
+    display: none;
+    margin-top: 10px;
+}
+
+.other-location.active {
+    display: block;
+}
+
+.phone-row {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+}
+
+.country-code-toggle {
+    flex-shrink: 0;
+}
+
+.country-code-toggle .radio-group {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
+
+.country-code-toggle .radio-label {
+    padding: 13px 14px;
+    font-size: 13px;
+    border-radius: 10px;
+    white-space: nowrap;
+    justify-content: flex-start;
+    font-weight: 600;
+    min-width: 104px;
+    flex-shrink: 0;
+    gap: 10px;
+}
+
+.country-code-toggle .radio-label span {
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 0.02em;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    line-height: 14px !important;
+}
+
+.field .radio-label,
+.field .checkbox-label {
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.field .radio-label span,
+.field .checkbox-label span {
+    text-transform: none;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: normal;
+    color: var(--slate);
+    line-height: 14px;
+}
+
+.field .checkbox-label span {
+    line-height: 20px;
+}
+
+.field .radio-label:has(input:checked) span {
+    color: var(--nordic-charcoal);
+    font-weight: 600;
+}
+
+.phone-row .field {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.radio-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--slate);
+    padding: 10px 18px;
+    background: var(--cloud);
+    border-radius: 50px;
+    border: 2px solid var(--hairline);
+    transition: all 0.2s ease;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.radio-label {
+    flex-direction: row;
+}
+
+.radio-label:hover { border-color: rgba(164, 210, 51, 0.6); }
+.radio-label input[type="radio"] {
+    accent-color: var(--firefly-green);
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    margin: 0;
+    transform: translateY(2px);
+}
+
+.country-code-toggle .radio-label input[type="radio"] {
+    transform: translateY(3px);
+}
+
+.radio-label span {
+    line-height: 14px;
+}
+
+.checkbox-label {
+    align-items: center;
+}
+
+.checkbox-label input[type="checkbox"] {
+    flex-shrink: 0;
+    transform: translateY(5px);
+}
+
+.checkbox-label span {
+    line-height: 20px;
+}
+
+.radio-label:has(input[type="radio"]:checked) {
+    border-color: var(--firefly-green);
+    background: var(--light-green);
+    color: var(--nordic-charcoal);
+    font-weight: 600;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--slate);
+    font-family: 'Open Sans', sans-serif;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--firefly-green);
+    cursor: pointer;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 16px 24px;
+    background: var(--firefly-green);
+    color: var(--nordic-charcoal);
+    border: none;
+    border-radius: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -12px rgba(164, 210, 51, 0.6);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.fine {
+    text-align: center;
+    font-size: 0.8125rem;
+    color: var(--muted);
+    margin-top: 20px;
+}
+
+.fine a {
+    color: var(--nordic-charcoal);
+    font-weight: 600;
+}
+
+.success {
+    display: none;
+    text-align: center;
+    padding: 40px 24px;
+}
+
+.success.active {
+    display: block;
+}
+
+.success-icon {
+    width: 72px;
+    height: 72px;
+    background: var(--firefly-green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 36px;
+    color: var(--nordic-charcoal);
+}
+
+.success h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+}
+
+.success p {
+    color: var(--slate);
+    margin-bottom: 24px;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.wa-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    background: #25D366;
+    color: var(--white);
+    text-decoration: none;
+    border-radius: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    transition: transform 0.2s;
+}
+
+.wa-btn:hover {
+    transform: translateY(-2px);
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    margin-bottom: 16px;
+    transition: color 0.2s;
+}
+
+.back-link:hover {
+    color: var(--nordic-charcoal);
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <a href="../index.html" class="topbar-logo">
+        <img src="../firefly_logo_padded.png" alt="Firefly Energy" onerror="this.style.display='none'">
+        <span>Firefly Energy</span>
+    </a>
+    <div class="lang-toggle">
+        <a href="quick.html" class="active">EN</a>
+        <a href="../es/survey/quick.html">ES</a>
+    </div>
+</div>
+
+<div class="page">
+
+    <a href="../index.html#calculator" class="back-link">← Back to estimator</a>
+
+    <div id="mainContent">
+        <div class="intro">
+            <span class="intro-eyebrow">Recommended Solution</span>
+            <h1>You're almost there.</h1>
+            <p>We've put together your recommended system below. Just share your contact info and our team will reach out within 24 hours to schedule your free site evaluation.</p>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">Your Recommended System</div>
+            <div class="summary-title" id="sumTitle">Firefly System</div>
+            <div class="summary-sub" id="sumSub">Based on the inputs you provided in the estimator</div>
+            <div class="summary-rows" id="sumRows"></div>
+        </div>
+
+        <div class="form-card">
+            <h2>Get your detailed quote</h2>
+            <p class="form-sub">We'll contact you within 24 hours to schedule a free site evaluation.</p>
+
+            <form id="quickForm">
+                <div class="section-label">Property Type</div>
+                <div class="option-grid" id="propertyTypeGrid">
+                    <label class="option-card">
+                        <input type="radio" name="property_type" value="residential" required>
+                        <span class="option-content"><strong>Home</strong><span class="option-sub">Residential</span></span>
+                        <span class="option-check">✓</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="property_type" value="commercial">
+                        <span class="option-content"><strong>Business</strong><span class="option-sub">Commercial</span></span>
+                        <span class="option-check">✓</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="property_type" value="industrial">
+                        <span class="option-content"><strong>Industrial</strong><span class="option-sub">Large scale</span></span>
+                        <span class="option-check">✓</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="property_type" value="new-construction">
+                        <span class="option-content"><strong>New Construction</strong><span class="option-sub">Building from scratch</span></span>
+                        <span class="option-check">✓</span>
+                    </label>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <div class="section-label">Property Location</div>
+                <div class="option-grid" id="locationGrid">
+                    <label class="option-card">
+                        <input type="radio" name="location" value="sma-centro" required>
+                        <span class="option-content"><strong>San Miguel (Centro)</strong><span class="option-sub">Historic Center</span></span>
+                        <span class="option-check">✓</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="location" value="sma-surrounding">
+                        <span class="option-content"><strong>San Miguel (Surrounding)</strong><span class="option-sub">Outlying areas</span></span>
+                        <span class="option-check">✓</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="location" value="queretaro-gto">
+                        <span class="option-content"><strong>Querétaro / Guanajuato</strong><span class="option-sub">Nearby regions</span></span>
+                        <span class="option-check">✓</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="location" value="other">
+                        <span class="option-content"><strong>Other</strong><span class="option-sub">Tell us where</span></span>
+                        <span class="option-check">✓</span>
+                    </label>
+                </div>
+                <div class="field other-location" id="otherLocationGroup">
+                    <label for="other_location">Where?</label>
+                    <input type="text" id="other_location" name="other_location" placeholder="e.g. Mexico City">
+                </div>
+
+                <div class="section-divider"></div>
+
+                <div class="section-label">Your Details</div>
+                <div class="field">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="field">
+                    <label>Phone Number</label>
+                    <div class="phone-row">
+                        <div class="country-code-toggle">
+                            <div class="radio-group">
+                                <label class="radio-label"><input type="radio" name="country_code" value="+52" checked><span>+52 MX</span></label>
+                                <label class="radio-label"><input type="radio" name="country_code" value="+1"><span>+1 US</span></label>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <input type="tel" id="phone" name="phone" required placeholder="415 123 4567">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="whatsapp_same" name="whatsapp_same" value="yes" checked>
+                        <span>This number is also connected on WhatsApp</span>
+                    </label>
+                </div>
+
+                <div class="field">
+                    <label>Preferred Language</label>
+                    <div class="radio-group">
+                        <label class="radio-label"><input type="radio" name="language" value="english" checked><span>English</span></label>
+                        <label class="radio-label"><input type="radio" name="language" value="español"><span>Español</span></label>
+                        <label class="radio-label"><input type="radio" name="language" value="both"><span>Both</span></label>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">Send My Quote Request</button>
+
+                <p class="fine">We'll reply within 24 hours. No spam, no sales pressure.</p>
+            </form>
+        </div>
+    </div>
+
+    <div class="success" id="successState">
+        <div class="success-icon">✓</div>
+        <h2>Thanks — we've got it.</h2>
+        <p>Our team will review your recommended system and reach out within 24 hours to schedule your free site evaluation.</p>
+        <a href="#" id="waLink" class="wa-btn" target="_blank">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.31-1.39c1.45.79 3.08 1.21 4.73 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01S14.69 2 12.04 2m0 1.67c2.2 0 4.26.86 5.82 2.42a8.2 8.2 0 0 1 2.41 5.82c0 4.54-3.7 8.23-8.24 8.23a8.3 8.3 0 0 1-4.21-1.15l-.3-.18-3.15.83.84-3.07-.2-.31a8.26 8.26 0 0 1-1.27-4.42c.01-4.54 3.7-8.23 8.24-8.23M8.53 7.33c-.16 0-.43.06-.66.31-.22.25-.87.86-.87 2.07s.89 2.39 1 2.56c.14.17 1.76 2.67 4.25 3.73.59.27 1.05.42 1.41.53.59.19 1.13.16 1.56.1.48-.07 1.46-.6 1.67-1.18.21-.58.21-1.07.15-1.18s-.23-.18-.48-.3c-.25-.12-1.47-.74-1.69-.82-.23-.08-.4-.12-.56.12s-.64.8-.79.97c-.15.16-.29.18-.54.06-.75-.3-1.44-.69-1.97-1.16-.49-.45-.98-1-1.38-1.66-.12-.21 0-.32.11-.43.1-.1.23-.27.35-.4s.16-.23.25-.38c.08-.15.04-.29-.02-.41s-.56-1.34-.76-1.84c-.15-.38-.3-.38-.43-.39h-.38z"/></svg>
+            Message us on WhatsApp
+        </a>
+    </div>
+
+</div>
+
+<script>
+function getParam(key) {
+    return new URLSearchParams(window.location.search).get(key) || '';
+}
+
+function formatBackupType(type) {
+    if (type === 'independence') return 'Energy Independence';
+    if (type === 'backup') return 'Backup for Outages';
+    return 'Custom';
+}
+
+(function renderSummary() {
+    const data = {
+        type: getParam('type'),
+        usage: getParam('usage'),
+        hours: getParam('hours'),
+        offset: getParam('offset'),
+        system: getParam('system'),
+        inverter: getParam('inverter'),
+        battery: getParam('battery'),
+        solar: getParam('solar'),
+        price: getParam('price')
+    };
+
+    const titleEl = document.getElementById('sumTitle');
+    titleEl.textContent = data.system || 'Firefly System';
+
+    const rowEntries = [];
+    if (data.type) rowEntries.push(['Goal', formatBackupType(data.type)]);
+    if (data.usage) rowEntries.push(['Daily Usage', data.usage + ' kWh']);
+    if (data.hours) rowEntries.push(['Backup Time', data.hours + ' hours']);
+    if (data.offset) rowEntries.push(['Solar Offset', data.offset + '%']);
+    if (data.inverter) rowEntries.push(['Inverter', data.inverter]);
+    if (data.battery) rowEntries.push(['Battery', data.battery]);
+    if (data.solar) rowEntries.push(['Solar', data.solar]);
+    if (data.price) rowEntries.push(['Estimated Price', data.price]);
+
+    const sumRows = document.getElementById('sumRows');
+    rowEntries.forEach(([k, v]) => {
+        const row = document.createElement('div');
+        row.className = 'summary-row';
+        const label = document.createElement('span');
+        label.className = 'label';
+        label.textContent = k;
+        const value = document.createElement('span');
+        value.className = 'value';
+        if (k === 'Estimated Price') value.classList.add('highlight');
+        value.textContent = v;
+        row.appendChild(label);
+        row.appendChild(value);
+        sumRows.appendChild(row);
+    });
+
+    if (rowEntries.length === 0) {
+        document.getElementById('sumSub').textContent = 'Share your details below and we\'ll build a custom recommendation.';
+    }
+})();
+
+function wireOptionGrid(gridId) {
+    const grid = document.getElementById(gridId);
+    grid.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            grid.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+            if (radio.checked) radio.closest('.option-card').classList.add('selected');
+        });
+    });
+}
+wireOptionGrid('propertyTypeGrid');
+wireOptionGrid('locationGrid');
+
+document.querySelectorAll('input[name="location"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+        const other = document.getElementById('otherLocationGroup');
+        const input = document.getElementById('other_location');
+        if (radio.value === 'other' && radio.checked) {
+            other.classList.add('active');
+            input.focus();
+        } else {
+            other.classList.remove('active');
+            input.value = '';
+        }
+    });
+});
+
+function getChecked(name) {
+    const el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : '';
+}
+
+document.getElementById('quickForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+
+    const payload = {
+        source: 'estimator',
+        submittedAt: new Date().toISOString(),
+        property: {
+            type: getChecked('property_type'),
+            location: getChecked('location'),
+            other_location: document.getElementById('other_location').value
+        },
+        contact: {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            country_code: getChecked('country_code'),
+            phone: document.getElementById('phone').value,
+            whatsapp_same: document.getElementById('whatsapp_same').checked,
+            language: getChecked('language')
+        },
+        estimator: {
+            type: getParam('type'),
+            usage: getParam('usage'),
+            hours: getParam('hours'),
+            offset: getParam('offset'),
+            system: getParam('system'),
+            inverter: getParam('inverter'),
+            battery: getParam('battery'),
+            solar: getParam('solar'),
+            price: getParam('price')
+        }
+    };
+
+    try {
+        const res = await fetch('https://n8n.srv835342.hstgr.cloud/webhook/firefly-survey', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error('Webhook returned ' + res.status);
+
+        const system = getParam('system') || 'a Firefly system';
+        const waMsg = encodeURIComponent('Hi Firefly! I just submitted my quote request for ' + system + '. Looking forward to the next steps.');
+        document.getElementById('waLink').href = 'https://wa.me/5214151805030?text=' + waMsg;
+
+        document.getElementById('mainContent').style.display = 'none';
+        document.getElementById('successState').classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'Send My Quote Request';
+        alert('Something went wrong. Please try again or message us on WhatsApp at +52 415 180 5030.');
+    }
+});
+</script>
+
+</body>
+</html>
