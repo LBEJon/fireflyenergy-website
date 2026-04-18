@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mockup — Hybrid Inverter vs Microinverter (Light)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+    --nordic-charcoal: #1E2022;
+    --slate: #4A4E54;
+    --white: #FFFFFF;
+    --cream: #FAF9F6;
+    --page: #F5F6F4;
+    --firefly-green: #A4D233;
+    --energy-lime: #C6EB5C;
+    --light-green: #E8F5D6;
+    --hairline: #E6E7E4;
+    --muted: #6B7075;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    background: var(--page);
+    color: var(--nordic-charcoal);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+.mockup-label {
+    background: var(--firefly-green);
+    color: var(--nordic-charcoal);
+    padding: 10px 24px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-align: center;
+}
+
+.hvm {
+    padding: 96px 24px;
+    background: var(--page);
+    position: relative;
+    overflow: hidden;
+}
+
+.hvm::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 10% 0%, rgba(164, 210, 51, 0.08), transparent 50%),
+        radial-gradient(circle at 90% 100%, rgba(164, 210, 51, 0.05), transparent 55%);
+    pointer-events: none;
+}
+
+.hvm-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.hvm-header {
+    text-align: center;
+    margin-bottom: 56px;
+}
+
+.hvm-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--nordic-charcoal);
+    color: var(--firefly-green);
+    padding: 10px 22px;
+    border-radius: 50px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin-bottom: 22px;
+    box-shadow: 0 8px 20px -8px rgba(30, 32, 34, 0.3);
+}
+
+.hvm-eyebrow .hvm-vs {
+    background: var(--firefly-green);
+    color: var(--nordic-charcoal);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+}
+
+.hvm-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(30px, 4vw, 44px);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    color: var(--nordic-charcoal);
+}
+
+.hvm-title span { color: #7FA324; }
+
+.hvm-subtitle {
+    font-size: 1.125rem;
+    color: var(--slate);
+    max-width: 760px;
+    margin: 0 auto;
+    line-height: 1.65;
+}
+
+.hvm-subtitle strong {
+    color: var(--nordic-charcoal);
+    font-weight: 700;
+}
+
+.hvm-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.hvm-row-wrap {
+    background: var(--white);
+    border: 1px solid var(--hairline);
+    border-radius: 16px;
+    padding: 28px 28px 24px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hvm-row-wrap:hover {
+    border-color: rgba(164, 210, 51, 0.4);
+    box-shadow: 0 10px 30px -18px rgba(30, 32, 34, 0.12);
+}
+
+.hvm-row-content {
+    display: grid;
+    grid-template-columns: 56px 1.1fr 1.1fr 1.1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.hvm-num {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--firefly-green);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    padding-top: 4px;
+}
+
+.hvm-dimension h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--nordic-charcoal);
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+}
+
+.hvm-dimension p {
+    font-size: 0.875rem;
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+.hvm-option {
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    height: 100%;
+}
+
+.hvm-option--firefly {
+    background: rgba(164, 210, 51, 0.1);
+    border-color: rgba(164, 210, 51, 0.3);
+}
+
+.hvm-option--micro {
+    background: #F5F6F4;
+    border-color: var(--hairline);
+}
+
+.hvm-option-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 8px;
+}
+
+.hvm-option--firefly .hvm-option-label { color: #5A7A0E; }
+.hvm-option--micro .hvm-option-label { color: var(--muted); }
+
+.hvm-option-body {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--slate);
+}
+
+.hvm-option-body strong {
+    color: var(--nordic-charcoal);
+    font-weight: 700;
+}
+
+.hvm-footnote {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: rgba(164, 210, 51, 0.08);
+    border-left: 3px solid var(--firefly-green);
+    border-radius: 0 8px 8px 0;
+    display: flex;
+    gap: 12px;
+    align-items: start;
+}
+
+.hvm-footnote-label {
+    flex-shrink: 0;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    color: #5A7A0E;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding-top: 2px;
+    min-width: 80px;
+}
+
+.hvm-footnote-text {
+    font-size: 0.875rem;
+    color: var(--slate);
+    line-height: 1.55;
+}
+
+.hvm-footnote-text strong { color: var(--nordic-charcoal); }
+
+
+@media (max-width: 960px) {
+    .hvm-row-content {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+    .hvm-num {
+        font-size: 24px;
+        padding-top: 0;
+    }
+    .hvm-row-wrap { padding: 22px 20px; }
+}
+</style>
+</head>
+<body>
+<div class="mockup-label">MOCKUP — Hybrid Inverter vs. Microinverter (Light)</div>
+
+<section class="hvm">
+    <div class="hvm-inner">
+        <div class="hvm-header">
+            <span class="hvm-eyebrow">Hybrid Inverter <span class="hvm-vs">VS</span> Microinverter</span>
+            <h1 class="hvm-title">Same sun. Same energy.<br><span>One superior solution.</span></h1>
+            <p class="hvm-subtitle">Solar panels with microinverters produce energy and lower your energy costs — but that's where the benefits stop. Firefly's hybrid architecture creates a <strong>microgrid in your home</strong>, delivering true energy independence even when CFE goes down.</p>
+        </div>
+
+        <div class="hvm-rows">
+
+            <div class="hvm-row-wrap">
+                <div class="hvm-row-content">
+                    <div class="hvm-num">01</div>
+                    <div class="hvm-dimension">
+                        <h3>What happens when CFE goes out</h3>
+                        <p>The moment the grid drops, the system decides whether your home stays powered.</p>
+                    </div>
+                    <div class="hvm-option hvm-option--firefly">
+                        <div class="hvm-option-label">● Firefly Hybrid</div>
+                        <div class="hvm-option-body"><strong>Keeps producing and delivering power</strong> from solar and battery. Your home stays on.</div>
+                    </div>
+                    <div class="hvm-option hvm-option--micro">
+                        <div class="hvm-option-label">○ Microinverter</div>
+                        <div class="hvm-option-body"><strong>Shuts off.</strong> Grid-tie code requires microinverters to stop producing when CFE goes down — even with full sun on the panels.</div>
+                    </div>
+                </div>
+                <div class="hvm-footnote">
+                    <span class="hvm-footnote-label">Why it matters</span>
+                    <span class="hvm-footnote-text">This is the single biggest functional difference. A microinverter system alone cannot power your home during a blackout.</span>
+                </div>
+            </div>
+
+            <div class="hvm-row-wrap">
+                <div class="hvm-row-content">
+                    <div class="hvm-num">02</div>
+                    <div class="hvm-dimension">
+                        <h3>Backup battery integration</h3>
+                        <p>Backup as a built-in feature vs. something bolted on later.</p>
+                    </div>
+                    <div class="hvm-option hvm-option--firefly">
+                        <div class="hvm-option-label">● Firefly Hybrid</div>
+                        <div class="hvm-option-body"><strong>Built in from day one.</strong> Out-of-the-box compatible with DC batteries, and you can <strong>connect multiple packs in parallel</strong> to scale capacity as your needs grow.</div>
+                    </div>
+                    <div class="hvm-option hvm-option--micro">
+                        <div class="hvm-option-label">○ Microinverter</div>
+                        <div class="hvm-option-body">Not native to the solution. Adding backup requires a <strong>separate battery system and a coordinating gateway</strong> — often from different brands stitched together.</div>
+                    </div>
+                </div>
+                <div class="hvm-footnote">
+                    <span class="hvm-footnote-label">Why it matters</span>
+                    <span class="hvm-footnote-text">One integrated system means simpler wiring, one 8-year warranty, and one local team accountable for the whole installation.</span>
+                </div>
+            </div>
+
+            <div class="hvm-row-wrap">
+                <div class="hvm-row-content">
+                    <div class="hvm-num">03</div>
+                    <div class="hvm-dimension">
+                        <h3>Where the electronics live</h3>
+                        <p>Location shapes lifespan and servicing effort.</p>
+                    </div>
+                    <div class="hvm-option hvm-option--firefly">
+                        <div class="hvm-option-label">● Firefly Hybrid</div>
+                        <div class="hvm-option-body">One wall-mounted inverter inside your home or garage — <strong>ventilated, shaded, and serviced at eye level</strong>.</div>
+                    </div>
+                    <div class="hvm-option hvm-option--micro">
+                        <div class="hvm-option-label">○ Microinverter</div>
+                        <div class="hvm-option-body"><strong>3–5 microinverters on the roof</strong> for a typical 6–10 panel install (one per pair of panels), exposed to sun and weather.</div>
+                    </div>
+                </div>
+                <div class="hvm-footnote">
+                    <span class="hvm-footnote-label">Why it matters</span>
+                    <span class="hvm-footnote-text">Rooftop electronics weather faster than equipment indoors, and service calls require roof access and panel removal.</span>
+                </div>
+            </div>
+
+            <div class="hvm-row-wrap">
+                <div class="hvm-row-content">
+                    <div class="hvm-num">04</div>
+                    <div class="hvm-dimension">
+                        <h3>Expanding the system later</h3>
+                        <p>Both systems can grow — they just scale different things.</p>
+                    </div>
+                    <div class="hvm-option hvm-option--firefly">
+                        <div class="hvm-option-label">● Firefly Hybrid</div>
+                        <div class="hvm-option-body"><strong>Designed to grow with you.</strong> Add battery capacity up to 16 units in parallel, add panels when you need to generate more energy, or add additional inverters to scale as your needs grow.</div>
+                    </div>
+                    <div class="hvm-option hvm-option--micro">
+                        <div class="hvm-option-label">○ Microinverter</div>
+                        <div class="hvm-option-body"><strong>Solar expands, storage doesn't.</strong> Each new panel needs a compatible microinverter; mixed panel models are fine if each is paired correctly. Adding backup still requires a separate battery system later.</div>
+                    </div>
+                </div>
+                <div class="hvm-footnote">
+                    <span class="hvm-footnote-label">Why it matters</span>
+                    <span class="hvm-footnote-text">Firefly's upgrade path includes more storage — the part most homeowners actually want to add as CFE reliability changes.</span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+</body>
+</html>

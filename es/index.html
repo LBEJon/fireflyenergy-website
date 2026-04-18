@@ -3171,6 +3171,7 @@
         </div>
     </section>
 
+
     <!-- Calculator Section -->
     <section class="calculator" id="calculator">
         <div class="section-container">
@@ -3253,6 +3254,10 @@
                                 para las horas pico de sol de San Miguel de Allende.</p>
                         </div>
                     </div>
+                </div>
+                <!-- New bold CTA -->
+                <div style="text-align: center; margin-top: 2.5rem; width: 100%;">
+                    <button onclick="openSurvey()" class="btn-primary" style="font-size: 1.2rem; font-weight: 700; padding: 1.25rem 2.5rem; box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3); width: 100%; max-width: 450px; margin: 0 auto; display: block; letter-spacing: 0.5px;">Estoy listo para mi cotización gratuita de Firefly &rarr;</button>
                 </div>
             </div>
         </div>
@@ -3403,6 +3408,813 @@
     </section>
 
     <!-- Trust Section -->
+    <section class="trust" id="about">
+        <div class="trust-content">
+            <div class="trust-badge">20 Años de Experiencia Local</div>
+            <h2 class="trust-title">Construido por Nordic Electric.<br>Diseñado para México.</h2>
+            <p class="trust-text">Durante dos décadas, Nordic Electric ha energizado los hogares y la infraestructura de
+                San Miguel de Allende, Guanajuato. Firefly representa nuestra respuesta a una red cambiante—resiliencia
+                energética
+                moderna respaldada por experiencia local, soporte bilingüe y tecnología compatible con CFE.</p>
+
+            <div class="trust-stats">
+                <div class="trust-stat">
+                    <span class="trust-stat-value">20+</span>
+                    <span class="trust-stat-label">Años en San Miguel</span>
+                </div>
+                <div class="trust-stat">
+                    <span class="trust-stat-value">8,000+</span>
+                    <span class="trust-stat-label">Ciclos de Batería</span>
+                </div>
+                <div class="trust-stat">
+                    <span class="trust-stat-value">96kWh</span>
+                    <span class="trust-stat-label">Capacidad Máxima</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="contact">
+        <div class="section-container">
+            <h2 class="cta-title">¿Listo para Tomar el Control de Tu Energía?</h2>
+            <p class="cta-text">Obtén una consulta gratuita y cotización personalizada en menos de 24 horas.</p>
+            <a href="/es/survey/" class="btn-dark">Agendar Consulta Gratuita →</a>
+        </div>
+    </section>
+
+    <!-- Survey Modal -->
+    <div id="surveyModal" class="survey-modal">
+        <div class="survey-container">
+            <div class="survey-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <span class="progress-text">Paso <span id="currentStep">1</span> de 6</span>
+            </div>
+
+            <button class="survey-close" onclick="closeSurvey()" aria-label="Cerrar encuesta">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+
+            <form id="fireflySurvey" class="survey-form">
+
+                <!-- Paso 1: Ubicación -->
+                <div class="survey-step active" data-step="1">
+                    <div class="step-header">
+                        <span class="step-badge">Paso 1</span>
+                        <h2 class="step-title">¿Dónde está tu propiedad?</h2>
+                    </div>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="location" value="sma-centro" required>
+                            <span class="option-content"><strong>San Miguel de Allende (Centro)</strong><span
+                                    class="option-sub">Centro Histórico</span></span>
+                            <span class="option-check">✓</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="location" value="sma-surrounding">
+                            <span class="option-content"><strong>San Miguel de Allende (Áreas cercanas)</strong><span
+                                    class="option-sub">Zonas aledañas</span></span>
+                            <span class="option-check">✓</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="location" value="queretaro-gto">
+                            <span class="option-content"><strong>Querétaro / Guanajuato</strong><span
+                                    class="option-sub">Regiones cercanas</span></span>
+                            <span class="option-check">✓</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="location" value="other">
+                            <span class="option-content"><strong>Otro</strong><span class="option-sub">Dinos
+                                    dónde</span></span>
+                            <span class="option-check">✓</span>
+                        </label>
+                    </div>
+                    <div class="step-nav">
+                        <button type="button" class="btn-next" onclick="nextStep()">Continuar →</button>
+                    </div>
+                </div>
+
+                <!-- Paso 2: Tipo de Propiedad -->
+                <div class="survey-step" data-step="2">
+                    <div class="step-header">
+                        <span class="step-badge">Paso 2</span>
+                        <h2 class="step-title">¿Qué tipo de propiedad?</h2>
+                    </div>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="property_type" value="residential" required>
+                            <span class="option-content"><strong>Casa</strong><span
+                                    class="option-sub">Residencial</span></span>
+                            <span class="option-check">✓</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="property_type" value="commercial">
+                            <span class="option-content"><strong>Negocio</strong><span
+                                    class="option-sub">Comercial</span></span>
+                            <span class="option-check">✓</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="property_type" value="industrial">
+                            <span class="option-content"><strong>Industria</strong><span class="option-sub">Gran
+                                    escala</span></span>
+                            <span class="option-check">✓</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="property_type" value="new-construction">
+                            <span class="option-content"><strong>Nueva construcción</strong><span
+                                    class="option-sub">Construcción nueva</span></span>
+                            <span class="option-check">✓</span>
+                        </label>
+                    </div>
+                    <div class="step-nav">
+                        <button type="button" class="btn-back" onclick="prevStep()">← Atrás</button>
+                        <button type="button" class="btn-next" onclick="nextStep()">Continuar →</button>
+                    </div>
+                </div>
+
+                <!-- Paso 3: Situación Actual -->
+                <div class="survey-step" data-step="3">
+                    <div class="step-header">
+                        <span class="step-badge">Paso 3</span>
+                        <h2 class="step-title">¿Cuál es tu situación actual?</h2>
+                    </div>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="current_setup" value="grid-only" required>
+                            <span class="option-content"><strong>Solo CFE</strong><span class="option-sub">Sin
+                                    respaldo</span></span>
+                            <span class="option-check">✓</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="current_setup" value="generator">
+                            <span class="option-content"><strong>Generador</strong><span class="option-sub">Buscando
+                                    mejorar</span></span>
+                            <span class="option-check">✓</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="current_setup" value="existing-solar">
+                            <span class="option-content"><strong>Paneles solares</strong><span
+                                    class="option-sub">Sistema existente</span></span>
+                            <span class="option-check">✓</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="current_setup" value="new-build">
+                            <span class="option-content"><strong>Construcción nueva</strong><span
+                                    class="option-sub">Desde cero</span></span>
+                            <span class="option-check">✓</span>
+                        </label>
+                    </div>
+                    <div class="step-nav">
+                        <button type="button" class="btn-back" onclick="prevStep()">← Atrás</button>
+                        <button type="button" class="btn-next" onclick="nextStep()">Continuar →</button>
+                    </div>
+                </div>
+
+                <!-- Paso 4: Qué respaldar -->
+                <div class="survey-step" data-step="4">
+                    <div class="step-header">
+                        <span class="step-badge">Paso 4</span>
+                        <h2 class="step-title">¿Qué necesitas respaldar?</h2>
+                    </div>
+
+                    <!-- Parte 1: Nivel de aparatos -->
+                    <div class="step-section">
+                        <p class="step-section-label">Aparatos</p>
+                        <div class="options-grid appliance-grid">
+                            <label class="option-card appliance-card">
+                                <input type="radio" name="appliance_level" value="basic" required>
+                                <span class="appliance-icon">🔌</span>
+                                <span class="option-content">
+                                    <strong>Básico</strong>
+                                    <span class="option-sub">Refrigerador, luces, WiFi, contactos</span>
+                                </span>
+                                <span class="option-check">✓</span>
+                            </label>
+                            <label class="option-card appliance-card">
+                                <input type="radio" name="appliance_level" value="comfort">
+                                <span class="appliance-icon">❄️</span>
+                                <span class="option-content">
+                                    <strong>Confort</strong>
+                                    <span class="option-sub">Básico + aire acondicionado, TVs, ventiladores</span>
+                                </span>
+                                <span class="option-check">✓</span>
+                            </label>
+                            <label class="option-card appliance-card">
+                                <input type="radio" name="appliance_level" value="complete">
+                                <span class="appliance-icon">🏠</span>
+                                <span class="option-content">
+                                    <strong>Completo</strong>
+                                    <span class="option-sub">Todos los circuitos, bomba de agua, lavadora</span>
+                                </span>
+                                <span class="option-check">✓</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Parte 2: Horas de respaldo -->
+                    <div class="step-section">
+                        <p class="step-section-label">¿Cuántas horas de respaldo?</p>
+                        <div class="hours-grid">
+                            <label class="hours-pill">
+                                <input type="radio" name="backup_hours" value="5" required>
+                                <span class="hours-content">
+                                    <span class="hours-value">~5 hrs</span>
+                                    <span class="hours-label">Apagón corto</span>
+                                </span>
+                            </label>
+                            <label class="hours-pill">
+                                <input type="radio" name="backup_hours" value="12">
+                                <span class="hours-content">
+                                    <span class="hours-value">~12 hrs</span>
+                                    <span class="hours-label">Medio día</span>
+                                </span>
+                            </label>
+                            <label class="hours-pill">
+                                <input type="radio" name="backup_hours" value="24">
+                                <span class="hours-content">
+                                    <span class="hours-value">~24 hrs</span>
+                                    <span class="hours-label">Día completo</span>
+                                </span>
+                            </label>
+                            <label class="hours-pill">
+                                <input type="radio" name="backup_hours" value="24plus">
+                                <span class="hours-content">
+                                    <span class="hours-value">24+ hrs</span>
+                                    <span class="hours-label">Independencia</span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="step-nav">
+                        <button type="button" class="btn-back" onclick="prevStep()">← Atrás</button>
+                        <button type="button" class="btn-next" onclick="nextStep()">Continuar →</button>
+                    </div>
+                </div>
+
+                <!-- Paso 5: Interés Solar -->
+                <div class="survey-step" data-step="5">
+                    <div class="step-header">
+                        <span class="step-badge">Paso 5</span>
+                        <h2 class="step-title">¿Te interesa agregar paneles solares?</h2>
+                    </div>
+                    <div class="options-grid">
+                        <label class="option-card solar-yes">
+                            <input type="radio" name="solar_interest" value="total-independence" required>
+                            <span class="solar-icon">☀️</span>
+                            <span class="option-content"><strong>Sí - Independencia total</strong><span
+                                    class="option-sub">Independencia total de CFE</span></span>
+                            <span class="option-check">✓</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="solar_interest" value="later">
+                            <span class="solar-icon">🌅</span>
+                            <span class="option-content"><strong>Tal vez más adelante</strong><span
+                                    class="option-sub">Quizás después</span></span>
+                            <span class="option-check">✓</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="solar_interest" value="just-backup">
+                            <span class="solar-icon">🔋</span>
+                            <span class="option-content"><strong>No, solo respaldo</strong><span class="option-sub">Solo
+                                    respaldo por ahora</span></span>
+                            <span class="option-check">✓</span>
+                        </label>
+                    </div>
+                    <div class="step-nav">
+                        <button type="button" class="btn-back" onclick="prevStep()">← Atrás</button>
+                        <button type="button" class="btn-next" onclick="nextStep()">Continuar →</button>
+                    </div>
+                </div>
+
+                <!-- Paso 6: Información de Contacto -->
+                <div class="survey-step" data-step="6">
+                    <div class="step-header">
+                        <span class="step-badge">Paso 6</span>
+                        <h2 class="step-title">Información de contacto</h2>
+                        <p class="step-subtitle">Un especialista te contactará en menos de 24 horas.</p>
+                    </div>
+                    <div class="form-fields">
+                        <div class="form-group">
+                            <label for="name">Nombre completo *</label>
+                            <input type="text" id="name" name="name" required placeholder="Ej. Juan Pérez">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Correo electrónico *</label>
+                            <input type="email" id="email" name="email" required placeholder="juan@ejemplo.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Teléfono *</label>
+                            <input type="tel" id="phone" name="phone" required placeholder="+52 415 123 4567">
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="whatsapp_same" value="yes" checked>
+                                <span>Este número tiene WhatsApp</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>Idioma preferido</label>
+                            <div class="radio-group">
+                                <label class="radio-label"><input type="radio" name="language" value="español"
+                                        checked><span>Español</span></label>
+                                <label class="radio-label"><input type="radio" name="language"
+                                        value="english"><span>English</span></label>
+                                <label class="radio-label"><input type="radio" name="language"
+                                        value="both"><span>Ambos</span></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-nav">
+                        <button type="button" class="btn-back" onclick="prevStep()">← Atrás</button>
+                        <button type="submit" class="btn-submit">
+                            <span class="submit-text">Enviar</span>
+                            <span class="submit-loading" style="display: none;">Enviando...</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mensaje de Éxito -->
+                <div class="survey-step success-step" data-step="success">
+                    <div class="success-icon">✓</div>
+                    <h2 class="success-title">¡Gracias!</h2>
+                    <p class="success-message">
+                        Hemos recibido tu información. Un especialista te contactará pronto.
+                    </p>
+                    <div class="success-details" id="successDetails"></div>
+                    <div class="success-actions">
+                        <a href="#" class="btn-whatsapp" id="whatsappBtn"
+                            onclick="var u=this.getAttribute('data-url'); if(u){window.open(u,'_blank');} return false;">💬
+                            WhatsApp Directo</a>
+                        <button type="button" class="btn-close-survey" onclick="closeSurvey()">Cerrar</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="/es/" class="logo">
+                        <img src="/firefly_logo_transparent.png" alt="Firefly por Nordic Electric"
+                            style="filter: brightness(0) invert(1);">
+                    </a>
+                    <p class="footer-desc">Resiliencia energética moderna para San Miguel de Allende. Respaldo
+                        silencioso de baterías, integración solar e independencia energética completa—respaldado por 20
+                        años de experiencia local.</p>
+                </div>
+
+                <div class="footer-column">
+                    <h4 class="footer-title">Soluciones</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Esencial (5kWh)</a></li>
+                        <li><a href="#">Good (10kWh)</a></li>
+                        <li><a href="#">Better (10kWh)</a></li>
+                        <li><a href="#">Completo (16kWh)</a></li>
+                        <li><a href="#">Sistemas Personalizados</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h4 class="footer-title">Empresa</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Sobre Nosotros</a></li>
+                        <li><a href="#">Nuestra Historia</a></li>
+                        <li><a href="#">Tecnología</a></li>
+                        <li><a href="#">Empleos</a></li>
+                        <li><a href="#">Contacto</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h4 class="footer-title">Soporte</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Preguntas Frecuentes</a></li>
+                        <li><a href="#">Instalación</a></li>
+                        <li><a href="#">Garantía</a></li>
+                        <li><a href="#">Mantenimiento</a></li>
+                        <li><a href="#">Soporte por WhatsApp</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 Firefly por Nordic Electric. San Miguel de Allende, México.</p>
+                <p>Política de Privacidad | Términos de Servicio</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ── Mobile menu ──────────────────────────────────────────────────
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const mobileNav = document.getElementById('mobileNav');
+
+        function toggleMobileMenu() {
+            const isOpen = mobileNav.classList.contains('open');
+            if (isOpen) {
+                mobileNav.classList.remove('open');
+                mobileMenuBtn.classList.remove('active');
+                document.body.style.overflow = '';
+            } else {
+                mobileNav.classList.add('open');
+                mobileMenuBtn.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+
+        // Close on link click
+        mobileNav.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileNav.classList.remove('open');
+                mobileMenuBtn.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && mobileNav.classList.contains('open')) {
+                toggleMobileMenu();
+            }
+        });
+
+        // ── Navbar scroll effect ──────────────────────────────────────────
+        const navbar = document.getElementById('navbar');
+        const langBar = document.getElementById('langBar');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+                langBar.classList.add('hidden');
+            } else {
+                navbar.classList.remove('scrolled');
+                langBar.classList.remove('hidden');
+            }
+        });
+
+        // ── Scroll reveal (IntersectionObserver) ─────────────────────────
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // ── Smooth scroll ───────────────────────────────────────────────
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // ── Language toggle ───────────────────────────────────────────────
+        document.querySelectorAll('.lang-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                if (option.classList.contains('active')) {
+                    e.preventDefault(); // Already on this language
+                }
+                // Otherwise, let the link navigate naturally
+            });
+        });
+
+        // ── Survey ────────────────────────────────────────────────────────
+        let currentStep = 1;
+        const totalSteps = 6;
+        let surveyData = {};
+
+        const N8N_WEBHOOK_URL = '/api/survey';
+
+        function openSurvey() {
+            document.getElementById('surveyModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            updateProgress();
+        }
+
+        function closeSurvey() {
+            document.getElementById('surveyModal').classList.remove('active');
+            document.body.style.overflow = '';
+            setTimeout(resetSurvey, 300);
+        }
+
+        function resetSurvey() {
+            currentStep = 1;
+            surveyData = {};
+            document.getElementById('fireflySurvey').reset();
+            document.querySelectorAll('.survey-step').forEach(step => step.classList.remove('active'));
+            document.querySelector('.survey-step[data-step="1"]').classList.add('active');
+            const submitBtn = document.querySelector('.btn-submit');
+            submitBtn.disabled = false;
+            submitBtn.querySelector('.submit-text').style.display = 'inline';
+            submitBtn.querySelector('.submit-loading').style.display = 'none';
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('currentStep').textContent = currentStep;
+        }
+
+        function nextStep() {
+            const stepEl = document.querySelector(`.survey-step[data-step="${currentStep}"]`);
+            const radioGroups = {};
+
+            // Collect required radio names
+            stepEl.querySelectorAll('input[type="radio"][required]').forEach(input => {
+                radioGroups[input.name] = false;
+            });
+
+            // Check which groups have a selection
+            stepEl.querySelectorAll('input[type="radio"]:checked').forEach(input => {
+                if (input.name in radioGroups) radioGroups[input.name] = true;
+            });
+
+            const allValid = Object.values(radioGroups).every(v => v);
+
+            if (!allValid) {
+                stepEl.style.animation = 'shake 0.5s ease';
+                setTimeout(() => { stepEl.style.animation = ''; }, 500);
+                return;
+            }
+
+            // Save data
+            stepEl.querySelectorAll('input').forEach(input => {
+                if ((input.type === 'radio' || input.type === 'checkbox') && input.checked) {
+                    surveyData[input.name] = input.value;
+                } else if (input.type !== 'radio' && input.type !== 'checkbox') {
+                    surveyData[input.name] = input.value;
+                }
+            });
+
+            if (currentStep === 4) calculateRecommendation();
+
+            if (currentStep < totalSteps) {
+                stepEl.classList.remove('active');
+                currentStep++;
+                document.querySelector(`.survey-step[data-step="${currentStep}"]`).classList.add('active');
+                updateProgress();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                document.querySelector(`.survey-step[data-step="${currentStep}"]`).classList.remove('active');
+                currentStep--;
+                document.querySelector(`.survey-step[data-step="${currentStep}"]`).classList.add('active');
+                updateProgress();
+            }
+        }
+
+        function calculateRecommendation() {
+            // Nivel de aparatos × horas de respaldo → sistema recomendado
+            const matrix = {
+                'basic': {
+                    '5': { name: 'Esencial', specs: '5kWh • 5.2kW Monofásico • 120V', kwh: 5 },
+                    '12': { name: 'Good', specs: '10kWh • 6.5kW Bifásico • 120/220V', kwh: 10 },
+                    '24': { name: 'Completo', specs: '16kWh • 12kW Bifásico • 120/220V', kwh: 16 },
+                    '24plus': { name: 'Solución Personalizada', specs: 'Escalable 16–96kWh', kwh: '16+' }
+                },
+                'comfort': {
+                    '5': { name: 'Good', specs: '10kWh • 6.5kW Bifásico • 120/220V', kwh: 10 },
+                    '12': { name: 'Better', specs: '10kWh • 10kW Bifásico • 120/220V', kwh: 10 },
+                    '24': { name: 'Completo', specs: '16kWh • 12kW Bifásico • 120/220V', kwh: 16 },
+                    '24plus': { name: 'Solución Personalizada', specs: 'Escalable 32–96kWh', kwh: '32+' }
+                },
+                'complete': {
+                    '5': { name: 'Better', specs: '10kWh • 10kW Bifásico • 120/220V', kwh: 10 },
+                    '12': { name: 'Completo', specs: '16kWh • 12kW Bifásico • 120/220V', kwh: 16 },
+                    '24': { name: 'Solución Personalizada', specs: 'Escalable 32kWh+', kwh: '32+' },
+                    '24plus': { name: 'Solución Personalizada', specs: 'Escalable hasta 96kWh', kwh: '96' }
+                }
+            };
+
+            const tier = matrix[surveyData.appliance_level];
+            surveyData.recommended_solution = (tier && tier[surveyData.backup_hours])
+                ? tier[surveyData.backup_hours]
+                : { name: 'Solución Personalizada', specs: 'Adaptado a tus necesidades', kwh: 'TBD' };
+        }
+
+        document.getElementById('fireflySurvey').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const submitBtn = document.querySelector('.btn-submit');
+            submitBtn.querySelector('.submit-text').style.display = 'none';
+            submitBtn.querySelector('.submit-loading').style.display = 'inline';
+            submitBtn.disabled = true;
+
+            // Collect step 6 data
+            document.querySelector('.survey-step[data-step="6"]').querySelectorAll('input').forEach(input => {
+                if (input.type === 'radio' && input.checked) surveyData[input.name] = input.value;
+                else if (input.type === 'checkbox') surveyData[input.name] = input.checked ? input.value : 'no';
+                else if (input.type !== 'radio') surveyData[input.name] = input.value;
+            });
+
+            surveyData.timestamp = new Date().toISOString();
+            surveyData.lead_id = 'FF-' + Date.now();
+
+            try {
+                const response = await fetch(N8N_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(surveyData)
+                });
+                if (!response.ok) throw new Error('Failed');
+            } catch (err) {
+                console.warn('Webhook not configured yet — showing success anyway.');
+            }
+
+            showSuccess();
+        });
+
+        function showSuccess() {
+            document.querySelector(`.survey-step[data-step="${currentStep}"]`).classList.remove('active');
+            document.querySelector('.success-step').classList.add('active');
+
+            const sol = surveyData.recommended_solution || {};
+            const solarLabel = {
+                'total-independence': 'Alta',
+                'later': 'Futura',
+                'just-backup': 'Solo respaldo'
+            }[surveyData.solar_interest] || '—';
+
+            document.getElementById('successDetails').innerHTML = `
+                <div class="detail-row">
+                    <span class="detail-label">Solución recomendada</span>
+                    <span class="detail-value">${sol.name || 'Consulta'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Especificaciones</span>
+                    <span class="detail-value">${sol.specs || 'TBD'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Capacidad estimada</span>
+                    <span class="detail-value">${sol.kwh || 'TBD'} kWh</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Interés solar</span>
+                    <span class="detail-value">${solarLabel}</span>
+                </div>
+            `;
+
+            const msg = `Hola, acabo de completar la evaluación de Firefly. Me interesa la solución ${sol.name}. ¿Podemos agendar una llamada?`;
+            document.getElementById('whatsappBtn').setAttribute('data-url', `https://wa.me/5214151805030?text=${encodeURIComponent(msg)}`);
+        }
+
+        // Close on backdrop click
+        document.getElementById('surveyModal').addEventListener('click', function (e) {
+            if (e.target === this) closeSurvey();
+        });
+
+        // Escape key to close
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && document.getElementById('surveyModal').classList.contains('active')) {
+                closeSurvey();
+            }
+        });
+    </script>
+
+    <!-- Flow Diagram Animation -->
+    <script>
+        (function () {
+            const FD_STATES = [
+                {
+                    key: 'normal', cls: 'state-normal', title: 'OPERACIÓN NORMAL',
+                    desc: 'El sol y la red eléctrica alimentan tu hogar mientras cargan la batería',
+                    solarOn: true, gridOn: true, houseOn: true, chargingOn: true, dischargingOn: false, outage: false,
+                    gridExport: false,
+                    pathSolar: 'active-solar', pathGrid: 'active-grid', pathHouse: 'active',
+                    pathInvBat: 'active-battery', pathBatInv: 'dimmed', bat: 'charging'
+                },
+                {
+                    key: 'export', cls: 'state-normal', title: 'MÁXIMO AHORRO SOLAR',
+                    desc: 'El exceso de energía solar carga la batería y se exporta de vuelta a la red',
+                    solarOn: true, gridOn: true, houseOn: true, chargingOn: true, dischargingOn: false, outage: false,
+                    gridExport: true,
+                    pathSolar: 'active-solar', pathGrid: 'dimmed', pathHouse: 'active',
+                    pathInvBat: 'active-battery', pathBatInv: 'dimmed', bat: 'charging'
+                },
+                {
+                    key: 'backup', cls: 'state-outage', title: 'CORTE ELÉCTRICO / FUERA DE LA RED',
+                    desc: 'La red eléctrica falla — la batería asume el control, la vida continúa sin interrupción',
+                    solarOn: false, gridOn: false, houseOn: true, chargingOn: false, dischargingOn: true, outage: true,
+                    gridExport: false,
+                    pathSolar: 'dimmed', pathGrid: 'cut', pathHouse: 'active',
+                    pathInvBat: 'dimmed', pathBatInv: 'active-battery', bat: 'discharging'
+                }
+            ];
+
+            let fdCur = 0, fdBatFrame = 0;
+
+            function fdApply(idx) {
+                const s = FD_STATES[idx];
+                const banner = document.getElementById('flow-banner');
+                if (!banner) return;
+                banner.className = 'flow-state-banner ' + s.cls;
+                document.getElementById('flow-title').textContent = s.title;
+                document.getElementById('flow-desc').textContent = s.desc;
+                for (let i = 0; i < 3; i++) document.getElementById('fd' + i).className = 'flow-dot' + (i === idx ? ' on' : '');
+
+                setCls('fp-solar-inv', 'fd-path ' + s.pathSolar);
+                setCls('fp-grid-inv', 'fd-path ' + s.pathGrid);
+                setCls('fp-inv-grid', 'fd-path ' + (s.gridExport ? 'active-grid' : 'dimmed'));
+                setCls('fp-inv-house', 'fd-path ' + s.pathHouse);
+
+                const fpInvBat = document.getElementById('fp-inv-bat');
+                fpInvBat.className.baseVal = 'fd-path ' + s.pathInvBat;
+                if (s.bat === 'charging') fpInvBat.classList.add('charging');
+                else fpInvBat.classList.remove('charging');
+
+                const fpBatInv = document.getElementById('fp-bat-inv');
+                fpBatInv.className.baseVal = 'fd-path ' + s.pathBatInv;
+                if (s.bat === 'charging') fpBatInv.classList.add('charging');
+                else fpBatInv.classList.remove('charging');
+
+                // Toggle ambient glow based on state
+                const glow = document.querySelector('.fd-ambient-glow');
+                if (glow) {
+                    if (s.outage) {
+                        glow.setAttribute('fill', 'url(#inverter-glow-outage)'); // fallback to standard if not defined, but you can define more radial gradients
+                        glow.style.opacity = 0.5;
+                    } else {
+                        glow.setAttribute('fill', 'url(#inverter-glow)');
+                        glow.style.opacity = 1;
+                    }
+                }
+
+                ['fps1', 'fps2', 'fps3'].forEach(id => toggleCls(id, 'visible', s.solarOn));
+                ['fpg1', 'fpg2', 'fpg3'].forEach(id => toggleCls(id, 'visible', s.gridOn && !s.gridExport));
+                ['fpg4', 'fpg5', 'fpg6'].forEach(id => toggleCls(id, 'visible', s.gridExport));
+                ['fph1', 'fph2', 'fph3'].forEach(id => toggleCls(id, 'visible', s.houseOn));
+                ['fpc1', 'fpc2'].forEach(id => document.getElementById(id).classList.toggle('visible', s.chargingOn));
+                ['fpd1', 'fpd2'].forEach(id => document.getElementById(id).classList.toggle('visible', s.dischargingOn));
+
+                const sc = document.querySelector('#fd-solar .fd-card');
+                sc.className.baseVal = 'fd-card optional ' + (s.solarOn ? 'active' : 'dimmed');
+                document.querySelector('#fd-solar .fd-label').classList.toggle('fd-dimmed-text', !s.solarOn);
+
+                document.querySelector('#fd-grid .fd-card').className.baseVal = 'fd-card ' + (s.gridOn ? 'active' : 'dimmed');
+                document.querySelector('#fd-grid .fd-label').classList.toggle('fd-dimmed-text', !s.gridOn);
+
+                document.getElementById('fd-x1').classList.toggle('show', s.outage);
+                document.getElementById('fd-x2').classList.toggle('show', s.outage);
+
+                document.querySelectorAll('.fd-win-glow').forEach(w => {
+                    w.setAttribute('opacity', s.houseOn ? (w.dataset.baseOp || '0.25') : '0.02');
+                });
+
+                document.querySelectorAll('#fd-solar line, #fd-solar circle, #fd-solar rect:not(.fd-card)').forEach(el => {
+                    el.style.transition = 'opacity 0.8s'; el.style.opacity = s.solarOn ? '' : '0.12';
+                });
+                document.querySelectorAll('#fd-solar text:not(.fd-label)').forEach(el => {
+                    el.style.transition = 'opacity 0.8s'; el.style.opacity = s.solarOn ? '' : '0.2';
+                });
+                document.querySelectorAll('#fd-grid line:not(.fd-outage-x), #fd-grid rect:not(.fd-card), #fd-grid text:not(.fd-label)').forEach(el => {
+                    el.style.transition = 'opacity 0.8s'; el.style.opacity = s.gridOn ? '' : '0.12';
+                });
+            }
+
+            function fdAnimBat() {
+                const bars = ['fb1', 'fb2', 'fb3', 'fb4'];
+                const s = FD_STATES[fdCur];
+                if (s.bat === 'charging') {
+                    const fill = fdBatFrame % 5;
+                    bars.forEach((id, i) => document.getElementById(id).setAttribute('opacity', i < fill ? '0.85' : '0.1'));
+                } else {
+                    const keep = 4 - (fdBatFrame % 4);
+                    bars.forEach((id, i) => document.getElementById(id).setAttribute('opacity', i < keep ? '0.85' : '0.06'));
+                }
+                fdBatFrame++;
+            }
+
+            document.querySelectorAll('.fd-win-glow').forEach(w => { w.dataset.baseOp = w.getAttribute('opacity'); });
+            fdApply(0);
+            setInterval(fdAnimBat, 700);
+            setInterval(function () { fdCur = (fdCur + 1) % FD_STATES.length; fdBatFrame = 0; fdApply(fdCur); }, 5000);
+        })();
+    </script>
+</body>
+
+</html    <!-- Trust Section -->
     <section class="trust" id="about">
         <div class="trust-content">
             <div class="trust-badge">20 Años de Experiencia Local</div>

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Firefly | Energy Independence for San Miguel de Allende</title>
+    <link rel="icon" type="image/png" href="favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -1111,6 +1112,595 @@
             font-size: 16px;
         }
 
+        /* ── Hybrid Inverter vs. Microinverter (Why Hybrid) ── */
+        .hvm {
+            padding: 96px 24px;
+            background: #F5F6F4;
+            color: var(--nordic-charcoal);
+            position: relative;
+            overflow: hidden;
+            border-top: 1px solid rgba(30, 32, 34, 0.05);
+        }
+
+        .hvm::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 10% 0%, rgba(164, 210, 51, 0.08), transparent 50%),
+                radial-gradient(circle at 90% 100%, rgba(164, 210, 51, 0.05), transparent 55%);
+            pointer-events: none;
+        }
+
+        .hvm-inner {
+            max-width: 1120px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hvm-header {
+            text-align: center;
+            margin-bottom: 56px;
+        }
+
+        .hvm-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--nordic-charcoal);
+            color: var(--firefly-green);
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            margin-bottom: 22px;
+            box-shadow: 0 8px 20px -8px rgba(30, 32, 34, 0.3);
+        }
+
+        .hvm-eyebrow .hvm-vs {
+            background: var(--firefly-green);
+            color: var(--nordic-charcoal);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+        }
+
+        .hvm-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(30px, 4vw, 44px);
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            line-height: 1.15;
+            margin: 0 0 16px;
+            color: var(--nordic-charcoal);
+        }
+
+        .hvm-title span { color: #7FA324; }
+
+        .hvm-subtitle {
+            font-size: 1.125rem;
+            color: var(--slate);
+            max-width: 760px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+
+        .hvm-subtitle strong {
+            color: var(--nordic-charcoal);
+            font-weight: 700;
+        }
+
+        .hvm-rows {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .hvm-row-wrap {
+            background: var(--white);
+            border: 1px solid #E6E7E4;
+            border-radius: 16px;
+            padding: 28px 28px 24px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .hvm-row-wrap:hover {
+            border-color: rgba(164, 210, 51, 0.4);
+            box-shadow: 0 10px 30px -18px rgba(30, 32, 34, 0.12);
+        }
+
+        .hvm-row-content {
+            display: grid;
+            grid-template-columns: 56px 1.1fr 1.1fr 1.1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .hvm-num {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--firefly-green);
+            line-height: 1;
+            letter-spacing: -0.04em;
+            padding-top: 4px;
+        }
+
+        .hvm-dimension h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.0625rem;
+            font-weight: 700;
+            color: var(--nordic-charcoal);
+            margin: 0 0 6px;
+            letter-spacing: -0.01em;
+        }
+
+        .hvm-dimension p {
+            font-size: 0.875rem;
+            color: #6B7075;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .hvm-option {
+            padding: 14px 16px;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            height: 100%;
+        }
+
+        .hvm-option--firefly {
+            background: rgba(164, 210, 51, 0.1);
+            border-color: rgba(164, 210, 51, 0.3);
+        }
+
+        .hvm-option--micro {
+            background: #F5F6F4;
+            border-color: #E6E7E4;
+        }
+
+        .hvm-option-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 8px;
+        }
+
+        .hvm-option--firefly .hvm-option-label { color: #5A7A0E; }
+        .hvm-option--micro .hvm-option-label { color: #6B7075; }
+
+        .hvm-option-body {
+            font-size: 0.9375rem;
+            line-height: 1.55;
+            color: var(--slate);
+        }
+
+        .hvm-option-body strong {
+            color: var(--nordic-charcoal);
+            font-weight: 700;
+        }
+
+        .hvm-footnote {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: rgba(164, 210, 51, 0.08);
+            border-left: 3px solid var(--firefly-green);
+            border-radius: 0 8px 8px 0;
+            display: flex;
+            gap: 12px;
+            align-items: start;
+        }
+
+        .hvm-footnote-label {
+            flex-shrink: 0;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 10px;
+            font-weight: 800;
+            color: #5A7A0E;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding-top: 2px;
+            min-width: 80px;
+        }
+
+        .hvm-footnote-text {
+            font-size: 0.875rem;
+            color: var(--slate);
+            line-height: 1.55;
+        }
+
+        .hvm-footnote-text strong { color: var(--nordic-charcoal); }
+
+        @media (max-width: 960px) {
+            .hvm-row-content {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+            .hvm-num { font-size: 24px; padding-top: 0; }
+            .hvm-row-wrap { padding: 22px 20px; }
+        }
+
+        .power-defense {
+            padding: 100px 24px;
+            background: linear-gradient(160deg, var(--nordic-charcoal) 0%, #252830 100%);
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .power-defense::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 10% 30%, rgba(164,210,51,0.08) 0%, transparent 55%),
+                radial-gradient(ellipse at 90% 70%, rgba(164,210,51,0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .pd-inner {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .pd-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .pd-eyebrow {
+            display: inline-block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--firefly-green);
+            margin-bottom: 14px;
+        }
+
+        .pd-header h2 {
+            font-size: clamp(28px, 4vw, 44px);
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 12px;
+        }
+
+        .pd-header h2 span { color: var(--firefly-green); }
+
+        .pd-subtitle {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.68);
+            max-width: 580px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+
+        /* Stats bar */
+        .pd-stats {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(164,210,51,0.2);
+            border-radius: 16px;
+            padding: 20px 40px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .pd-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 32px;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .pd-stat + .pd-stat {
+            border-left: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .pd-stat-num {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--firefly-green);
+            line-height: 1;
+        }
+
+        .pd-stat-label {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-align: center;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        /* Table */
+        .pd-table-wrap {
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(164,210,51,0.15);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
+        }
+
+        .pd-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .pd-table thead tr {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .pd-table th {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(164,210,51,0.12);
+        }
+
+        .pd-table th:first-child { padding-left: 28px; }
+        .pd-table th:last-child { text-align: center; }
+
+        .pd-table tbody tr {
+            background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 160ms ease;
+        }
+
+        .pd-table tbody tr:last-child { border-bottom: none; }
+
+        .pd-table tbody tr:hover { background: rgba(164,210,51,0.06); }
+
+        .pd-table tbody tr.featured {
+            background: rgba(164,210,51,0.08);
+            border-left: 3px solid var(--firefly-green);
+        }
+
+        .pd-table td {
+            padding: 18px 20px;
+            vertical-align: middle;
+        }
+
+        .pd-table td:first-child { padding-left: 28px; }
+
+        .pd-threat-name {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--white);
+            display: block;
+        }
+
+        .pd-threat-sub {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.42);
+            display: block;
+            margin-top: 2px;
+        }
+
+        .pd-response {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.5;
+            max-width: 300px;
+        }
+
+        .pd-response strong { color: var(--white); font-weight: 600; }
+
+        .pd-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 5px 11px;
+            border-radius: 99px;
+            white-space: nowrap;
+        }
+
+        .pd-pill.fast {
+            background: rgba(164,210,51,0.15);
+            color: var(--firefly-green);
+            border: 1px solid rgba(164,210,51,0.35);
+        }
+
+        .pd-pill.warn {
+            background: rgba(250,200,80,0.12);
+            color: #FAC850;
+            border: 1px solid rgba(250,200,80,0.3);
+        }
+
+        .pd-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 99px;
+        }
+
+        .pd-badge.full {
+            background: rgba(164,210,51,0.15);
+            color: var(--firefly-green);
+            border: 1px solid rgba(164,210,51,0.4);
+        }
+
+        .pd-badge.partial {
+            background: rgba(250,200,80,0.12);
+            color: #FAC850;
+            border: 1px solid rgba(250,200,80,0.35);
+        }
+
+        /* Note cards */
+        .pd-notes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+
+        .pd-note {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 20px 22px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .pd-note.highlight {
+            border-color: rgba(164,210,51,0.3);
+            background: rgba(164,210,51,0.05);
+        }
+
+        .pd-note-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
+
+        .pd-note-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 5px;
+        }
+
+        .pd-note-text {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.62);
+            line-height: 1.6;
+        }
+
+        /* CTA */
+        .pd-cta {
+            text-align: center;
+            padding: 32px;
+            background: rgba(164,210,51,0.07);
+            border: 1px solid rgba(164,210,51,0.25);
+            border-radius: 20px;
+        }
+
+        .pd-cta-wrap {
+            text-align: center;
+            margin-top: 48px;
+        }
+
+        .pd-cta-eyebrow {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--firefly-green);
+            margin-bottom: 10px;
+        }
+
+        .pd-cta h3 {
+            font-size: clamp(22px, 3vw, 32px);
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 8px;
+        }
+
+        .pd-cta p {
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 28px;
+            line-height: 1.6;
+        }
+
+        .pd-cta-btns {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .pd-btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--nordic-charcoal);
+            background: var(--firefly-green);
+            padding: 16px 36px;
+            border-radius: 10px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: background 150ms ease, transform 200ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 200ms ease;
+            letter-spacing: 0.01em;
+        }
+
+        .pd-btn-primary:hover {
+            background: var(--energy-lime);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(164,210,51,0.4);
+        }
+
+        .pd-btn-primary:active { transform: scale(0.98); }
+
+        .pd-btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--firefly-green);
+            background: transparent;
+            padding: 14px 30px;
+            border-radius: 10px;
+            border: 2px solid var(--firefly-green);
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 150ms ease, color 150ms ease, transform 200ms cubic-bezier(0.34,1.56,0.64,1);
+        }
+
+        .pd-btn-secondary:hover {
+            background: var(--firefly-green);
+            color: var(--nordic-charcoal);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .pd-stats { padding: 16px 20px; }
+            .pd-stat { padding: 8px 16px; }
+            .pd-stat + .pd-stat { border-left: none; border-top: 1px solid rgba(255,255,255,0.1); }
+            .pd-notes { grid-template-columns: 1fr; }
+            .pd-table th, .pd-table td { padding: 14px 12px; }
+            .pd-table th:first-child, .pd-table td:first-child { padding-left: 14px; }
+            .pd-response { max-width: 200px; font-size: 0.8rem; }
+            .pd-threat-sub { display: none; }
+        }
+
         /* Trust Section */
         .trust {
             padding: 100px 24px;
@@ -2131,24 +2721,58 @@
         /* Calculator Section */
         .calculator {
             padding: 80px 24px;
-            background: var(--nordic-charcoal);
-            color: var(--white);
+            background: #F5F6F4;
+            color: var(--nordic-charcoal);
         }
 
         .calculator .section-title {
-            color: var(--white);
+            color: var(--nordic-charcoal);
         }
 
         .calculator .section-subtitle {
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--slate);
             margin-bottom: 40px;
+        }
+
+        .calculator-widget {
+            background: var(--nordic-charcoal);
+            border-radius: 28px;
+            padding: 56px 48px;
+            box-shadow: 0 30px 80px -20px rgba(22, 32, 38, 0.35),
+                        0 12px 24px -8px rgba(22, 32, 38, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .calculator-widget {
+                padding: 32px 20px;
+                border-radius: 20px;
+            }
+        }
+
+        .calculator-header {
+            margin: 0 0 48px;
+            text-align: left;
+        }
+
+        .calculator-header .section-label {
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .calculator-header .section-subtitle {
+            margin: 16px 0 0;
+            max-width: 680px;
         }
 
         .calculator-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 60px;
-            align-items: center;
+            align-items: start;
+        }
+
+        .calculator-results {
+            margin-top: 40px;
         }
 
         .calculator-inputs {
@@ -2267,6 +2891,35 @@
             gap: 20px;
         }
 
+        .result-row-top {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .result-row-top > .result-card {
+            flex: 1 1 220px;
+            padding: 24px;
+            gap: 16px;
+        }
+
+        .result-row-top .result-icon {
+            font-size: 36px;
+        }
+
+        .result-row-top .result-number {
+            font-size: 38px;
+            margin-bottom: 8px;
+        }
+
+        .result-row-top .result-info h3 {
+            font-size: 14px;
+        }
+
+        .result-row-top .result-info p {
+            font-size: 12px;
+        }
+
         .result-card {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -2315,10 +2968,147 @@
             line-height: 1.6;
         }
 
+        .package-result {
+            background: linear-gradient(135deg, rgba(22, 163, 74, 0.12), rgba(22, 163, 74, 0.04));
+            border: 1px solid rgba(22, 163, 74, 0.35);
+        }
+
+        .package-result:hover {
+            border-color: var(--firefly-green);
+        }
+
+        .package-badge {
+            display: inline-block;
+            background: var(--firefly-green);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 999px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .package-name {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--firefly-green);
+            line-height: 1.1;
+            margin-bottom: 14px;
+        }
+
+        .package-specs {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 18px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .package-specs li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 14px;
+        }
+
+        .package-specs li span {
+            color: rgba(255, 255, 255, 0.55);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .package-specs li strong {
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 600;
+            font-size: 14px;
+            text-align: right;
+        }
+
+        .package-note {
+            margin: 0 0 16px 0;
+            font-size: 12px;
+            font-style: italic;
+            color: rgba(34, 197, 94, 0.85);
+            letter-spacing: 0.2px;
+        }
+
+        .package-price-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .package-price .iva-tag {
+            font-size: 0.5em;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.45);
+            letter-spacing: 0.4px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        .package-price {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 30px;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .package-price-sub {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.55);
+            margin-top: 6px;
+        }
+
+        .package-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--nordic-charcoal);
+            background: var(--firefly-green);
+            padding: 16px 36px;
+            border-radius: 10px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+            transition: background 150ms ease, transform 200ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 200ms ease;
+        }
+
+        .package-cta:hover {
+            background: var(--energy-lime);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(164,210,51,0.4);
+        }
+
+        .package-cta:active { transform: scale(0.98); }
+
+        .package-cta:focus-visible {
+            outline: 2px solid rgba(163, 230, 53, 0.9);
+            outline-offset: 3px;
+        }
+
         @media (max-width: 968px) {
             .calculator-grid {
                 grid-template-columns: 1fr;
                 gap: 40px;
+            }
+            .calculator-results {
+                margin-top: 0;
             }
         }
     </style>
@@ -2342,9 +3132,10 @@
             </a>
 
             <div class="nav-links">
-                <a href="#solutions" class="nav-link">Solutions</a>
+                <a href="#calculator" class="nav-link">Solutions</a>
                 <a href="#technology" class="nav-link">Technology</a>
                 <a href="#about" class="nav-link">About</a>
+                <a href="faq.html" class="nav-link">FAQ</a>
                 <a href="#contact" class="nav-link">Contact</a>
                 <a href="/survey/" class="btn-primary">Get Started</a>
             </div>
@@ -2359,9 +3150,10 @@
 
     <!-- Mobile Navigation Overlay -->
     <div class="mobile-nav" id="mobileNav">
-        <a href="#solutions" class="mobile-nav-link">Solutions</a>
+        <a href="#calculator" class="mobile-nav-link">Solutions</a>
         <a href="#technology" class="mobile-nav-link">Technology</a>
         <a href="#about" class="mobile-nav-link">About</a>
+        <a href="faq.html" class="mobile-nav-link">FAQ</a>
         <a href="#contact" class="mobile-nav-link">Contact</a>
         <a href="/survey/" class="btn-primary">Get Started</a>
     </div>
@@ -3143,18 +3935,269 @@
         </div>
     </section>
 
+    <!-- Comparison Section: Hybrid + Battery vs. Traditional Grid-Tie Solar -->
+    <!-- Hybrid Inverter vs. Microinverter Section -->
+    <section class="hvm" id="compare">
+        <div class="hvm-inner">
+            <div class="hvm-header reveal">
+                <span class="hvm-eyebrow">Hybrid Inverter <span class="hvm-vs">VS</span> Microinverter</span>
+                <h2 class="hvm-title">Same sun. Same energy.<br><span>One superior solution.</span></h2>
+                <p class="hvm-subtitle">Solar panels with microinverters produce energy and lower your energy costs — but that's where the benefits stop. Firefly's hybrid architecture creates a <strong>microgrid in your home</strong>, delivering true energy independence even when CFE goes down.</p>
+            </div>
+
+            <div class="hvm-rows">
+
+                <div class="hvm-row-wrap reveal">
+                    <div class="hvm-row-content">
+                        <div class="hvm-num">01</div>
+                        <div class="hvm-dimension">
+                            <h3>What happens when CFE goes out</h3>
+                            <p>The moment the grid drops, the system decides whether your home stays powered.</p>
+                        </div>
+                        <div class="hvm-option hvm-option--firefly">
+                            <div class="hvm-option-label">● Firefly Hybrid</div>
+                            <div class="hvm-option-body"><strong>Keeps producing and delivering power</strong> from solar and battery. Your home stays on.</div>
+                        </div>
+                        <div class="hvm-option hvm-option--micro">
+                            <div class="hvm-option-label">○ Microinverter</div>
+                            <div class="hvm-option-body"><strong>Shuts off.</strong> Grid-tie code requires microinverters to stop producing when CFE goes down — even with full sun on the panels.</div>
+                        </div>
+                    </div>
+                    <div class="hvm-footnote">
+                        <span class="hvm-footnote-label">Why it matters</span>
+                        <span class="hvm-footnote-text">This is the single biggest functional difference. A microinverter system alone cannot power your home during a blackout.</span>
+                    </div>
+                </div>
+
+                <div class="hvm-row-wrap reveal">
+                    <div class="hvm-row-content">
+                        <div class="hvm-num">02</div>
+                        <div class="hvm-dimension">
+                            <h3>Backup battery integration</h3>
+                            <p>Backup as a built-in feature vs. something bolted on later.</p>
+                        </div>
+                        <div class="hvm-option hvm-option--firefly">
+                            <div class="hvm-option-label">● Firefly Hybrid</div>
+                            <div class="hvm-option-body"><strong>Built in from day one.</strong> Out-of-the-box compatible with DC batteries, and you can <strong>connect multiple packs in parallel</strong> to scale capacity as your needs grow.</div>
+                        </div>
+                        <div class="hvm-option hvm-option--micro">
+                            <div class="hvm-option-label">○ Microinverter</div>
+                            <div class="hvm-option-body">Not native to the solution. Adding backup requires a <strong>separate battery system and a coordinating gateway</strong> — often from different brands stitched together.</div>
+                        </div>
+                    </div>
+                    <div class="hvm-footnote">
+                        <span class="hvm-footnote-label">Why it matters</span>
+                        <span class="hvm-footnote-text">One integrated system means simpler wiring, one 8-year warranty, and one local team accountable for the whole installation.</span>
+                    </div>
+                </div>
+
+                <div class="hvm-row-wrap reveal">
+                    <div class="hvm-row-content">
+                        <div class="hvm-num">03</div>
+                        <div class="hvm-dimension">
+                            <h3>Where the electronics live</h3>
+                            <p>Location shapes lifespan and servicing effort.</p>
+                        </div>
+                        <div class="hvm-option hvm-option--firefly">
+                            <div class="hvm-option-label">● Firefly Hybrid</div>
+                            <div class="hvm-option-body">One wall-mounted inverter inside your home or garage — <strong>ventilated, shaded, and serviced at eye level</strong>.</div>
+                        </div>
+                        <div class="hvm-option hvm-option--micro">
+                            <div class="hvm-option-label">○ Microinverter</div>
+                            <div class="hvm-option-body"><strong>3–5 microinverters on the roof</strong> for a typical 6–10 panel install (one per pair of panels), exposed to sun and weather.</div>
+                        </div>
+                    </div>
+                    <div class="hvm-footnote">
+                        <span class="hvm-footnote-label">Why it matters</span>
+                        <span class="hvm-footnote-text">Rooftop electronics weather faster than equipment indoors, and service calls require roof access and panel removal.</span>
+                    </div>
+                </div>
+
+                <div class="hvm-row-wrap reveal">
+                    <div class="hvm-row-content">
+                        <div class="hvm-num">04</div>
+                        <div class="hvm-dimension">
+                            <h3>Expanding the system later</h3>
+                            <p>Both systems can grow — they just scale different things.</p>
+                        </div>
+                        <div class="hvm-option hvm-option--firefly">
+                            <div class="hvm-option-label">● Firefly Hybrid</div>
+                            <div class="hvm-option-body"><strong>Designed to grow with you.</strong> Add battery capacity up to 16 units in parallel, add panels when you need to generate more energy, or add additional inverters to scale as your needs grow.</div>
+                        </div>
+                        <div class="hvm-option hvm-option--micro">
+                            <div class="hvm-option-label">○ Microinverter</div>
+                            <div class="hvm-option-body"><strong>Solar expands, storage doesn't.</strong> Each new panel needs a compatible microinverter; mixed panel models are fine if each is paired correctly. Adding backup still requires a separate battery system later.</div>
+                        </div>
+                    </div>
+                    <div class="hvm-footnote">
+                        <span class="hvm-footnote-label">Why it matters</span>
+                        <span class="hvm-footnote-text">Firefly's upgrade path includes more storage — the part most homeowners actually want to add as CFE reliability changes.</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Power Defense Layer Section -->
+    <section class="power-defense" id="technology">
+        <div class="pd-inner">
+
+            <!-- Header -->
+            <div class="pd-header reveal">
+                <span class="pd-eyebrow">System Intelligence</span>
+                <h2>Firefly's <span>Power Defense Layer</span></h2>
+                <p class="pd-subtitle">Mexico's grid faces real daily challenges — voltage spikes, brownouts, and outages. Here's exactly how your Firefly hybrid inverter responds to each one, automatically.</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="pd-stats reveal">
+                <div class="pd-stat">
+                    <span class="pd-stat-num">&lt;20ms</span>
+                    <span class="pd-stat-label">Switchover Time</span>
+                </div>
+                <div class="pd-stat">
+                    <span class="pd-stat-num">60&times;</span>
+                    <span class="pd-stat-label">Voltage Checks / Sec</span>
+                </div>
+                <div class="pd-stat">
+                    <span class="pd-stat-num">100%</span>
+                    <span class="pd-stat-label">Automatic — No Action</span>
+                </div>
+                <div class="pd-stat">
+                    <span class="pd-stat-num">24/7</span>
+                    <span class="pd-stat-label">Grid Awareness</span>
+                </div>
+            </div>
+
+            <!-- Threat Table -->
+            <div class="pd-table-wrap reveal">
+                <table class="pd-table">
+                    <thead>
+                        <tr>
+                            <th style="width:26%">Grid Threat</th>
+                            <th style="width:8%">Type</th>
+                            <th style="width:38%">How the Inverter Responds</th>
+                            <th style="width:14%">Response Time</th>
+                            <th style="width:14%;text-align:center">Protection</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="featured">
+                            <td>
+                                <span class="pd-threat-name">Voltage Spike / Surge</span>
+                                <span class="pd-threat-sub">Grid surges above ~146V — common after CFE switching</span>
+                            </td>
+                            <td style="font-size:1.4rem">⚡</td>
+                            <td class="pd-response"><strong>Disconnects CFE instantly.</strong> Relay opens, isolating your home. Inverter delivers clean power from battery or solar. Reconnects automatically when grid normalizes.</td>
+                            <td><span class="pd-pill fast">⚡ &lt;20ms</span></td>
+                            <td style="text-align:center"><span class="pd-badge full">✓ Full</span></td>
+                        </tr>
+                        <tr class="featured">
+                            <td>
+                                <span class="pd-threat-name">Brownout / Low Voltage</span>
+                                <span class="pd-threat-sub">Grid drops below ~108V — common during peak demand</span>
+                            </td>
+                            <td style="font-size:1.4rem">📉</td>
+                            <td class="pd-response"><strong>Switches to battery.</strong> Motors, compressors, and electronics run at the correct 127V — preventing overheating and premature equipment failure.</td>
+                            <td><span class="pd-pill fast">⚡ &lt;20ms</span></td>
+                            <td style="text-align:center"><span class="pd-badge full">✓ Full</span></td>
+                        </tr>
+                        <tr class="featured">
+                            <td>
+                                <span class="pd-threat-name">Complete Power Outage</span>
+                                <span class="pd-threat-sub">Full CFE blackout — grid goes dead</span>
+                            </td>
+                            <td style="font-size:1.4rem">🌑</td>
+                            <td class="pd-response"><strong>Seamless switchover to battery + solar.</strong> Most electronics don't register an interruption. Power continues until the grid returns or batteries recharge from solar.</td>
+                            <td><span class="pd-pill fast">⚡ &lt;20ms</span></td>
+                            <td style="text-align:center"><span class="pd-badge full">✓ Full</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="pd-threat-name">Frequency Deviation</span>
+                                <span class="pd-threat-sub">Grid drifts outside 57–63 Hz band</span>
+                            </td>
+                            <td style="font-size:1.4rem">〰️</td>
+                            <td class="pd-response"><strong>Detects and disconnects.</strong> Monitors frequency alongside voltage. If CFE drifts outside safe limits, the system isolates your home and supplies stable 60 Hz from battery/solar.</td>
+                            <td><span class="pd-pill fast">⚡ &lt;20ms</span></td>
+                            <td style="text-align:center"><span class="pd-badge full">✓ Full</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="pd-threat-name">Extended Load Shedding</span>
+                                <span class="pd-threat-sub">Planned or rolling CFE outages lasting hours</span>
+                            </td>
+                            <td style="font-size:1.4rem">🔋</td>
+                            <td class="pd-response"><strong>Sustained battery + solar operation.</strong> Powers your home as long as battery and solar allow — typically 4–12+ hours for essential circuits.</td>
+                            <td><span class="pd-pill fast">⚡ &lt;20ms</span></td>
+                            <td style="text-align:center"><span class="pd-badge full">✓ Full</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="pd-threat-name">Fast Transient Spikes</span>
+                                <span class="pd-threat-sub">Nanosecond surges from lightning or utility switching</span>
+                            </td>
+                            <td style="font-size:1.4rem">🌩️</td>
+                            <td class="pd-response"><strong>Partial protection.</strong> The inverter responds faster than most transients, but instantaneous lightning surges may still reach equipment. Surge protectors on high-value electronics are recommended.</td>
+                            <td><span class="pd-pill warn">⚠ Partial</span></td>
+                            <td style="text-align:center"><span class="pd-badge partial">~ Partial</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Note cards -->
+            <div class="pd-notes reveal">
+                <div class="pd-note highlight">
+                    <div class="pd-note-icon">🔄</div>
+                    <div>
+                        <div class="pd-note-title">Designed for Mexico's Conditions</div>
+                        <div class="pd-note-text">Your inverter monitors voltage 60 times per second — every AC cycle. That continuous vigilance acts as a silent, automatic guardian for every outlet in your home.</div>
+                    </div>
+                </div>
+                <div class="pd-note highlight">
+                    <div class="pd-note-icon">⚡</div>
+                    <div>
+                        <div class="pd-note-title">No Action Required — Ever</div>
+                        <div class="pd-note-text">Every protection event is handled automatically. No switch to flip, no app to open, no generator to start. The system detects, disconnects, and restores power before you're even aware something happened.</div>
+                    </div>
+                </div>
+                <div class="pd-note">
+                    <div class="pd-note-icon">🛡️</div>
+                    <div>
+                        <div class="pd-note-title">Protecting Motors and Appliances</div>
+                        <div class="pd-note-text">Low voltage is one of the most damaging grid conditions for compressors, refrigerators, and AC units. Clean battery power during brownouts prevents the overheating that shortens appliance lifespan.</div>
+                    </div>
+                </div>
+                <div class="pd-note">
+                    <div class="pd-note-icon">💡</div>
+                    <div>
+                        <div class="pd-note-title">Our Recommendation</div>
+                        <div class="pd-note-text">For complete coverage including lightning transients, pair your Firefly system with quality surge protectors on high-value electronics. Together, they address every layer of grid risk in Mexico.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pd-cta-wrap reveal">
+                <button onclick="openSurvey()" class="pd-btn-primary">I'm Ready for Firefly &rarr;</button>
+            </div>
+
+        </div>
+    </section>
+
+
     <!-- Calculator Section -->
     <section class="calculator" id="calculator">
         <div class="section-container">
-            <div class="calculator-grid reveal">
-                <div class="calculator-content">
-                    <span class="section-label">Design Your System</span>
-                    <h2 class="section-title">Calculate Your Needs</h2>
-                    <p class="section-subtitle" style="margin-left: 0;">Find out exactly how much battery backup and
-                        solar you need for your home in San Miguel de Allende. Select your daily usage and desired
-                        backup time to visualize your optimal setup.</p>
-
-                    <div class="calculator-inputs">
+            <div class="calculator-header reveal">
+                <span class="section-label">Design Your System</span>
+                <h2 class="section-title">Calculate Your Needs</h2>
+                <p class="section-subtitle">Find out how much battery backup and solar you need for your home. Select your daily usage and desired backup to visualize your optimal setup.</p>
+            </div>
+            <div class="calculator-widget reveal">
+            <div class="calculator-grid">
+                <div class="calculator-inputs">
                         <div class="calc-group">
                             <label>Select System Type</label>
                             <div class="system-toggle-group">
@@ -3168,7 +4211,7 @@
                                 </label>
                                 <label class="system-toggle-label">
                                     <input type="radio" name="system-type" value="cfe-only">
-                                    <span class="toggle-text">CFE Only</span>
+                                    <span class="toggle-text">CFE Only / Existing Solar</span>
                                 </label>
                             </div>
                         </div>
@@ -3189,185 +4232,65 @@
                                 <div class="slider-val"><span id="usage-val">30</span> kWh</div>
                             </div>
                             <p class="calc-help">Check your typical daily kWh usage on your CFE bill by dividing
-                                bimestral usage by 60.</p>
+                                bimestral usage by 60. <em>Average home: 30–40 kWh/day.</em></p>
                         </div>
 
                         <div class="calc-group">
                             <label for="backup-hours">Desired Backup Time (Hours)</label>
                             <div class="slider-container">
-                                <input type="range" id="backup-hours" min="4" max="72" value="24" class="calc-slider">
-                                <div class="slider-val"><span id="backup-val">24</span> hrs</div>
+                                <input type="range" id="backup-hours" min="4" max="24" value="12" class="calc-slider">
+                                <div class="slider-val"><span id="backup-val">12</span> hrs</div>
                             </div>
                             <p class="calc-help">How many hours do you want to run purely on battery without grid or
                                 solar?</p>
                         </div>
-                    </div>
                 </div>
-
                 <div class="calculator-results">
-                    <div class="result-card battery-result">
-                        <div class="result-icon">🔋</div>
-                        <div class="result-info">
-                            <h3>Recommended Battery Capacity</h3>
-                            <div class="result-number"><span id="battery-result">30</span> <span>kWh</span></div>
-                            <p>To comfortably support your usage for <span id="hours-text">24</span> hours based on
-                                typical power loads.</p>
+                    <div class="result-row-top">
+                        <div class="result-card battery-result">
+                            <div class="result-icon">🔋</div>
+                            <div class="result-info">
+                                <h3>Recommended Battery Capacity</h3>
+                                <div class="result-number"><span id="battery-result">30</span> <span>kWh</span></div>
+                                <p>To comfortably support your usage for <span id="hours-text">12</span> hours based on
+                                    typical power loads.</p>
+                            </div>
+                        </div>
+
+                        <div class="result-card solar-result" id="solar-result-card">
+                            <div class="result-icon">☀️</div>
+                            <div class="result-info">
+                                <h3>Required Solar Panels (650W)</h3>
+                                <div class="result-number"><span id="panels-result">12</span> <span>Panels</span></div>
+                                <p id="panels-desc">To generate <span id="usage-text">30</span> kWh daily, optimizing for
+                                    San Miguel de
+                                    Allende's peak sun hours.</p>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="result-card solar-result" id="solar-result-card">
-                        <div class="result-icon">☀️</div>
-                        <div class="result-info">
-                            <h3>Required Solar Panels (580W)</h3>
-                            <div class="result-number"><span id="panels-result">12</span> <span>Panels</span></div>
-                            <p id="panels-desc">To generate <span id="usage-text">30</span> kWh daily, optimizing for
-                                San Miguel de
-                                Allende's peak sun hours.</p>
+                    <div class="result-card package-result" id="package-result-card">
+                        <div class="result-icon">📦</div>
+                        <div class="result-info" style="flex: 1;">
+                            <h3>Recommended Solution</h3>
+                            <div class="package-name" id="package-name">Recommended Solution</div>
+                            <ul class="package-specs" id="package-specs">
+                                <li><span>Inverter</span><strong id="package-inverter">12 kW Split-Phase</strong></li>
+                                <li><span>Battery</span><strong id="package-battery">16 kWh LiFePO4</strong></li>
+                                <li class="package-specs-solar" id="package-solar-line"><span>Solar</span><strong id="package-solar">12 × 650W panels</strong></li>
+                            </ul>
+                            <p class="package-note" id="package-note">All Firefly packages use split-phase 110/220 V inverters.</p>
+                            <div class="package-price-row">
+                                <div class="package-price-col">
+                                    <div class="package-price" id="package-price">$188,674 MXN<span class="iva-tag">+IVA</span></div>
+                                    <div class="package-price-sub" id="package-price-sub">Includes basic installation</div>
+                                </div>
+                                <a href="#" id="package-cta" onclick="openSurvey();return false;" class="package-cta">Schedule My Site Evaluation →</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Solutions Section -->
-    <section class="solutions" id="solutions">
-        <div class="section-container">
-            <div class="section-header reveal">
-                <span class="section-label">Our Solutions</span>
-                <h2 class="section-title">Four Levels of Control</h2>
-                <p class="section-subtitle">Start with backup power. Add solar when you're ready. Scale to complete
-                    independence.</p>
-            </div>
-
-            <div class="solutions-grid">
-                <div class="solution-card reveal">
-                    <span class="solution-tier">Tier 1</span>
-                    <h3 class="solution-name">Essentials</h3>
-                    <ul class="solution-specs">
-                        <li><span>Battery</span> <strong>5kWh</strong></li>
-                        <li><span>Inverter</span> <strong>5.2kW Single-Phase</strong></li>
-                        <li><span>Voltage</span> <strong>120V</strong></li>
-                        <li><span>Runtime</span> <strong>~3-5 hours</strong></li>
-                    </ul>
-                    <div class="solution-footer">
-                        <div class="solution-price">
-                            <div class="price-label">Starting at</div>
-                            <div class="price-value">$65,000 MXN</div>
-                        </div>
-                        <div class="solution-arrow">→</div>
-                    </div>
-                </div>
-
-                <div class="solution-card reveal">
-                    <span class="solution-tier">Tier 2</span>
-                    <h3 class="solution-name">Good</h3>
-                    <ul class="solution-specs">
-                        <li><span>Battery</span> <strong>10kWh</strong></li>
-                        <li><span>Inverter</span> <strong>6.5kW Split-Phase</strong></li>
-                        <li><span>Voltage</span> <strong>120/220V</strong></li>
-                        <li><span>Runtime</span> <strong>~6-8 hours</strong></li>
-                    </ul>
-                    <div class="solution-footer">
-                        <div class="solution-price">
-                            <div class="price-label">Starting at</div>
-                            <div class="price-value">$105,000 MXN</div>
-                        </div>
-                        <div class="solution-arrow">→</div>
-                    </div>
-                </div>
-
-                <div class="solution-card featured reveal">
-                    <span class="solution-badge">Recommended</span>
-                    <span class="solution-tier">Tier 3</span>
-                    <h3 class="solution-name">Better</h3>
-                    <ul class="solution-specs">
-                        <li><span>Battery</span> <strong>10kWh</strong></li>
-                        <li><span>Inverter</span> <strong>10kW Split-Phase</strong></li>
-                        <li><span>Voltage</span> <strong>120/220V</strong></li>
-                        <li><span>Runtime</span> <strong>~6-8 hours</strong></li>
-                    </ul>
-                    <div class="solution-footer">
-                        <div class="solution-price">
-                            <div class="price-label">Starting at</div>
-                            <div class="price-value">$115,000 MXN</div>
-                        </div>
-                        <div class="solution-arrow">→</div>
-                    </div>
-                </div>
-
-                <div class="solution-card reveal">
-                    <span class="solution-tier">Tier 4</span>
-                    <h3 class="solution-name">Complete</h3>
-                    <ul class="solution-specs">
-                        <li><span>Battery</span> <strong>16kWh</strong></li>
-                        <li><span>Inverter</span> <strong>12kW Split-Phase</strong></li>
-                        <li><span>Voltage</span> <strong>120/220V</strong></li>
-                        <li><span>Runtime</span> <strong>~12-24 hours</strong></li>
-                    </ul>
-                    <div class="solution-footer">
-                        <div class="solution-price">
-                            <div class="price-label">Starting at</div>
-                            <div class="price-value">$140,000 MXN</div>
-                        </div>
-                        <div class="solution-arrow">→</div>
-                    </div>
-                </div>
-            </div>
-
-            <p class="solutions-note reveal">All solutions offer expandable capacities and are solar ready.</p>
-        </div>
-    </section>
-
-    <!-- Comparison Section -->
-    <section class="comparison" id="technology">
-        <div class="section-container">
-            <div class="comparison-grid">
-                <div class="comparison-content reveal">
-                    <span class="section-label">Why Batteries</span>
-                    <h2>Why Firefly Beats Generators</h2>
-                    <p style="color: var(--slate); margin-top: 16px;">Traditional generators were designed for
-                        occasional outages. Firefly is designed for the reality of Mexico's grid—frequent,
-                        unpredictable, and increasingly common.</p>
-                </div>
-
-                <div class="comparison-table reveal">
-                    <div class="comparison-row header">
-                        <div class="col-feature">Feature</div>
-                        <div class="col-generator">Generator</div>
-                        <div class="col-firefly">Firefly</div>
-                    </div>
-                    <div class="comparison-row">
-                        <div class="col-feature">Response Time</div>
-                        <div class="col-generator">10-30 seconds</div>
-                        <div class="col-firefly">20 milliseconds</div>
-                    </div>
-                    <div class="comparison-row">
-                        <div class="col-feature">Noise Level</div>
-                        <div class="col-generator">60-80 dB (loud)</div>
-                        <div class="col-firefly">Silent operation</div>
-                    </div>
-                    <div class="comparison-row">
-                        <div class="col-feature">Fuel Required</div>
-                        <div class="col-generator">Diesel/Gasoline</div>
-                        <div class="col-firefly">None (solar rechargeable)</div>
-                    </div>
-                    <div class="comparison-row">
-                        <div class="col-feature">Maintenance</div>
-                        <div class="col-generator">Monthly service</div>
-                        <div class="col-firefly">Zero maintenance</div>
-                    </div>
-                    <div class="comparison-row">
-                        <div class="col-feature">Lifespan</div>
-                        <div class="col-generator">3-5 years</div>
-                        <div class="col-firefly">20+ years (8,000 cycles)</div>
-                    </div>
-                    <div class="comparison-row">
-                        <div class="col-feature">Scalability</div>
-                        <div class="col-generator">Fixed capacity</div>
-                        <div class="col-firefly">5kWh to 96kWh modular</div>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
@@ -3404,7 +4327,7 @@
         <div class="section-container">
             <h2 class="cta-title">Ready to Take Control of Your Power?</h2>
             <p class="cta-text">Get a free consultation and custom quote in less than 24 hours.</p>
-            <a href="/survey/" class="btn-dark">Schedule Free Consultation →</a>
+            <button onclick="openSurvey()" class="btn-dark" style="border:none;cursor:pointer;font-family:inherit;">I'm Ready for Firefly &rarr;</button>
         </div>
     </section>
 
@@ -3762,7 +4685,7 @@
                 <div class="footer-column">
                     <h4 class="footer-title">Support</h4>
                     <ul class="footer-links">
-                        <li><a href="#">FAQ</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
                         <li><a href="#">Installation</a></li>
                         <li><a href="#">Warranty</a></li>
                         <li><a href="#">Maintenance</a></li>
@@ -4074,6 +4997,67 @@
         const offsetGroup = document.getElementById('solar-offset-group');
         const solarResultCard = document.getElementById('solar-result-card');
 
+        // Pricing sourced from Airtable "Products" table (sale price USD).
+        // Converted to MXN at runtime with EXCHANGE_RATE_MXN (rolling average).
+        const EXCHANGE_RATE_MXN = 17.5;
+
+        const INVERTERS = [
+            { id: '6.5kp',  label: '6.5 kW Split-Phase', sku: 'POW-Sunsmart 6.5KP', kw: 6.5, max_panels: 15, price_usd: 2411.81 },
+            { id: '10kp',   label: '10 kW Split-Phase',  sku: 'POW-Sunsmart 10KP',  kw: 10,  max_panels: 16, price_usd: 3248.48 },
+            { id: 'fu12',   label: '12 kW Split-Phase',  sku: 'PowMr FU12-248P',    kw: 12, max_panels: 18, price_usd: 2760.80 }
+        ];
+
+        const BATTERIES = [
+            { id: '5kwh',  kwh: 5,  count: 1, price_usd: 1864.50, sku: 'POW-LIO48100-16S' },
+            { id: '10kwh', kwh: 10, count: 1, price_usd: 4184.28, sku: 'POW-LIO48200-16S' },
+            { id: '16kwh', kwh: 16, count: 1, price_usd: 5078.40, sku: 'POW-LIO48300-16S' },
+            { id: '32kwh', kwh: 16, count: 2, price_usd: 5078.40, sku: 'POW-LIO48300-16S' },
+            { id: '48kwh', kwh: 16, count: 3, price_usd: 5078.40, sku: 'POW-LIO48300-16S' }
+        ];
+
+        const PANEL_650W_USD = 210.91;      // LONGi LR8-66HVD 650W bifacial
+        const PANEL_RACK_USD = 116.00;      // 1 rack per panel (flat or 20° angle)
+        const PANEL_TOTAL_USD = PANEL_650W_USD + PANEL_RACK_USD; // $326.91 per installed panel
+
+        function selectBattery(requiredKwh) {
+            // Ladder: 5, 10, 16, 32, 48 kWh. Over 48 → custom quote.
+            // Rule: requiredKwh >= 12 rounds UP to 16 kWh. From 16 and above,
+            // nearest-neighbor with ties toward the lower tier. Below 12,
+            // choose between 5 and 10 at midpoint 7.5.
+            const MAX_LADDER_KWH = 48;
+            if (requiredKwh > MAX_LADDER_KWH) return null;
+            if (requiredKwh >= 12) {
+                const upper = BATTERIES.slice(2); // 16, 32, 48
+                let best = upper[0];
+                let bestDist = Math.abs(best.kwh * best.count - requiredKwh);
+                for (const b of upper) {
+                    const dist = Math.abs(b.kwh * b.count - requiredKwh);
+                    if (dist < bestDist) { best = b; bestDist = dist; }
+                }
+                return best;
+            }
+            return requiredKwh <= 7.5 ? BATTERIES[0] : BATTERIES[1];
+        }
+
+        function selectInverter(battery, dailyUsageKwh, panelCount) {
+            // Default inverter by battery capacity
+            let startIdx;
+            const totalKwh = battery.kwh * battery.count;
+            if (totalKwh >= 16) startIdx = 2;                       // 16+ KWh → LVM12K
+            else if (totalKwh === 10 && dailyUsageKwh > 25) startIdx = 1; // 10 KWh + heavy use → 10KP
+            else startIdx = 0;                                      // otherwise → 6.5KP
+
+            // Bump up tier until inverter's PV input can handle panel count
+            for (let i = startIdx; i < INVERTERS.length; i++) {
+                if (panelCount <= INVERTERS[i].max_panels) return INVERTERS[i];
+            }
+            return null; // > 20 panels → custom quote
+        }
+
+        function toMXN(usd) {
+            return Math.round(usd * EXCHANGE_RATE_MXN); // actual price from Airtable USD × 17.5, nearest peso
+        }
+
         function updateCalculator() {
             if (!usageSlider || !backupSlider) return;
 
@@ -4102,11 +5086,12 @@
             // Assumptions for San Miguel de Allende
             const peakSunHours = 5.5;
             const systemEfficiency = 0.85; // 15% system loss
-            const panelWattage = 580; // W
+            const panelWattage = 650; // W — LONGi 650W-class (2026 standard)
 
             // Battery calculation: (Daily usage / 24) * Backup hours
             const batteryReq = (usage / 24) * hours;
-            batteryResult.textContent = Math.ceil(batteryReq);
+            const batteryReqRounded = Math.ceil(batteryReq);
+            batteryResult.textContent = batteryReqRounded;
 
             let panels = 0;
             if (selectedType === 'independence') {
@@ -4126,6 +5111,78 @@
             if (selectedType !== 'cfe-only') {
                 panelsResult.textContent = panels;
             }
+
+            updatePackageCard(batteryReqRounded, usage, panels, selectedType);
+        }
+
+        function updatePackageCard(batteryReqKwh, dailyUsageKwh, panelCount, systemType) {
+            const nameEl = document.getElementById('package-name');
+            const inverterEl = document.getElementById('package-inverter');
+            const batteryEl = document.getElementById('package-battery');
+            const solarEl = document.getElementById('package-solar');
+            const solarLineEl = document.getElementById('package-solar-line');
+            const noteEl = document.getElementById('package-note');
+            const priceEl = document.getElementById('package-price');
+            const priceSubEl = document.getElementById('package-price-sub');
+            const ctaEl = document.getElementById('package-cta');
+            const specsEl = document.getElementById('package-specs');
+            if (!priceEl) return;
+
+            let battery = selectBattery(batteryReqKwh);
+            let inverter = battery ? selectInverter(battery, dailyUsageKwh, panelCount) : null;
+
+            // Pairing rule: the 5 kWh battery only suits inverters up to 6 kW.
+            // Our smallest split-phase inverter is 6.5 kW, so bump to 10 kWh
+            // whenever the selected inverter is above 6 kW.
+            if (battery && inverter && battery.id === '5kwh' && inverter.kw > 6) {
+                battery = BATTERIES[1]; // 10 kWh
+                inverter = selectInverter(battery, dailyUsageKwh, panelCount);
+            }
+
+            // Custom quote fallback — battery > 48 KWh or panels > 20
+            if (!battery || !inverter) {
+                nameEl.textContent = 'Custom Solution';
+                specsEl.style.display = 'none';
+                noteEl.textContent = 'Your configuration exceeds our standard component capacities. We design custom systems for site-specific needs.';
+                priceEl.textContent = 'Custom Quote';
+                priceSubEl.textContent = 'Request a site evaluation';
+                ctaEl.textContent = 'Schedule My Site Evaluation →';
+                return;
+            }
+
+            // Standard config
+            specsEl.style.display = '';
+            noteEl.textContent = 'All packages use split-phase 110/220 V inverters.';
+            ctaEl.textContent = 'Schedule My Site Evaluation →';
+
+            const totalBatteryKwh = battery.kwh * battery.count;
+            nameEl.textContent = `${totalBatteryKwh} kWh + ${inverter.kw} kW System`;
+
+            inverterEl.textContent = inverter.label;
+            batteryEl.textContent = battery.count > 1
+                ? `${battery.count} × ${battery.kwh} kWh LiFePO4 (${totalBatteryKwh} kWh total)`
+                : `${battery.kwh} kWh LiFePO4`;
+
+            const batteryCostUsd = battery.price_usd * battery.count;
+            const equipmentUsd = batteryCostUsd + inverter.price_usd;
+
+            const renderPrice = (usd) => {
+                priceEl.textContent = `$${toMXN(usd).toLocaleString('en-US')} MXN`;
+                const ivaSpan = document.createElement('span');
+                ivaSpan.className = 'iva-tag';
+                ivaSpan.textContent = '+IVA';
+                priceEl.appendChild(ivaSpan);
+            };
+            if (systemType === 'cfe-only') {
+                solarLineEl.style.display = 'none';
+                renderPrice(equipmentUsd);
+            } else {
+                solarLineEl.style.display = 'flex';
+                solarEl.textContent = panelCount > 0 ? `${panelCount} × 650W panels` : '—';
+                const solarUsd = panelCount * PANEL_TOTAL_USD;
+                renderPrice(equipmentUsd + solarUsd);
+            }
+            priceSubEl.textContent = 'Includes basic installation';
         }
 
         if (usageSlider && backupSlider) {
