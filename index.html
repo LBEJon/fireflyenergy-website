@@ -31,6 +31,7 @@
 
         html {
             scroll-behavior: smooth;
+            overflow-x: hidden;
         }
 
         body {
@@ -39,6 +40,7 @@
             color: var(--nordic-charcoal);
             line-height: 1.6;
             overflow-x: hidden;
+            max-width: 100%;
             padding-bottom: calc(40px + env(safe-area-inset-bottom));
         }
 
@@ -389,6 +391,10 @@
             width: 100%;
         }
 
+        .hero-container > * {
+            min-width: 0;
+        }
+
         .hero-badge {
             display: inline-flex;
             align-items: center;
@@ -585,6 +591,21 @@
                 overflow-x: hidden;
                 padding-left: 0;
                 padding-right: 0;
+            }
+
+            .flow-diagram-header {
+                padding: 16px 18px;
+                gap: 10px;
+            }
+
+            .flow-diagram-header img {
+                height: 48px;
+            }
+
+            .flow-diagram-header .flow-title {
+                font-size: 13px;
+                letter-spacing: 1px;
+                line-height: 1.2;
             }
         }
 
@@ -1699,9 +1720,15 @@
             .pd-stat { padding: 8px 16px; }
             .pd-stat + .pd-stat { border-left: none; border-top: 1px solid rgba(255,255,255,0.1); }
             .pd-notes { grid-template-columns: 1fr; }
-            .pd-table th, .pd-table td { padding: 14px 12px; }
+            .pd-table-wrap {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                border-radius: 12px;
+            }
+            .pd-table { min-width: 560px; }
+            .pd-table th, .pd-table td { padding: 12px 10px; font-size: 0.85rem; }
             .pd-table th:first-child, .pd-table td:first-child { padding-left: 14px; }
-            .pd-response { max-width: 200px; font-size: 0.8rem; }
+            .pd-response { max-width: 180px; font-size: 0.78rem; }
             .pd-threat-sub { display: none; }
         }
 
@@ -2680,8 +2707,28 @@
                 grid-template-columns: 1fr;
             }
 
+            .hero {
+                padding: 120px 20px 40px;
+            }
+
+            .hero-badge {
+                font-size: 12px;
+                padding: 10px 14px;
+                letter-spacing: 0.2px;
+                gap: 6px;
+                margin-bottom: 20px;
+            }
+
+            .hero-badge::before {
+                font-size: 14px;
+            }
+
             .hero-title {
-                font-size: 36px;
+                font-size: 32px;
+            }
+
+            .hero-subtitle {
+                font-size: 16px;
             }
 
             .comparison-row.header {
@@ -2776,6 +2823,10 @@
             align-items: start;
         }
 
+        .calculator-grid > * {
+            min-width: 0;
+        }
+
         .calculator-results {
             margin-top: 40px;
         }
@@ -2784,6 +2835,7 @@
             display: flex;
             flex-direction: column;
             gap: 32px;
+            min-width: 0;
         }
 
         .system-toggle-group {
@@ -3114,6 +3166,51 @@
             }
             .calculator-results {
                 margin-top: 0;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .result-card {
+                padding: 20px;
+                gap: 14px;
+            }
+            .result-card,
+            .result-info,
+            .result-number {
+                min-width: 0;
+            }
+            .result-info {
+                flex: 1;
+                min-width: 0;
+            }
+            .result-number {
+                font-size: 36px;
+                word-break: break-word;
+            }
+            .package-name {
+                font-size: 22px;
+            }
+            .package-price {
+                font-size: 22px;
+            }
+            .package-specs li {
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+            .package-specs li strong {
+                text-align: left;
+                font-size: 13px;
+            }
+            .package-price-row {
+                gap: 12px;
+            }
+            .package-cta {
+                padding: 14px 24px;
+                font-size: 0.95rem;
+                white-space: normal;
+                text-align: center;
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>

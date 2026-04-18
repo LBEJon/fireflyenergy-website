@@ -23,6 +23,8 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+html { overflow-x: hidden; }
+
 body {
     font-family: 'Open Sans', sans-serif;
     background: var(--cloud);
@@ -30,6 +32,7 @@ body {
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
+    overflow-x: hidden;
     padding-bottom: calc(52px + env(safe-area-inset-bottom));
 }
 
