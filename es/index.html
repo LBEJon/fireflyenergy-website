@@ -38,6 +38,7 @@
             color: var(--nordic-charcoal);
             line-height: 1.6;
             overflow-x: hidden;
+            padding-bottom: calc(40px + env(safe-area-inset-bottom));
         }
 
         h1,
@@ -53,17 +54,21 @@
 
         /* Language Toggle Bar */
         .lang-bar {
-            background: var(--nordic-charcoal);
-            padding: 8px 0;
+            background: rgba(30, 32, 34, 0.7);
+            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+            backdrop-filter: blur(12px) saturate(1.2);
+            padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
             position: fixed;
-            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
             width: 100%;
             z-index: 1001;
             transition: transform 0.3s var(--transition-smooth);
         }
 
         .lang-bar.hidden {
-            transform: translateY(-100%);
+            transform: translateY(100%);
         }
 
         .lang-container {
@@ -107,15 +112,14 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             position: fixed;
-            top: 36px;
+            top: 0;
             width: 100%;
             z-index: 1000;
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            transition: top 0.3s var(--transition-smooth), box-shadow 0.3s var(--transition-smooth);
+            transition: box-shadow 0.3s var(--transition-smooth);
         }
 
         .navbar.scrolled {
-            top: 0;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
         }
 
@@ -2330,9 +2334,9 @@
     <!-- Language Toggle -->
     <div class="lang-bar" id="langBar">
         <div class="lang-container">
-            <a href="/" class="lang-option">English</a>
+            <a href="/" class="lang-option" aria-label="English">EN</a>
             <span class="lang-divider">|</span>
-            <a href="/es/" class="lang-option active">Español</a>
+            <a href="/es/" class="lang-option active" aria-label="Español">ES</a>
         </div>
     </div>
 
@@ -3852,15 +3856,12 @@
 
         // ── Navbar scroll effect ──────────────────────────────────────────
         const navbar = document.getElementById('navbar');
-        const langBar = document.getElementById('langBar');
 
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
                 navbar.classList.add('scrolled');
-                langBar.classList.add('hidden');
             } else {
                 navbar.classList.remove('scrolled');
-                langBar.classList.remove('hidden');
             }
         });
 
@@ -4659,15 +4660,12 @@
 
         // ── Navbar scroll effect ──────────────────────────────────────────
         const navbar = document.getElementById('navbar');
-        const langBar = document.getElementById('langBar');
 
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
                 navbar.classList.add('scrolled');
-                langBar.classList.add('hidden');
             } else {
                 navbar.classList.remove('scrolled');
-                langBar.classList.remove('hidden');
             }
         });
 

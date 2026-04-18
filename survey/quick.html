@@ -30,6 +30,53 @@ body {
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
+    padding-bottom: calc(52px + env(safe-area-inset-bottom));
+}
+
+.lang-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(30, 32, 34, 0.7);
+    -webkit-backdrop-filter: blur(12px) saturate(1.2);
+    backdrop-filter: blur(12px) saturate(1.2);
+    padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+    z-index: 1001;
+}
+
+.lang-bar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.lang-bar-inner a {
+    color: var(--white);
+    text-decoration: none;
+    padding: 4px 12px;
+    border-radius: 20px;
+    opacity: 0.7;
+    transition: opacity 0.2s, background 0.2s, color 0.2s;
+}
+
+.lang-bar-inner a.active {
+    background: var(--firefly-green);
+    color: var(--nordic-charcoal);
+    opacity: 1;
+}
+
+.lang-bar-inner a:hover:not(.active) {
+    opacity: 1;
+}
+
+.lang-bar-inner .divider {
+    color: #4A4E54;
+    font-size: 13px;
 }
 
 .topbar {
@@ -652,10 +699,6 @@ body {
         <img src="../firefly_logo_padded.png" alt="Firefly Energy" onerror="this.style.display='none'">
         <span>Firefly Energy</span>
     </a>
-    <div class="lang-toggle">
-        <a href="quick.html" class="active">EN</a>
-        <a href="../es/survey/quick.html">ES</a>
-    </div>
 </div>
 
 <div class="page">
@@ -946,6 +989,14 @@ document.getElementById('quickForm').addEventListener('submit', async function(e
     }
 });
 </script>
+
+<div class="lang-bar">
+    <div class="lang-bar-inner">
+        <a href="quick.html" class="active" aria-label="English">EN</a>
+        <span class="divider">|</span>
+        <a href="../es/survey/" aria-label="Español">ES</a>
+    </div>
+</div>
 
 </body>
 </html>
