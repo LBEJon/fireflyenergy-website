@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preguntas Frecuentes | Firefly Energy</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta name="description"
+        content="Respuestas a las preguntas más comunes sobre los sistemas solares híbridos, de respaldo con batería y de resiliencia energética de Firefly para hogares en San Miguel de Allende y la región.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --firefly-green: #A4D233;
+            --energy-lime: #C4E639;
+            --nordic-charcoal: #1E2022;
+            --slate: #4A4E54;
+            --cloud: #F5F6F7;
+            --white: #FFFFFF;
+            --light-green: #E8F5D6;
+            --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: var(--cloud);
+            color: var(--nordic-charcoal);
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding-bottom: calc(40px + env(safe-area-inset-bottom));
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        /* ── Language Bar ── */
+        .lang-bar {
+            background: rgba(30, 32, 34, 0.7);
+            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+            backdrop-filter: blur(12px) saturate(1.2);
+            padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1001;
+        }
+
+        .lang-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .lang-option {
+            color: var(--white);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            opacity: 0.7;
+            transition: opacity 0.3s, background-color 0.3s, color 0.3s;
+        }
+
+        .lang-option.active {
+            background: var(--firefly-green);
+            color: var(--nordic-charcoal);
+            opacity: 1;
+        }
+
+        .lang-divider {
+            color: var(--slate);
+            font-size: 13px;
+        }
+
+        /* ── Navbar ── */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.3s var(--transition-smooth);
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 12px;
+        }
+
+        .logo img {
+            height: 60px;
+            width: auto;
+            display: block;
+        }
+
+        .logo-main {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--nordic-charcoal);
+        }
+
+        .logo-main span {
+            color: var(--firefly-green);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--slate);
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s var(--transition-smooth);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--firefly-green);
+            transition: width 0.3s var(--transition-smooth);
+        }
+
+        .nav-link:hover {
+            color: var(--nordic-charcoal);
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        .nav-link.active {
+            color: var(--nordic-charcoal);
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: var(--firefly-green);
+            color: var(--nordic-charcoal);
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.3s var(--transition-smooth), box-shadow 0.3s var(--transition-smooth), background-color 0.3s var(--transition-smooth);
+        }
+
+        .btn-primary:hover {
+            background: var(--energy-lime);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(164, 210, 51, 0.3);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .mobile-menu-btn span {
+            width: 24px;
+            height: 2px;
+            background: var(--nordic-charcoal);
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        .mobile-menu-btn.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .mobile-menu-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu-btn.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 1002;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            opacity: 0;
+            transition: opacity 0.3s var(--transition-smooth);
+        }
+
+        .mobile-nav.open {
+            display: flex;
+            opacity: 1;
+        }
+
+        .mobile-nav a {
+            text-decoration: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--nordic-charcoal);
+            padding: 12px 24px;
+            border-radius: 8px;
+            transition: color 0.3s, background-color 0.3s;
+        }
+
+        .mobile-nav a:hover {
+            color: var(--firefly-green);
+            background: var(--light-green);
+        }
+
+        /* ── Page Hero ── */
+        .page-hero {
+            background: var(--nordic-charcoal);
+            padding: 140px 24px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60%;
+            height: 100%;
+            opacity: 0.03;
+            background-image: radial-gradient(circle at 2px 2px, var(--white) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+
+        .page-hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(164, 210, 51, 0.15);
+            border: 1px solid rgba(164, 210, 51, 0.3);
+            padding: 8px 18px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--firefly-green);
+            margin-bottom: 24px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .page-hero-title {
+            font-size: clamp(36px, 5vw, 56px);
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 16px;
+        }
+
+        .page-hero-title span {
+            color: var(--firefly-green);
+        }
+
+        .page-hero-subtitle {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.65);
+            max-width: 600px;
+            line-height: 1.7;
+        }
+
+        /* ── Category Filter ── */
+        .filter-section {
+            background: var(--white);
+            padding: 24px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 100px;
+            z-index: 100;
+        }
+
+        .filter-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--slate);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-right: 4px;
+        }
+
+        .filter-btn {
+            background: var(--cloud);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            color: var(--slate);
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s var(--transition-smooth);
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--firefly-green);
+            color: var(--nordic-charcoal);
+            border-color: var(--firefly-green);
+        }
+
+        /* ── FAQ Main Layout ── */
+        .faq-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 64px 24px 96px;
+        }
+
+        .faq-category {
+            margin-bottom: 64px;
+        }
+
+        .faq-category-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--light-green);
+        }
+
+        .faq-category-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--nordic-charcoal);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .faq-category-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--nordic-charcoal);
+        }
+
+        .faq-category-count {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--firefly-green);
+            background: var(--light-green);
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-left: auto;
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── FAQ Item (Accordion) ── */
+        .faq-item {
+            background: var(--white);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            transition: box-shadow 0.3s var(--transition-smooth), transform 0.3s var(--transition-smooth);
+        }
+
+        .faq-item:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+        }
+
+        .faq-item.open {
+            box-shadow: 0 6px 30px rgba(164, 210, 51, 0.12);
+            border-color: rgba(164, 210, 51, 0.3);
+        }
+
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 28px;
+            cursor: pointer;
+            gap: 16px;
+            user-select: none;
+        }
+
+        .faq-question-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--nordic-charcoal);
+            line-height: 1.4;
+        }
+
+        .faq-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--cloud);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.3s, transform 0.3s var(--transition-smooth);
+        }
+
+        .faq-icon svg {
+            width: 14px;
+            height: 14px;
+            stroke: var(--slate);
+            stroke-width: 2.5;
+            fill: none;
+            transition: stroke 0.3s, transform 0.3s var(--transition-smooth);
+        }
+
+        .faq-item.open .faq-icon {
+            background: var(--firefly-green);
+            transform: none;
+        }
+
+        .faq-item.open .faq-icon svg {
+            stroke: var(--nordic-charcoal);
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s var(--transition-smooth), padding 0.3s;
+        }
+
+        .faq-item.open .faq-answer {
+            max-height: 800px;
+        }
+
+        .faq-answer-inner {
+            padding: 0 28px 28px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding-top: 20px;
+        }
+
+        .faq-answer-inner p {
+            font-size: 15px;
+            color: var(--slate);
+            line-height: 1.75;
+            margin-bottom: 12px;
+        }
+
+        .faq-answer-inner p:last-child {
+            margin-bottom: 0;
+        }
+
+        .faq-answer-inner strong {
+            color: var(--nordic-charcoal);
+        }
+
+        .faq-answer-inner ul {
+            list-style: none;
+            margin: 12px 0;
+        }
+
+        .faq-answer-inner ul li {
+            padding: 6px 0 6px 24px;
+            position: relative;
+            font-size: 15px;
+            color: var(--slate);
+            line-height: 1.6;
+        }
+
+        .faq-answer-inner ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 14px;
+            width: 8px;
+            height: 8px;
+            background: var(--firefly-green);
+            border-radius: 50%;
+        }
+
+        /* ── Spec Table ── */
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        .spec-table thead {
+            background: var(--nordic-charcoal);
+            color: var(--white);
+        }
+
+        .spec-table thead th {
+            padding: 12px 16px;
+            text-align: left;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .spec-table tbody tr {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .spec-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .spec-table tbody tr:nth-child(even) {
+            background: var(--cloud);
+        }
+
+        .spec-table tbody td {
+            padding: 12px 16px;
+            color: var(--slate);
+            vertical-align: top;
+        }
+
+        .spec-table tbody td:first-child {
+            font-weight: 600;
+            color: var(--nordic-charcoal);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        /* ── Highlight Note ── */
+        .faq-note {
+            background: var(--light-green);
+            border-left: 3px solid var(--firefly-green);
+            padding: 14px 18px;
+            border-radius: 0 8px 8px 0;
+            margin: 16px 0;
+        }
+
+        .faq-note p {
+            color: #2d4a0e !important;
+            font-size: 14px !important;
+        }
+
+        /* ── CTA Section ── */
+        .faq-cta {
+            background: var(--nordic-charcoal);
+            border-radius: 20px;
+            padding: 56px 48px;
+            text-align: center;
+            margin: 0 24px 96px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 96px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .faq-cta::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(164, 210, 51, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .faq-cta h2 {
+            color: var(--white);
+            font-size: 32px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .faq-cta p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+            margin-bottom: 32px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .faq-cta .btn-primary {
+            font-size: 16px;
+            padding: 16px 36px;
+        }
+
+        /* ── Footer ── */
+        .footer {
+            background: var(--nordic-charcoal);
+            padding: 40px 24px;
+            text-align: center;
+        }
+
+        .footer p {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+        }
+
+        .footer a {
+            color: var(--firefly-green);
+            text-decoration: none;
+        }
+
+        /* ── Animations ── */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.6s var(--transition-smooth) both;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+            }
+
+            .page-hero {
+                padding: 120px 20px 60px;
+            }
+
+            .faq-section {
+                padding: 40px 16px 64px;
+            }
+
+            .faq-question {
+                padding: 18px 20px;
+            }
+
+            .faq-question-text {
+                font-size: 15px;
+            }
+
+            .faq-answer-inner {
+                padding: 0 20px 20px;
+                padding-top: 16px;
+            }
+
+            .faq-cta {
+                padding: 40px 24px;
+                margin: 0 16px 64px;
+            }
+
+            .faq-cta h2 {
+                font-size: 24px;
+            }
+
+            .filter-section {
+                top: 88px;
+            }
+
+            .spec-table {
+                font-size: 13px;
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                white-space: nowrap;
+            }
+
+            .spec-table thead th,
+            .spec-table tbody td {
+                padding: 10px 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Language Bar -->
+    <div class="lang-bar">
+        <div class="lang-container">
+            <a href="/faq.html" class="lang-option">EN</a>
+            <span class="lang-divider">|</span>
+            <a href="#" class="lang-option active">ES</a>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="/es/index.html" class="logo">
+                <img src="/firefly_logo_transparent.png" alt="Firefly por Nordic Electric">
+            </a>
+            <div class="nav-links">
+                <a href="/es/index.html#calculator" class="nav-link">Soluciones</a>
+                <a href="/es/index.html#technology" class="nav-link">Tecnología</a>
+                <a href="/es/compare/" class="nav-link">Firefly vs Solar Tradicional</a>
+                <a href="/es/faq.html" class="nav-link active">Preguntas Frecuentes</a>
+                <a href="/es/index.html#contact" class="nav-link">Contacto</a>
+                <a href="/es/survey/" class="btn-primary">Comenzar</a>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Nav -->
+    <nav class="mobile-nav" id="mobileNav">
+        <a href="/es/index.html#calculator">Soluciones</a>
+        <a href="/es/index.html#technology">Tecnología</a>
+        <a href="/es/compare/">Firefly vs Solar Tradicional</a>
+        <a href="/es/faq.html">Preguntas Frecuentes</a>
+        <a href="/es/index.html#contact">Contacto</a>
+        <a href="/es/survey/" class="btn-primary">Comenzar</a>
+    </nav>
+
+    <!-- Page Hero -->
+    <section class="page-hero">
+        <div class="page-hero-content">
+            <div class="page-hero-badge">⚡ Base de Conocimiento</div>
+            <h1 class="page-hero-title">Preguntas <span>Frecuentes</span></h1>
+            <p class="page-hero-subtitle">Todo lo que necesita saber sobre cómo funciona el sistema Firefly, qué incluye y cómo se adapta a su casa.</p>
+        </div>
+    </section>
+
+    <!-- Category Filter -->
+    <div class="filter-section">
+        <div class="filter-container">
+            <span class="filter-label">Filtrar:</span>
+            <button class="filter-btn active" data-filter="all">Todas las Preguntas</button>
+            <button class="filter-btn" data-filter="system">Funcionamiento del Sistema</button>
+            <button class="filter-btn" data-filter="equipment">Equipo</button>
+            <button class="filter-btn" data-filter="installation">Instalación</button>
+            <button class="filter-btn" data-filter="billing">CFE y Facturación</button>
+        </div>
+    </div>
+
+    <!-- FAQ Content -->
+    <main class="faq-section">
+
+        <!-- System Operation -->
+        <div class="faq-category" data-category="system">
+            <div class="faq-category-header">
+                <div class="faq-category-icon">⚡</div>
+                <h2 class="faq-category-title">Funcionamiento del Sistema</h2>
+                <span class="faq-category-count">4 preguntas</span>
+            </div>
+
+            <div class="faq-item" data-category="system">
+                <div class="faq-question">
+                    <span class="faq-question-text">Si tengo paneles solares, ¿cómo prioriza el sistema las fuentes de energía?</span>
+                    <div class="faq-icon">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        <p>Si usted tiene paneles solares, <strong>se convierten en la fuente de energía principal</strong> durante el día — alimentando su casa y cargando la batería al mismo tiempo. La CFE solo entra automáticamente cuando la batería está baja y la producción solar no es suficiente (cielos nublados, alta demanda o de noche). El sistema maneja todo esto automáticamente sin necesidad de intervención manual.</p>
+                        <p>Si aún no tiene solar, la batería por sí sola proporciona respaldo y protege su casa contra los apagones de CFE y la energía sucia — y los paneles solares se pueden agregar en cualquier momento.</p>
+                        <div class="faq-note">
+                            <p><strong>Por qué esto importa para su recibo de CFE:</strong> la tarifa residencial de electricidad en México es escalonada — el precio aumenta considerablemente al superar los umbrales de consumo más bajos. Si tiene solar, el objetivo principal del sistema es reducir los kWh que compra a CFE, manteniéndolo en las tarifas más bajas y reduciendo significativamente su recibo con el tiempo.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="system">
+                <div class="faq-question">
+                    <span class="faq-question-text">Cuando la batería se agota en la noche, ¿vuelve automáticamente a la CFE?</span>
+                    <div class="faq-icon">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        <p>Sí. Cuando la batería llega a su umbral bajo, el sistema se transfiere automáticamente a la energía de la red (CFE) — sin que usted tenga que hacer nada.</p>
+                        <p>Algo importante: <strong>toda la energía pasa siempre a través del inversor</strong>, sin importar la fuente. Ya sea que esté operando con batería, solar o CFE, la salida hacia su casa es siempre energía limpia y estable. Esto también protege sus equipos de los picos de voltaje y la energía sucia que frecuentemente vienen directo de la CFE.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="system">
+                <div class="faq-question">
+                    <span class="faq-question-text">¿Qué pasa durante un apagón de la CFE?</span>
+                    <div class="faq-icon">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        <p>El cambio es imperceptible y prácticamente instantáneo. Cuando se va la CFE, el inversor híbrido detecta el apagón y transfiere automáticamente su casa a la energía de batería y solar en milisegundos — tan rápido que la mayoría de los electrónicos y electrodomésticos ni siquiera notan la transición.</p>
+                        <p>Durante el apagón, su casa sigue funcionando normalmente con batería y solar. Cuando regresa la CFE, el sistema se transfiere de vuelta automáticamente.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="system">
+                <div class="faq-question">
+                    <span class="faq-question-text">¿Puedo integrar mi generador existente al sistema?</span>
+                    <div class="faq-icon">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        <p>Sí. Su generador se conecta a través de un <strong>interruptor de transferencia automática (ATS)</strong> que viene incluido en la instalación. Usted lo arranca manualmente, el sistema detecta la energía del generador y el inversor la utiliza para mantener la casa funcionando y cargar la batería al mismo tiempo.</p>
+                        <p>Una consideración importante: el generador dará prioridad a energizar la casa primero, y usará la capacidad sobrante para cargar la batería. Dependiendo de la potencia del generador, es posible que no recargue por completo un banco de baterías grande mientras alimenta toda la casa — pero extiende significativamente su autonomía durante apagones prolongados.</p>
+                        <div class="faq-note">
+                            <p>Esta es una razón por la que recomendamos comenzar con la mayor capacidad de batería (16 kWh). Más almacenamiento significa mayor resiliencia sin depender del generador.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Equipment -->
+        <div class="faq-category" data-category="equipment">
+            <div class="faq-category-header">
+                <div class="faq-category-icon">🔋</div>
+                <h2 class="faq-category-title">Equipo y Especificaciones</h2>
+                <span class="faq-category-count">4 preguntas</span>
+            </div>
+
+            <div class="faq-item" data-category="equipment">
+                <div class="faq-question">
+                    <span class="faq-question-text">¿Puedo comenzar con una batería más pequeña y expandirla después?</span>
+                    <div class="faq-icon">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        <p>Sí, el sistema es completamente modular. Puede comenzar con un módulo de batería de 5 kWh y agregar más capacidad en cualquier momento sin cambiar el inversor ni ningún otro equipo. El sistema admite hasta 16 unidades de batería en paralelo.</p>
+                        <p>Dicho esto, normalmente recomendamos comenzar con la <strong>configuración de 16 kWh</strong> si su situación lo permite. Ya sea que tenga un sistema solar existente o esté empezando desde cero, más capacidad de batería significa mayor resiliencia durante apagones — y es más rentable dimensionar correctamente desde el inicio que agregar módulos después.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="equipment">
+                <div class="faq-question">
+                    <span class="faq-question-text">¿Qué marcas y equipos usa Firefly?</span>
+                    <div class="faq-icon">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        <table class="spec-table">
+                            <thead>
+                                <tr>
+                                    <th>Equipo</th>
+                                    <th>Modelo / Especificación</th>
+                                    <th>Especificaciones Principales</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Inversor</td>
+                                    <td>PowMr — Híbrido de Grado Comercial 12 kW Bifásico</td>
+                                    <td>Bifásico 120V/240V, dos rastreadores MPPT solares, monitoreo WiFi, salida de onda senoidal pura, eficiencia &gt;95%, expandible hasta 6 unidades en paralelo</td>
+                                </tr>
+                                <tr>
+                                    <td>Batería</td>
+                                    <td>EVE / CATL LiFePO4 48V — BMS 200A con balance activo de celdas</td>
+                                    <td>Celdas de fosfato de hierro y litio de alta capacidad, configuraciones modulares de 5 a 16 kWh, vida útil de 6,000+ ciclos, expandible hasta 16 unidades en paralelo</td>
+                                </tr>
+                                <tr>
+                                    <td>Paneles Solares</td>
+                                    <td>580W Bifaciales Grado A</td>
+                                    <td>Celdas monocristalinas tipo N, eficiencia de 22%+, construcción de doble vidrio</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="equipment">
+                <div class="faq-question">
+                    <span class="faq-question-text">¿Debo usar paneles bifaciales o paneles de una sola cara?</span>
+                    <div class="faq-icon">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        <p>Depende del lugar de instalación:</p>
+                        <ul>
+                            <li><strong>Cubierta de patio / pérgola abierta por debajo:</strong> los paneles bifaciales son ideales aquí. Capturan la luz reflejada desde abajo además de la luz directa del sol — exactamente para lo que fue diseñada la tecnología bifacial. Como no hay diferencia de costo, no hay razón para no aprovechar la generación adicional.</li>
+                            <li><strong>Techo cerrado estándar:</strong> los paneles monocristalinos de una sola cara son la opción correcta. Están optimizados para instalaciones sobre techo y tienen excelente desempeño en superficies inclinadas o planas. Misma potencia, mismo precio.</li>
+                        </ul>
+                        <p>Evaluamos cada instalación de manera individual y especificamos el tipo de panel correcto para su configuración.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="equipment">
+                <div class="faq-question">
+                    <span class="faq-question-text">¿Necesito paneles solares para que el sistema funcione?</span>
+                    <div class="faq-icon">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        <p>No — los paneles solares no son necesarios para que el sistema funcione. La batería y el inversor por sí solos proporcionan energía de respaldo, protegen su casa de los apagones de CFE y entregan energía limpia sin importar la fuente. Muchos clientes empiezan solo con batería y agregan solar después.</p>
+                        <p>Si ya tiene paneles solares, el inversor híbrido libera todo su valor — almacenando la generación excedente del día para usarla en la noche, en vez de enviarla de regreso a la red sin aprovecharla. Si está pensando en agregar solar, el sistema ya está diseñado para admitir paneles en cualquier momento sin cambios adicionales de equipo.</p>
+                        <div class="faq-note">
+                            <p>Para clientes con un sistema solar existente, normalmente priorizamos <strong>el almacenamiento en batería primero</strong> — en muchos casos entrega mejores resultados que agregar más paneles, especialmente si su sistema ya produce más de lo que su casa consume durante las horas pico.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Installation -->
+        <div class="faq-category" data-category="installation">
+            <div class="faq-category-header">
+                <div class="faq-category-icon">🔧</div>
+                <h2 class="faq-category-title">Instalación</h2>
+                <span class="faq-category-count">2 preguntas</span>
+            </div>
+
+            <div class="faq-item" data-category="installation">
+                <div class="faq-question">
+                    <span class="faq-question-text">¿La instalación tiene costo adicional?</span>
+                    <div class="faq-icon">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        <p><strong>La instalación estándar está incluida</strong> en todos los paquetes de Firefly — es parte del precio, no un cargo adicional.</p>
+                        <p>Solo cobramos costos adicionales de instalación para configuraciones más complejas, tales como:</p>
+                        <ul>
+                            <li>Subpaneles de separación de circuitos para manejo específico de cargas</li>
+                            <li>Tramos de cable extendidos sobre distancias largas</li>
+                            <li>Requisitos especiales de montaje estructural</li>
+                            <li>Configuraciones que quedan fuera de los parámetros residenciales estándar</li>
+                        </ul>
+                        <p>La instalación del interruptor de transferencia automática (ATS) para integración con generador está incluida en el proyecto sin costo adicional.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="installation">
+                <div class="faq-question">
+                    <span class="faq-question-text">¿Cuánto tiempo toma una instalación típica?</span>
+                    <div class="faq-icon">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        <p>Una instalación estándar de Firefly normalmente toma <strong>1 o 2 días</strong>, dependiendo del alcance del proyecto. Esto incluye montar el inversor y la batería, conectar el sistema a su panel eléctrico y las pruebas finales y puesta en marcha.</p>
+                        <p>Si los paneles solares son parte de su proyecto, o si está integrando un sistema solar existente, considere medio día o un día adicional. La integración del ATS del generador y otras configuraciones complejas también pueden agregar tiempo. Le daremos un estimado claro de tiempos durante su evaluación.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CFE & Billing -->
+        <div class="faq-category" data-category="billing">
+            <div class="faq-category-header">
+                <div class="faq-category-icon">📊</div>
+                <h2 class="faq-category-title">CFE y Facturación</h2>
+                <span class="faq-category-count">2 preguntas</span>
+            </div>
+
+            <div class="faq-item" data-category="billing">
+                <div class="faq-question">
+                    <span class="faq-question-text">¿Cómo reduce el sistema Firefly mi recibo de CFE?</span>
+                    <div class="faq-icon">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        <p>La tarifa residencial de CFE (Tarifa 01) tiene una estructura de precios escalonada — mientras más consume, más paga por kWh. El primer bloque pequeño de consumo está subsidiado a tarifas bajas, pero el consumo por encima de eso salta al bloque de <em>excedente</em>, que puede ser <strong>3 o 4 veces más caro</strong>.</p>
+                        <p>El sistema Firefly reduce los kWh que le compra a CFE al:</p>
+                        <ul>
+                            <li>Almacenar energía en la batería y usarla para alimentar su casa en vez de la red</li>
+                            <li>Si tiene solar: energizar su casa directamente con los paneles durante el día y guardar el excedente para usarlo de noche</li>
+                            <li>Tomar energía de CFE solo cuando la batería está baja y ninguna otra fuente (solar o generador) está disponible</li>
+                        </ul>
+                        <p>El resultado: su consumo medido por CFE cae considerablemente, regresándolo a los bloques más económicos — donde los ahorros se acumulan en cada período de facturación.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="billing">
+                <div class="faq-question">
+                    <span class="faq-question-text">¿Funciona el sistema con medición neta?</span>
+                    <div class="faq-icon">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        <p>Sí — si su sistema incluye paneles solares, el programa de medición neta de México permite exportar la energía solar excedente a la red de CFE a cambio de créditos en kWh, que pueden compensar consumo futuro.</p>
+                        <p>Con el sistema híbrido Firefly, la batería almacena primero la energía solar excedente — reduciendo lo que toma de la red por la noche. Cualquier generación que exceda tanto su consumo inmediato como la capacidad de la batería puede entonces exportarse para créditos. Esto maximiza el valor de cada kWh que producen sus paneles. Si está pensando en agregar solar en el futuro, la medición neta se puede activar en ese momento.</p>
+                        <div class="faq-note">
+                            <p>Los créditos de medición neta se acumulan hasta por 12 meses en México. Si no se usan, pueden aplicarse a recibos futuros o regresarse a CFE. Su contrato de interconexión especificará los términos específicos para su propiedad.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Warranty -->
+        <div class="faq-category" data-category="equipment">
+            <div class="faq-category-header">
+                <div class="faq-category-icon">🛡️</div>
+                <h2 class="faq-category-title">Garantía y Soporte</h2>
+                <span class="faq-category-count">1 pregunta</span>
+            </div>
+
+            <div class="faq-item" data-category="equipment">
+                <div class="faq-question">
+                    <span class="faq-question-text">¿Qué garantía ofrece Firefly sobre el equipo?</span>
+                    <div class="faq-icon">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        <table class="spec-table">
+                            <thead>
+                                <tr>
+                                    <th>Equipo</th>
+                                    <th>Garantía</th>
+                                    <th>Cobertura</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Inversor</td>
+                                    <td>8 años</td>
+                                    <td>Partes, mano de obra y soporte posventa</td>
+                                </tr>
+                                <tr>
+                                    <td>Sistema de Batería</td>
+                                    <td>8 años</td>
+                                    <td>Partes, mano de obra y soporte posventa</td>
+                                </tr>
+                                <tr>
+                                    <td>Paneles Solares — Materiales</td>
+                                    <td>25 años</td>
+                                    <td>Defectos de producto y de fabricación</td>
+                                </tr>
+                                <tr>
+                                    <td>Paneles Solares — Potencia de Salida</td>
+                                    <td>30 años</td>
+                                    <td>Mínimo 87.4% de salida garantizada al año 30 (vs. el estándar de la industria del 80%)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- CTA -->
+    <section style="padding: 0 24px;">
+        <div class="faq-cta">
+            <h2>¿Todavía tiene preguntas?</h2>
+            <p>Nuestro equipo está en San Miguel de Allende y listo para ayudarle a resolver cualquier duda.</p>
+            <a href="/es/index.html#contact" class="btn-primary">Hablar con un Especialista ⚡</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2026 Firefly Energy por Nordic Electric · <a href="/es/index.html">Inicio</a> · <a href="/es/faq.html">Preguntas Frecuentes</a></p>
+    </footer>
+
+    <script>
+        // Navbar scroll behavior
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) navbar.classList.add('scrolled');
+            else navbar.classList.remove('scrolled');
+        });
+
+        // Mobile menu
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileNav = document.getElementById('mobileNav');
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenuBtn.classList.toggle('active');
+            mobileNav.classList.toggle('open');
+        });
+        mobileNav.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenuBtn.classList.remove('active');
+                mobileNav.classList.remove('open');
+            });
+        });
+
+        // Accordion
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                const isOpen = item.classList.contains('open');
+                // Close all
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+                // Toggle current
+                if (!isOpen) item.classList.add('open');
+            });
+        });
+
+        // Category filter
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const filter = btn.dataset.filter;
+                document.querySelectorAll('.faq-category').forEach(cat => {
+                    if (filter === 'all' || cat.dataset.category === filter) {
+                        cat.style.display = '';
+                    } else {
+                        cat.style.display = 'none';
+                    }
+                });
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    if (filter === 'all' || item.dataset.category === filter) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                        item.classList.remove('open');
+                    }
+                });
+            });
+        });
+
+        // Open first item by default
+        document.querySelector('.faq-item')?.classList.add('open');
+    </script>
+
+</body>
+
+</html>
