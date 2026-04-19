@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /survey/quick.html
+Disallow: /survey/bilingual.html
+
+Sitemap: https://fireflyenergy.mx/sitemap.xml

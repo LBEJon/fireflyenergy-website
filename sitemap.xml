@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <url>
+    <loc>https://fireflyenergy.mx/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fireflyenergy.mx/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://fireflyenergy.mx/es/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fireflyenergy.mx/"/>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
+    <loc>https://fireflyenergy.mx/es/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fireflyenergy.mx/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://fireflyenergy.mx/es/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fireflyenergy.mx/"/>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
+    <loc>https://fireflyenergy.mx/faq.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fireflyenergy.mx/faq.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://fireflyenergy.mx/es/faq.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fireflyenergy.mx/faq.html"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://fireflyenergy.mx/es/faq.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fireflyenergy.mx/faq.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://fireflyenergy.mx/es/faq.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fireflyenergy.mx/faq.html"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://fireflyenergy.mx/compare/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fireflyenergy.mx/compare/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://fireflyenergy.mx/es/compare/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fireflyenergy.mx/compare/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://fireflyenergy.mx/es/compare/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fireflyenergy.mx/compare/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://fireflyenergy.mx/es/compare/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fireflyenergy.mx/compare/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+</urlset>
