@@ -5261,6 +5261,9 @@
             if (!battery || !inverter) {
                 nameEl.textContent = 'Custom Solution';
                 specsEl.style.display = 'none';
+                inverterEl.textContent = '';
+                batteryEl.textContent = '';
+                solarEl.textContent = '';
                 noteEl.textContent = 'Your configuration exceeds our standard component capacities. We design custom systems for site-specific needs.';
                 priceEl.textContent = 'Custom Quote';
                 priceSubEl.textContent = 'Request a site evaluation';
