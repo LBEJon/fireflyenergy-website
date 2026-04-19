@@ -3447,7 +3447,7 @@
                         Seamless. Scalable.</span>Modern battery backup from the team that's served Mexico for 20
                     years.</p>
                 <div class="hero-ctas" style="justify-content: center;">
-                    <a href="/survey/" class="btn-hero">Find out more!</a>
+                    <a href="#calculator" class="btn-hero">Design My System →</a>
                 </div>
             </div>
 
@@ -4458,7 +4458,7 @@
                                     <div class="package-price" id="package-price">$188,674 MXN<span class="iva-tag">+IVA</span></div>
                                     <div class="package-price-sub" id="package-price-sub">Includes basic installation</div>
                                 </div>
-                                <a href="#" id="package-cta" onclick="goToQuickForm();return false;" class="package-cta">Schedule My Site Evaluation →</a>
+                                <a href="#" id="package-cta" onclick="goToQuickForm();return false;" class="package-cta">I'm Ready for My Free Site Evaluation →</a>
                             </div>
                         </div>
                     </div>
@@ -4500,7 +4500,7 @@
         <div class="section-container">
             <h2 class="cta-title">Ready to Take Control of Your Power?</h2>
             <p class="cta-text">Get a free consultation and custom quote in less than 24 hours.</p>
-            <button onclick="openSurvey()" class="btn-dark" style="border:none;cursor:pointer;font-family:inherit;">I'm Ready for Firefly &rarr;</button>
+            <button onclick="openSurvey()" class="btn-dark" style="border:none;cursor:pointer;font-family:inherit;">Get My Free Quote &rarr;</button>
             <div class="cta-contact-row">
                 <span class="cta-contact-label">Or reach us directly:</span>
                 <a href="https://wa.me/5214151805030" class="cta-contact-link" target="_blank" rel="noopener" aria-label="Message or call us on WhatsApp">
@@ -5327,14 +5327,14 @@
                 noteEl.textContent = 'Your configuration exceeds our standard component capacities. We design custom systems for site-specific needs.';
                 priceEl.textContent = 'Custom Quote';
                 priceSubEl.textContent = 'Request a site evaluation';
-                ctaEl.textContent = 'Schedule My Site Evaluation →';
+                ctaEl.textContent = "I'm Ready for My Free Site Evaluation →";
                 return;
             }
 
             // Standard config
             specsEl.style.display = '';
             noteEl.textContent = 'All packages use split-phase 110/220 V inverters.';
-            ctaEl.textContent = 'Schedule My Site Evaluation →';
+            ctaEl.textContent = "I'm Ready for My Free Site Evaluation →";
 
             const totalBatteryKwh = battery.kwh * battery.count;
             nameEl.textContent = `${totalBatteryKwh} kWh + ${inverter.kw} kW System`;

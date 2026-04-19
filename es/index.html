@@ -3447,7 +3447,7 @@
                         Imperceptible. Escalable.</span>Respaldo moderno con batería, del equipo que lleva 20 años
                     sirviendo a México.</p>
                 <div class="hero-ctas" style="justify-content: center;">
-                    <a href="/es/survey/" class="btn-hero">¡Conozca más!</a>
+                    <a href="#calculator" class="btn-hero">Diseñe Mi Sistema →</a>
                 </div>
             </div>
 
@@ -4456,7 +4456,7 @@
                                     <div class="package-price" id="package-price">$188,674 MXN<span class="iva-tag">+IVA</span></div>
                                     <div class="package-price-sub" id="package-price-sub">Incluye instalación básica</div>
                                 </div>
-                                <a href="#" id="package-cta" onclick="goToQuickForm();return false;" class="package-cta">Agendar Mi Evaluación en Sitio →</a>
+                                <a href="#" id="package-cta" onclick="goToQuickForm();return false;" class="package-cta">Estoy Listo para Mi Evaluación Gratuita en Sitio →</a>
                             </div>
                         </div>
                     </div>
@@ -4498,7 +4498,7 @@
         <div class="section-container">
             <h2 class="cta-title">¿Listo para Tomar el Control de su Energía?</h2>
             <p class="cta-text">Obtenga una consulta gratuita y una cotización personalizada en menos de 24 horas.</p>
-            <button onclick="openSurvey()" class="btn-dark" style="border:none;cursor:pointer;font-family:inherit;">Estoy Listo para Firefly &rarr;</button>
+            <button onclick="openSurvey()" class="btn-dark" style="border:none;cursor:pointer;font-family:inherit;">Obtenga Mi Cotización Gratuita &rarr;</button>
             <div class="cta-contact-row">
                 <span class="cta-contact-label">O contáctenos directamente:</span>
                 <a href="https://wa.me/5214151805030" class="cta-contact-link" target="_blank" rel="noopener" aria-label="Escríbanos o llámenos por WhatsApp">
@@ -5324,14 +5324,14 @@
                 noteEl.textContent = 'Your configuration exceeds our standard component capacities. We design custom systems for site-specific needs.';
                 priceEl.textContent = 'Custom Quote';
                 priceSubEl.textContent = 'Request a site evaluation';
-                ctaEl.textContent = 'Schedule My Site Evaluation →';
+                ctaEl.textContent = "Estoy Listo para Mi Evaluación Gratuita en Sitio →";
                 return;
             }
 
             // Standard config
             specsEl.style.display = '';
             noteEl.textContent = 'All packages use split-phase 110/220 V inverters.';
-            ctaEl.textContent = 'Schedule My Site Evaluation →';
+            ctaEl.textContent = "Estoy Listo para Mi Evaluación Gratuita en Sitio →";
 
             const totalBatteryKwh = battery.kwh * battery.count;
             nameEl.textContent = `${totalBatteryKwh} kWh + ${inverter.kw} kW System`;
