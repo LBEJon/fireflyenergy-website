@@ -5159,22 +5159,13 @@
 
         function selectBattery(requiredKwh) {
             // Ladder: 5, 10, 16, 32, 48 kWh. Over 48 → custom quote.
-            // Rule: requiredKwh >= 12 rounds UP to 16 kWh. From 16 and above,
-            // nearest-neighbor with ties toward the lower tier. Below 12,
-            // choose between 5 and 10 at midpoint 7.5.
-            const MAX_LADDER_KWH = 48;
-            if (requiredKwh > MAX_LADDER_KWH) return null;
-            if (requiredKwh >= 12) {
-                const upper = BATTERIES.slice(2); // 16, 32, 48
-                let best = upper[0];
-                let bestDist = Math.abs(best.kwh * best.count - requiredKwh);
-                for (const b of upper) {
-                    const dist = Math.abs(b.kwh * b.count - requiredKwh);
-                    if (dist < bestDist) { best = b; bestDist = dist; }
-                }
-                return best;
-            }
-            return requiredKwh <= 7 ? BATTERIES[0] : BATTERIES[1];
+            // Thresholds: ≤5 → 5; ≤12 → 10; ≤20 → 16; ≤40 → 2×16; else 3×16.
+            if (requiredKwh > 48) return null;
+            if (requiredKwh <= 5)  return BATTERIES[0]; // 5 kWh
+            if (requiredKwh <= 12) return BATTERIES[1]; // 10 kWh
+            if (requiredKwh <= 20) return BATTERIES[2]; // 16 kWh (1×)
+            if (requiredKwh <= 40) return BATTERIES[3]; // 32 kWh (2×16)
+            return BATTERIES[4];                         // 48 kWh (3×16)
         }
 
         function selectInverter(battery, dailyUsageKwh, panelCount) {
