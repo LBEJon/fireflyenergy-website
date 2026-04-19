@@ -5204,7 +5204,7 @@
                 }
                 return best;
             }
-            return requiredKwh <= 7.5 ? BATTERIES[0] : BATTERIES[1];
+            return requiredKwh <= 7 ? BATTERIES[0] : BATTERIES[1];
         }
 
         function selectInverter(battery, dailyUsageKwh, panelCount) {
@@ -5298,14 +5298,6 @@
 
             let battery = selectBattery(batteryReqKwh);
             let inverter = battery ? selectInverter(battery, dailyUsageKwh, panelCount) : null;
-
-            // Pairing rule: the 5 kWh battery only suits inverters up to 6 kW.
-            // Our smallest split-phase inverter is 6.5 kW, so bump to 10 kWh
-            // whenever the selected inverter is above 6 kW.
-            if (battery && inverter && battery.id === '5kwh' && inverter.kw > 6) {
-                battery = BATTERIES[1]; // 10 kWh
-                inverter = selectInverter(battery, dailyUsageKwh, panelCount);
-            }
 
             // Custom quote fallback — battery > 48 KWh or panels > 20
             if (!battery || !inverter) {
