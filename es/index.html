@@ -3159,12 +3159,18 @@
             padding: 32px;
             display: flex;
             gap: 24px;
+            min-width: 0;
             transition: transform 0.3s var(--transition-smooth), border-color 0.3s var(--transition-smooth);
         }
 
         .result-card:hover {
             transform: translateY(-4px);
             border-color: var(--firefly-green);
+        }
+
+        .result-info {
+            flex: 1;
+            min-width: 0;
         }
 
         .result-icon {
@@ -3306,6 +3312,8 @@
         .package-cta {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
+            text-align: center;
             gap: 8px;
             font-family: 'Montserrat', sans-serif;
             font-size: 0.9rem;
@@ -3319,7 +3327,7 @@
             border: none;
             cursor: pointer;
             letter-spacing: 0.01em;
-            white-space: nowrap;
+            max-width: 100%;
             transition: background 150ms ease, transform 200ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 200ms ease;
         }
 
