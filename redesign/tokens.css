@@ -1,0 +1,67 @@
+/* ============================================================
+   FIREFLY WEB DESIGN SYSTEM — Design Tokens
+   Anchored to the 2026 vector logo (NOT the legacy proposal brand-guide).
+   Source of truth for: website → proposals → install packets → tools.
+   ============================================================ */
+
+:root {
+  /* ---- Brand core (from the locked 2026 logo) ---- */
+  --ff-green:        #9ED500; /* the logo lime — primary accent, ALWAYS on dark or as a fill, never as small text on white */
+  --ff-ink:          #2A2D34; /* logo charcoal — authority, body text, dark sections */
+
+  /* ---- Greens, extended for the web (accessible derivatives) ---- */
+  --ff-green-deep:   #9ED500; /* LOCKED: lime is the ONLY green (olive retired). Rule: lime owns large/display text + fills;
+                                 small labels use charcoal (--ff-ink); chips = lime fill + charcoal text. Never lime as small text on white. */
+  --ff-green-soft:   #C7EA5B; /* hover/quiet fills, gradient endpoint */
+  --ff-green-tint:   #F2F8E0; /* whisper-green section wash */
+  --ff-glow:         rgba(158,213,0,0.45); /* the "firefly glow" — use sparingly, behind hero focal points */
+
+  /* ---- Neutrals (warm, airy — optimistic light direction) ---- */
+  --ff-white:        #FFFFFF;
+  --ff-paper:        #F8F9F4; /* warm off-white page bg — softer & more economical-feeling than pure white */
+  --ff-mist:         #EEF0E8; /* alternate section / card edge */
+  --ff-line:         #E2E5DA; /* hairline borders */
+  --ff-slate:        #5B606B; /* secondary text on light */
+  --ff-storm:        #9498A1; /* captions, fine print */
+
+  /* ---- Accent (use rarely — credibility comes from restraint) ---- */
+  --ff-accent:       #FF6A3D; /* SUNSET CORAL — the "look here" accent. Warm complement to lime; max attention.
+                                 SCARCITY RULE: only the #1 action per view (primary CTA, savings figure, "featured" badge). */
+  --ff-accent-dk:    #E24A1E; /* coral text-on-white / hover */
+  --ff-accent-tint:  #FFE7DF; /* soft coral wash for badges */
+  --ff-gold:         #FFB81C; /* pricing / savings highlight only */
+
+  /* ---- Type ---- */
+  --ff-display: "Archivo Narrow", "Arial Narrow", sans-serif; /* echoes the wordmark — big moments only */
+  --ff-sans:    "Archivo", system-ui, -apple-system, sans-serif; /* body & UI — sibling family, cohesive */
+
+  /* Fluid type scale (clamp = responsive without breakpoints) */
+  --fs-display: clamp(2.75rem, 6vw, 5.5rem);
+  --fs-h1:      clamp(2.1rem, 4vw, 3.5rem);
+  --fs-h2:      clamp(1.6rem, 2.6vw, 2.4rem);
+  --fs-h3:      clamp(1.2rem, 1.8vw, 1.5rem);
+  --fs-lead:    clamp(1.1rem, 1.4vw, 1.35rem);
+  --fs-body:    1.0625rem;
+  --fs-small:   0.875rem;
+  --fs-eyebrow: 0.78rem;
+
+  --lh-tight: 0.98;
+  --lh-snug:  1.15;
+  --lh-body:  1.6;
+
+  /* ---- Space / rhythm (8pt base) ---- */
+  --sp-1: 0.5rem;  --sp-2: 1rem;   --sp-3: 1.5rem;  --sp-4: 2rem;
+  --sp-5: 3rem;    --sp-6: 4rem;   --sp-7: 6rem;    --sp-8: 8rem;
+  --container: 1200px;
+  --container-tight: 760px;
+
+  /* ---- Radius / elevation (soft, rounded — echoes the logo capsules) ---- */
+  --r-sm: 10px; --r-md: 16px; --r-lg: 24px; --r-pill: 999px;
+  --shadow-sm: 0 1px 2px rgba(42,45,52,0.06), 0 2px 8px rgba(42,45,52,0.05);
+  --shadow-md: 0 8px 30px rgba(42,45,52,0.08);
+  --shadow-lift: 0 20px 60px rgba(42,45,52,0.12);
+
+  /* ---- Motion (calm, premium — never bouncy/gimmicky) ---- */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur: 0.5s;
+}

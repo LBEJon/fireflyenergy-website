@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Firefly — Energy Independence, Designed for You</title>
+<link rel="icon" href="assets/firefly-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Narrow:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--ff-sans);font-size:var(--fs-body);line-height:var(--lh-body);
+       color:var(--ff-ink);background:var(--ff-paper);-webkit-font-smoothing:antialiased}
+  h1,h2,h3,.display{font-family:var(--ff-display);line-height:var(--lh-tight);font-weight:700;letter-spacing:-0.01em}
+  a{color:inherit;text-decoration:none}
+  img,svg{display:block;max-width:100%}
+  .wrap{max-width:var(--container);margin:0 auto;padding:0 var(--sp-3)}
+  .eyebrow{font-size:var(--fs-eyebrow);font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--ff-ink)}
+  .eyebrow::before{content:"";display:inline-block;width:18px;height:2px;background:var(--ff-green);
+           vertical-align:middle;margin-right:.55rem;border-radius:2px}
+  .lead{font-size:var(--fs-lead);color:var(--ff-slate);line-height:1.5}
+
+  .btn{display:inline-flex;align-items:center;gap:.5rem;font-weight:600;font-size:var(--fs-small);
+       padding:.85rem 1.5rem;border-radius:var(--r-pill);transition:all var(--dur) var(--ease);cursor:pointer;border:0}
+  .btn-primary{background:var(--ff-ink);color:#fff}
+  .btn-primary:hover{background:#000;transform:translateY(-2px);box-shadow:var(--shadow-md)}
+  .btn-green{background:var(--ff-green);color:var(--ff-ink)}
+  .btn-green:hover{background:var(--ff-green-soft);transform:translateY(-2px);box-shadow:0 10px 30px var(--ff-glow)}
+  .btn-accent{background:var(--ff-accent);color:#fff}
+  .btn-accent:hover{background:var(--ff-accent-dk);transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,106,61,.35)}
+  .btn-ghost{background:transparent;color:var(--ff-ink);border:1.5px solid var(--ff-line)}
+  .btn-ghost:hover{border-color:var(--ff-ink)}
+
+  header{position:sticky;top:0;z-index:50;background:rgba(248,249,244,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--ff-line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:74px}
+  .nav .logo{height:30px}
+  .nav-links{display:flex;gap:var(--sp-4);align-items:center}
+  .nav-links a{font-size:var(--fs-small);font-weight:500;color:var(--ff-slate);transition:color .3s}
+  .nav-links a:hover{color:var(--ff-ink)}
+  .nav-right{display:flex;align-items:center;gap:var(--sp-3)}
+  .lang{display:flex;font-size:var(--fs-small);font-weight:600;border:1px solid var(--ff-line);border-radius:var(--r-pill);overflow:hidden}
+  .lang button{border:0;background:transparent;padding:.35rem .7rem;cursor:pointer;color:var(--ff-storm);font-weight:600}
+  .lang button.active{background:var(--ff-ink);color:#fff}
+  @media(max-width:860px){.nav-links{display:none}}
+
+  /* hero */
+  .hero{position:relative;padding:var(--sp-6) 0 var(--sp-6);overflow:hidden}
+  .hero::before{content:"";position:absolute;top:-15%;right:-10%;width:60vw;height:60vw;max-width:760px;max-height:760px;
+       background:radial-gradient(circle,var(--ff-glow) 0%,transparent 62%);filter:blur(8px);z-index:0;pointer-events:none}
+  .hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:1.15fr .85fr;gap:var(--sp-5);align-items:center}
+  .hero h1{font-size:var(--fs-display);margin:var(--sp-3) 0}
+  .hero h1 .hl{color:var(--ff-green)}
+  .hero .cta-row{display:flex;gap:var(--sp-2);margin-top:var(--sp-4);flex-wrap:wrap}
+  .hero-card{background:#fff;border:1px solid var(--ff-line);border-radius:var(--r-lg);padding:var(--sp-4);box-shadow:var(--shadow-lift)}
+  .hero-card .big{font-family:var(--ff-display);font-size:3.4rem;color:var(--ff-ink);line-height:1}
+  .hero-card .big small{font-size:1.1rem;color:var(--ff-green);font-weight:700}
+  .meter{height:10px;border-radius:var(--r-pill);background:var(--ff-mist);margin:var(--sp-2) 0;overflow:hidden}
+  .meter span{display:block;height:100%;width:88%;border-radius:var(--r-pill);background:linear-gradient(90deg,var(--ff-green),var(--ff-green-soft))}
+  .hero-card .row{display:flex;justify-content:space-between;font-size:var(--fs-small);color:var(--ff-slate)}
+  @media(max-width:860px){.hero .wrap{grid-template-columns:1fr}}
+
+  /* trust strip */
+  .trust{border-top:1px solid var(--ff-line);border-bottom:1px solid var(--ff-line);background:#fff}
+  .trust .wrap{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);padding-top:var(--sp-3);padding-bottom:var(--sp-3);flex-wrap:wrap}
+  .trust .t-label{font-size:var(--fs-eyebrow);letter-spacing:.16em;text-transform:uppercase;color:var(--ff-storm);font-weight:700}
+  .trust .t-items{display:flex;gap:var(--sp-5);flex-wrap:wrap;color:var(--ff-slate);font-weight:600;font-size:var(--fs-small)}
+
+  section{padding:var(--sp-7) 0}
+  .sec-head{max-width:var(--container-tight);margin-bottom:var(--sp-5)}
+  .sec-head.center{margin-left:auto;margin-right:auto;text-align:center}
+  .sec-head h2{font-size:var(--fs-h1);margin:var(--sp-2) 0}
+
+  /* problem band */
+  .problem{background:var(--ff-ink);color:#fff;padding:var(--sp-5) 0}
+  .problem .wrap{display:flex;align-items:baseline;gap:var(--sp-3);flex-wrap:wrap;justify-content:center;text-align:center}
+  .problem .big{font-family:var(--ff-display);font-size:clamp(1.8rem,3.5vw,2.8rem)}
+  .problem .big .hl{color:var(--ff-green)}
+  .problem p{color:#b8bcc4;max-width:46ch}
+
+  /* how it works — states */
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-3)}
+  @media(max-width:860px){.grid-3{grid-template-columns:1fr}}
+  .state{background:#fff;border:1px solid var(--ff-line);border-radius:var(--r-lg);padding:var(--sp-4);transition:transform var(--dur) var(--ease),box-shadow var(--dur) var(--ease)}
+  .state:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
+  .state .ic{width:44px;height:44px;border-radius:var(--r-pill);background:var(--ff-green);color:var(--ff-ink);
+             display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:var(--sp-2)}
+  .state h3{font-size:var(--fs-h3);margin-bottom:.4rem}
+  .state p{color:var(--ff-slate);font-size:var(--fs-small);line-height:1.55}
+
+  /* protection */
+  .protect{background:var(--ff-green-tint)}
+  .chips{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-2);margin-bottom:var(--sp-5)}
+  @media(max-width:680px){.chips{grid-template-columns:repeat(2,1fr)}}
+  .chip-stat{background:#fff;border:1px solid var(--ff-line);border-radius:var(--r-md);padding:var(--sp-3);text-align:center}
+  .chip-stat .n{font-family:var(--ff-display);font-size:2rem;color:var(--ff-ink);line-height:1}
+  .chip-stat .l{font-size:var(--fs-small);color:var(--ff-slate);margin-top:.3rem}
+  .benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-3)}
+  @media(max-width:860px){.benefits{grid-template-columns:1fr}}
+  .benefit{display:flex;gap:var(--sp-2);align-items:flex-start}
+  .benefit .tick{flex:none;width:26px;height:26px;border-radius:var(--r-pill);background:var(--ff-green);color:var(--ff-ink);
+                 display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;margin-top:2px}
+  .benefit h4{font-family:var(--ff-display);font-size:1.15rem;margin-bottom:.2rem}
+  .benefit p{font-size:var(--fs-small);color:var(--ff-slate);line-height:1.5}
+
+  /* comparison */
+  .cmp{background:#fff;border:1px solid var(--ff-line);border-radius:var(--r-lg);overflow:hidden}
+  .cmp-row{display:grid;grid-template-columns:1.05fr 1fr 1fr}
+  .cmp-row+.cmp-row{border-top:1px solid var(--ff-line)}
+  .cmp-row>div{padding:18px 22px}
+  .cmp-head>div{padding:16px 22px;font-family:var(--ff-display);font-size:1.05rem}
+  .cmp-head .ff{background:var(--ff-green);color:var(--ff-ink)}
+  .cmp-head .trad{color:var(--ff-storm)}
+  .cmp .ff{background:var(--ff-green-tint)}
+  .cmp .aspect{font-weight:600;color:var(--ff-ink);font-size:var(--fs-small)}
+  .cmp .ff strong{color:var(--ff-ink)} .cmp .ff{font-size:var(--fs-small);color:var(--ff-slate)}
+  .cmp .trad{font-size:var(--fs-small);color:var(--ff-storm)}
+  .cmp .yes{color:var(--ff-green-deep);font-weight:700;margin-right:4px}
+  .cmp .no{color:var(--ff-accent);font-weight:700;margin-right:4px}
+  @media(max-width:760px){.cmp-row,.cmp-head{grid-template-columns:1fr}.cmp-head .aspect{display:none}}
+
+  /* solution / calculator teaser */
+  .solve{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-5);align-items:center}
+  @media(max-width:860px){.solve{grid-template-columns:1fr}}
+  .sol-card{background:#fff;border:1px solid var(--ff-line);border-radius:var(--r-lg);padding:var(--sp-4);box-shadow:var(--shadow-md)}
+  .sol-card .label{font-size:var(--fs-eyebrow);letter-spacing:.14em;text-transform:uppercase;color:var(--ff-storm);font-weight:700}
+  .sol-spec{display:flex;justify-content:space-between;padding:.7rem 0;border-bottom:1px solid var(--ff-line);font-size:var(--fs-small)}
+  .sol-spec b{font-family:var(--ff-display);font-weight:700}
+  .sol-price{font-family:var(--ff-display);font-size:2.2rem;margin:var(--sp-3) 0 .2rem}
+  .sol-price small{font-size:1rem;color:var(--ff-storm)}
+
+  /* split: industrial */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-5);align-items:center}
+  @media(max-width:860px){.split{grid-template-columns:1fr}}
+  .split .visual{background:linear-gradient(135deg,var(--ff-green-tint),#fff);border:1px solid var(--ff-line);border-radius:var(--r-lg);
+                 min-height:300px;display:flex;align-items:center;justify-content:center}
+  .split .visual .badge{font-family:var(--ff-display);font-size:5rem;color:var(--ff-green)}
+  .tag{display:inline-block;background:var(--ff-green);color:var(--ff-ink);font-weight:700;font-size:var(--fs-eyebrow);
+       letter-spacing:.12em;text-transform:uppercase;padding:.35rem .8rem;border-radius:var(--r-pill)}
+
+  /* credibility stats */
+  .stats{background:var(--ff-ink);color:#fff}
+  .stats .eyebrow{color:#fff}.stats .eyebrow::before{background:var(--ff-green)}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-3);text-align:center;margin-top:var(--sp-4)}
+  @media(max-width:680px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+  .stat .n{font-family:var(--ff-display);font-size:clamp(2.2rem,5vw,3.4rem);color:var(--ff-green);line-height:1}
+  .stat .l{font-size:var(--fs-small);color:#b8bcc4;margin-top:.3rem}
+
+  /* cta */
+  .cta-band{text-align:center;max-width:var(--container-tight);margin:0 auto}
+  .cta-band h2{font-size:var(--fs-h1);margin-bottom:var(--sp-2)}
+  .cta-sub{font-size:var(--fs-small);color:var(--ff-storm);margin-top:var(--sp-3)}
+  .cta-sub a{color:var(--ff-green-deep);font-weight:600}
+
+  footer{background:var(--ff-ink);color:#b8bcc4;padding:var(--sp-6) 0 var(--sp-4)}
+  footer .cols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:var(--sp-4);margin-bottom:var(--sp-5)}
+  @media(max-width:860px){footer .cols{grid-template-columns:1fr 1fr}}
+  footer h4{color:#fff;font-family:var(--ff-sans);font-size:var(--fs-small);text-transform:uppercase;letter-spacing:.1em;margin-bottom:var(--sp-2)}
+  footer a{display:block;font-size:var(--fs-small);padding:.25rem 0;color:#b8bcc4;transition:color .3s}
+  footer a:hover{color:var(--ff-green)}
+  footer .logo{height:28px;margin-bottom:var(--sp-2)}
+  footer .legal{border-top:1px solid #41444d;padding-top:var(--sp-3);font-size:var(--fs-small);color:var(--ff-storm);display:flex;justify-content:space-between;flex-wrap:wrap;gap:var(--sp-2)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="#"><img class="logo" src="assets/firefly-logo.svg" alt="Firefly"></a>
+    <nav class="nav-links">
+      <a href="#how" data-en="How it works" data-es="Cómo funciona">How it works</a>
+      <a href="#compare" data-en="vs. Traditional solar" data-es="vs. Solar tradicional">vs. Traditional solar</a>
+      <a href="#design" data-en="Design my system" data-es="Diseña tu sistema">Design my system</a>
+      <a href="#why" data-en="Why Firefly" data-es="Por qué Firefly">Why Firefly</a>
+    </nav>
+    <div class="nav-right">
+      <div class="lang">
+        <button data-lang="en" class="active">EN</button>
+        <button data-lang="es">ES</button>
+      </div>
+      <a href="#design" class="btn btn-green" data-en="Get a quote" data-es="Cotiza ahora">Get a quote</a>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow" data-en="Mexico is growing — the grid is not" data-es="México crece — la red no">Mexico is growing — the grid is not</span>
+      <h1>
+        <span data-en="Energy independence, " data-es="Independencia energética, ">Energy independence, </span><span class="hl" data-en="designed for you." data-es="diseñada para ti.">designed for you.</span>
+      </h1>
+      <p class="lead" data-en="Silent. Seamless. Scalable. Modern solar-plus-battery backup from the team that's powered Mexico for 20 years — so your home stays on, no matter what the grid does."
+         data-es="Silencioso. Sin interrupciones. Escalable. Respaldo moderno de solar más batería del equipo que ha energizado México por 20 años — para que tu hogar siga encendido, pase lo que pase con la red.">Silent. Seamless. Scalable. Modern solar-plus-battery backup from the team that's powered Mexico for 20 years — so your home stays on, no matter what the grid does.</p>
+      <div class="cta-row">
+        <a href="#design" class="btn btn-accent" data-en="Design my system →" data-es="Diseña mi sistema →">Design my system →</a>
+        <a href="#how" class="btn btn-ghost" data-en="See how it works" data-es="Ver cómo funciona">See how it works</a>
+      </div>
+    </div>
+    <div class="hero-card">
+      <span class="eyebrow" data-en="Live independence" data-es="Independencia en vivo">Live independence</span>
+      <div class="big">88<small>%</small></div>
+      <p style="font-size:var(--fs-small);color:var(--ff-slate);margin:.2rem 0 .6rem"
+         data-en="of this home's energy, self-supplied" data-es="de la energía de esta casa, autoabastecida">of this home's energy, self-supplied</p>
+      <div class="meter"><span></span></div>
+      <div class="row"><span data-en="From the grid" data-es="De la red">From the grid</span><span data-en="From Firefly" data-es="De Firefly">From Firefly</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST -->
+<div class="trust">
+  <div class="wrap">
+    <span class="t-label" data-en="Built by Nordic Electric" data-es="Hecho por Nordic Electric">Built by Nordic Electric</span>
+    <div class="t-items">
+      <span data-en="20+ years in San Miguel" data-es="20+ años en San Miguel">20+ years in San Miguel</span>
+      <span data-en="CFE-compliant" data-es="Compatible con CFE">CFE-compliant</span>
+      <span data-en="8-year warranty" data-es="8 años de garantía">8-year warranty</span>
+      <span data-en="Bilingual support" data-es="Soporte bilingüe">Bilingual support</span>
+    </div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<div class="problem">
+  <div class="wrap">
+    <div class="big"><span data-en="Spikes. Brownouts. Blackouts. " data-es="Picos. Bajones. Apagones. ">Spikes. Brownouts. Blackouts. </span><span class="hl" data-en="Firefly handles them all." data-es="Firefly los resuelve todos.">Firefly handles them all.</span></div>
+    <p data-en="A solar-plus-battery system that becomes a microgrid in your home — so you stay powered, automatically, even when CFE goes down."
+       data-es="Un sistema de solar más batería que se convierte en una microred en tu hogar — para que sigas con energía, automáticamente, incluso cuando CFE falla.">A solar-plus-battery system that becomes a microgrid in your home — so you stay powered, automatically, even when CFE goes down.</p>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow" data-en="How it works" data-es="Cómo funciona">How it works</span>
+      <h2 data-en="One system. Power that never stops." data-es="Un sistema. Energía que nunca se detiene.">One system. Power that never stops.</h2>
+      <p class="lead" data-en="Solar and the grid power your home and charge your battery. When the grid falters, Firefly switches over in under 20 milliseconds — most devices never even flicker."
+         data-es="El sol y la red alimentan tu hogar y cargan tu batería. Cuando la red falla, Firefly cambia en menos de 20 milisegundos — la mayoría de los equipos ni parpadean.">Solar and the grid power your home and charge your battery. When the grid falters, Firefly switches over in under 20 milliseconds — most devices never even flicker.</p>
+    </div>
+    <div class="grid-3">
+      <div class="state"><div class="ic">☀️</div>
+        <h3 data-en="Normal operation" data-es="Operación normal">Normal operation</h3>
+        <p data-en="Solar and grid power your home while topping up the LiFePO4 battery. Clean energy first, grid only when needed."
+           data-es="El sol y la red alimentan tu hogar mientras cargan la batería LiFePO4. Energía limpia primero, red solo cuando hace falta.">Solar and grid power your home while topping up the LiFePO4 battery. Clean energy first, grid only when needed.</p></div>
+      <div class="state"><div class="ic">🛡️</div>
+        <h3 data-en="The moment the grid fails" data-es="En cuanto la red falla">The moment the grid fails</h3>
+        <p data-en="Firefly disconnects in &lt;20ms and runs your home on battery and solar. No switch to flip, no generator to start."
+           data-es="Firefly se desconecta en &lt;20ms y alimenta tu hogar con batería y sol. Sin interruptores, sin encender un generador.">Firefly disconnects in <20ms and runs your home on battery and solar. No switch to flip, no generator to start.</p></div>
+      <div class="state"><div class="ic">🔋</div>
+        <h3 data-en="Through long outages" data-es="Durante apagones largos">Through long outages</h3>
+        <p data-en="Your essentials keep running for hours — typically 4 to 12+ — while solar recharges the battery through the day."
+           data-es="Tus equipos esenciales siguen funcionando por horas — normalmente de 4 a 12+ — mientras el sol recarga la batería durante el día.">Your essentials keep running for hours — typically 4 to 12+ — while solar recharges the battery through the day.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROTECTION -->
+<section class="protect">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow" data-en="Always-on protection" data-es="Protección permanente">Always-on protection</span>
+      <h2 data-en="A silent guardian, always on." data-es="Un guardián silencioso, siempre activo.">A silent guardian, always on.</h2>
+      <p class="lead" data-en="Firefly watches your power 60 times a second and acts on its own — so your appliances are safe and you never have to think about it."
+         data-es="Firefly vigila tu energía 60 veces por segundo y actúa solo — para que tus equipos estén seguros y tú nunca tengas que pensarlo.">Firefly watches your power 60 times a second and acts on its own — so your appliances are safe and you never have to think about it.</p>
+    </div>
+    <div class="chips">
+      <div class="chip-stat"><div class="n">&lt;20ms</div><div class="l" data-en="Instant response" data-es="Respuesta instantánea">Instant response</div></div>
+      <div class="chip-stat"><div class="n">60×</div><div class="l" data-en="Checks per second" data-es="Chequeos por segundo">Checks per second</div></div>
+      <div class="chip-stat"><div class="n">100%</div><div class="l" data-en="Fully automatic" data-es="Totalmente automático">Fully automatic</div></div>
+      <div class="chip-stat"><div class="n">24/7</div><div class="l" data-en="Always watching" data-es="Siempre vigilando">Always watching</div></div>
+    </div>
+    <div class="benefits">
+      <div class="benefit"><div class="tick">✓</div><div>
+        <h4 data-en="Your home stays on" data-es="Tu hogar sigue encendido">Your home stays on</h4>
+        <p data-en="Spikes, brownouts, blackouts, dirty power — Firefly absorbs them so your lights, fridge, and well pump never stop."
+           data-es="Picos, bajones, apagones, energía sucia — Firefly los absorbe para que tus luces, refri y bomba nunca se detengan.">Spikes, brownouts, blackouts, dirty power — Firefly absorbs them so your lights, fridge, and well pump never stop.</p></div></div>
+      <div class="benefit"><div class="tick">✓</div><div>
+        <h4 data-en="Your appliances stay safe" data-es="Tus equipos protegidos">Your appliances stay safe</h4>
+        <p data-en="It shields AC compressors, motors, and electronics from the voltage hits that quietly shorten their lives."
+           data-es="Protege compresores de aire, motores y electrónicos de los golpes de voltaje que acortan su vida útil.">It shields AC compressors, motors, and electronics from the voltage hits that quietly shorten their lives.</p></div></div>
+      <div class="benefit"><div class="tick">✓</div><div>
+        <h4 data-en="Nothing for you to do" data-es="Nada que hacer de tu parte">Nothing for you to do</h4>
+        <p data-en="No switch to flip, no app to open, no generator to start. It works quietly in the background, day and night."
+           data-es="Sin interruptores, sin abrir una app, sin encender un generador. Trabaja en silencio, de día y de noche.">No switch to flip, no app to open, no generator to start. It works quietly in the background, day and night.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARE -->
+<section id="compare">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow" data-en="Firefly vs. traditional solar" data-es="Firefly vs. solar tradicional">Firefly vs. traditional solar</span>
+      <h2 data-en="Same sun. Same energy. One superior solution." data-es="Mismo sol. Misma energía. Una solución superior.">Same sun. Same energy. One superior solution.</h2>
+      <p class="lead" data-en="Traditional solar lowers your bill — then stops there. Firefly pairs solar with a battery to make your home its own microgrid."
+         data-es="El solar tradicional baja tu recibo — y ahí se queda. Firefly combina solar con batería para convertir tu hogar en su propia microred.">Traditional solar lowers your bill — then stops there. Firefly pairs solar with a battery to make your home its own microgrid.</p>
+    </div>
+    <div class="cmp">
+      <div class="cmp-row cmp-head">
+        <div class="aspect"></div>
+        <div class="ff">Firefly</div>
+        <div class="trad" data-en="Traditional solar" data-es="Solar tradicional">Traditional solar</div>
+      </div>
+      <div class="cmp-row">
+        <div class="aspect" data-en="When CFE goes out" data-es="Cuando CFE falla">When CFE goes out</div>
+        <div class="ff"><span class="yes">✓</span><strong data-en="Keeps your home on." data-es="Tu hogar sigue encendido.">Keeps your home on.</strong> <span data-en="Solar and battery carry you through." data-es="Solar y batería te respaldan.">Solar and battery carry you through.</span></div>
+        <div class="trad"><span class="no">✕</span><span data-en="Shuts off. Safety rules force it to stop — even in full sun." data-es="Se apaga. Las normas lo obligan a detenerse — incluso a pleno sol.">Shuts off. Safety rules force it to stop — even in full sun.</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="aspect" data-en="Works from day one" data-es="Funciona desde el día uno">Works from day one</div>
+        <div class="ff"><span class="yes">✓</span><strong data-en="Powers your home the day it's installed." data-es="Energiza tu hogar el día que se instala.">Powers your home the day it's installed.</strong></div>
+        <div class="trad"><span class="no">✕</span><span data-en="Waits 3–4 months for CFE's two-way meter before it produces anything." data-es="Espera 3–4 meses el medidor bidireccional de CFE antes de producir.">Waits 3–4 months for CFE's two-way meter before it produces anything.</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="aspect" data-en="Surge & brownout protection" data-es="Protección contra picos y bajones">Surge &amp; brownout protection</div>
+        <div class="ff"><span class="yes">✓</span><strong data-en="Shields your appliances automatically." data-es="Protege tus equipos automáticamente.">Shields your appliances automatically.</strong></div>
+        <div class="trad"><span class="no">✕</span><span data-en="Wired straight to CFE — no filter, no buffer." data-es="Conectado directo a CFE — sin filtro, sin respaldo.">Wired straight to CFE — no filter, no buffer.</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="aspect" data-en="Backup battery" data-es="Batería de respaldo">Backup battery</div>
+        <div class="ff"><span class="yes">✓</span><strong data-en="Built in and expandable." data-es="Incluida y ampliable.">Built in and expandable.</strong> <span data-en="One system, one warranty, one local team." data-es="Un sistema, una garantía, un equipo local.">One system, one warranty, one local team.</span></div>
+        <div class="trad"><span class="no">✕</span><span data-en="A separate add-on later, often mixing brands." data-es="Un añadido aparte después, a menudo mezclando marcas.">A separate add-on later, often mixing brands.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DESIGN / CALCULATOR -->
+<section id="design">
+  <div class="wrap solve">
+    <div>
+      <span class="eyebrow" data-en="Design my system" data-es="Diseña mi sistema">Design my system</span>
+      <h2 style="font-size:var(--fs-h1);margin:var(--sp-2) 0" data-en="See your system in two minutes." data-es="Ve tu sistema en dos minutos.">See your system in two minutes.</h2>
+      <p class="lead" data-en="Tell us your daily usage and how many hours of backup you want. We'll size the inverter, battery, and solar — and show your price on the spot."
+         data-es="Dinos tu consumo diario y cuántas horas de respaldo quieres. Dimensionamos el inversor, la batería y el solar — y te mostramos tu precio al instante.">Tell us your daily usage and how many hours of backup you want. We'll size the inverter, battery, and solar — and show your price on the spot.</p>
+      <a href="#contact" class="btn btn-accent" style="margin-top:var(--sp-3)" data-en="Design my system →" data-es="Diseña mi sistema →">Design my system →</a>
+    </div>
+    <div class="sol-card">
+      <span class="label" data-en="Recommended solution" data-es="Solución recomendada">Recommended solution</span>
+      <div class="sol-spec"><span data-en="Inverter" data-es="Inversor">Inverter</span><b>12 kW <span data-en="Split-Phase" data-es="Bifásico">Split-Phase</span></b></div>
+      <div class="sol-spec"><span data-en="Battery" data-es="Batería">Battery</span><b>16 kWh LiFePO4</b></div>
+      <div class="sol-spec"><span data-en="Solar" data-es="Solar">Solar</span><b data-en="12 × 650W panels" data-es="12 × paneles de 650W">12 × 650W panels</b></div>
+      <div class="sol-price">$188,674 <small>MXN + IVA</small></div>
+      <p style="font-size:var(--fs-small);color:var(--ff-storm)" data-en="Includes basic installation" data-es="Incluye instalación básica">Includes basic installation</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHY / CREDIBILITY -->
+<section id="why" class="stats">
+  <div class="wrap">
+    <div class="sec-head center">
+      <span class="eyebrow" data-en="Why Firefly" data-es="Por qué Firefly">Why Firefly</span>
+      <h2 style="color:#fff" data-en="Built by Nordic Electric. Designed for Mexico." data-es="Hecho por Nordic Electric. Diseñado para México.">Built by Nordic Electric. Designed for Mexico.</h2>
+      <p class="lead" style="color:#b8bcc4" data-en="Two decades powering the homes and infrastructure of San Miguel — now answering a changing grid with modern energy resilience and local, bilingual support."
+         data-es="Dos décadas energizando los hogares e infraestructura de San Miguel — ahora respondemos a una red cambiante con resiliencia moderna y soporte local bilingüe.">Two decades powering the homes and infrastructure of San Miguel — now answering a changing grid with modern energy resilience and local, bilingual support.</p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat"><div class="n">20+</div><div class="l" data-en="Years in San Miguel" data-es="Años en San Miguel">Years in San Miguel</div></div>
+      <div class="stat"><div class="n">8,000+</div><div class="l" data-en="Battery cycles" data-es="Ciclos de batería">Battery cycles</div></div>
+      <div class="stat"><div class="n">96kWh</div><div class="l" data-en="Max capacity" data-es="Capacidad máxima">Max capacity</div></div>
+      <div class="stat"><div class="n">&lt;24h</div><div class="l" data-en="To your custom quote" data-es="Para tu cotización">To your custom quote</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- INDUSTRIAL -->
+<section id="industrial">
+  <div class="wrap split">
+    <div>
+      <span class="tag">Firefly Industrial</span>
+      <h2 style="font-size:var(--fs-h1);margin:var(--sp-2) 0" data-en="Resilience at commercial scale." data-es="Resiliencia a escala comercial.">Resilience at commercial scale.</h2>
+      <p class="lead" data-en="The same engineering, scaled for factories, farms, and businesses across Mexico — three-phase systems, demand management, and financing for operations that can't afford to stop."
+         data-es="La misma ingeniería, escalada para fábricas, agronegocios y empresas en México — sistemas trifásicos, gestión de demanda y financiamiento para operaciones que no pueden detenerse.">The same engineering, scaled for factories, farms, and businesses across Mexico — three-phase systems, demand management, and financing for operations that can't afford to stop.</p>
+      <a href="#contact" class="btn btn-primary" style="margin-top:var(--sp-3)" data-en="Talk to our industrial team" data-es="Habla con el equipo industrial">Talk to our industrial team</a>
+    </div>
+    <div class="visual"><div class="badge">⚡</div></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="contact">
+  <div class="wrap cta-band">
+    <span class="eyebrow" data-en="Take control" data-es="Toma el control">Take control</span>
+    <h2 data-en="Ready to take control of your power?" data-es="¿Listo para tomar el control de tu energía?">Ready to take control of your power?</h2>
+    <p class="lead" style="margin-bottom:var(--sp-4)" data-en="Get a free consultation and a custom quote in less than 24 hours."
+       data-es="Recibe una consulta gratuita y una cotización personalizada en menos de 24 horas.">Get a free consultation and a custom quote in less than 24 hours.</p>
+    <a href="#" class="btn btn-accent" data-en="Get my free quote →" data-es="Obtén mi cotización gratis →">Get my free quote →</a>
+    <p class="cta-sub" data-en="Or reach us directly:" data-es="O contáctanos directamente:">Or reach us directly:
+      <a href="https://wa.me/5214151805030">WhatsApp</a> · <a href="mailto:SMA@fireflyenergy.mx">SMA@fireflyenergy.mx</a></p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <img class="logo" src="assets/firefly-logo-white.svg" onerror="this.src='assets/firefly-logo.svg'" alt="Firefly">
+        <p style="font-size:var(--fs-small);max-width:32ch" data-en="Solar-plus-storage for energy independence across Mexico. Firefly by Nordic Electric."
+           data-es="Solar más almacenamiento para la independencia energética en todo México. Firefly by Nordic Electric.">Solar-plus-storage for energy independence across Mexico. Firefly by Nordic Electric.</p>
+      </div>
+      <div><h4 data-en="Solutions" data-es="Soluciones">Solutions</h4>
+        <a href="#how" data-en="How it works" data-es="Cómo funciona">How it works</a>
+        <a href="#compare" data-en="vs. Traditional solar" data-es="vs. Solar tradicional">vs. Traditional solar</a>
+        <a href="#industrial" data-en="Industrial" data-es="Industrial">Industrial</a></div>
+      <div><h4 data-en="Company" data-es="Empresa">Company</h4>
+        <a href="#why" data-en="Why Firefly" data-es="Por qué Firefly">Why Firefly</a>
+        <a href="#" data-en="Technology" data-es="Tecnología">Technology</a>
+        <a href="#" data-en="FAQ" data-es="Preguntas">FAQ</a></div>
+      <div><h4 data-en="Contact" data-es="Contacto">Contact</h4>
+        <a href="#">San Miguel de Allende, MX</a>
+        <a href="https://wa.me/5214151805030">WhatsApp</a>
+        <a href="mailto:SMA@fireflyenergy.mx">SMA@fireflyenergy.mx</a></div>
+    </div>
+    <div class="legal">
+      <span>© 2026 Firefly by Nordic Electric</span>
+      <span data-en="Energy independence, anywhere in Mexico." data-es="Independencia energética, en todo México.">Energy independence, anywhere in Mexico.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const setLang = (lang) => {
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-en]').forEach(el => {
+      const v = el.getAttribute('data-' + lang);
+      if (v != null) el.textContent = v;
+    });
+    document.querySelectorAll('.lang button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  };
+  document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+</script>
+</body>
+</html>
