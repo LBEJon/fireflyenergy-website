@@ -1,0 +1,69 @@
+---
+import { t, altUrl, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const ctaHref = altUrl(locale, 'calculator');
+const wa = t(locale, 'common.whatsapp');
+---
+<section class="ff-cta">
+  <div class="ff-cta__inner">
+    <h2 class="ff-cta__title display">{t(locale, 'cta.title')}</h2>
+    <p class="ff-cta__sub">{t(locale, 'cta.sub')}</p>
+    <div class="ff-cta__actions">
+      <a class="ff-btn ff-btn--coral" href={ctaHref}>{t(locale, 'cta.primary')}</a>
+      <a class="ff-btn ff-btn--ghost-dark" href={`https://wa.me/${wa}`} target="_blank" rel="noopener">
+        {t(locale, 'cta.whatsapp')}
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ff-cta {
+    background: var(--ff-ink);
+    color: var(--ff-paper);
+    padding: var(--sp-7) var(--sp-3);
+  }
+  .ff-cta__inner {
+    max-width: var(--container-tight);
+    margin: 0 auto;
+    text-align: center;
+  }
+  .ff-cta__title {
+    font-size: var(--fs-h1);
+    line-height: var(--lh-snug);
+    margin: 0 0 var(--sp-2);
+    color: var(--ff-white);
+  }
+  .ff-cta__sub {
+    font-size: var(--fs-lead);
+    color: var(--ff-mist);
+    margin: 0 0 var(--sp-4);
+  }
+  .ff-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    justify-content: center;
+  }
+  .ff-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--r-pill);
+    font-weight: 700;
+    font-size: var(--fs-body);
+    text-decoration: none;
+    padding: 0.85rem 1.6rem;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+  .ff-btn--coral { background: var(--ff-accent); color: var(--ff-white); }
+  .ff-btn--coral:hover { background: var(--ff-accent-dk); transform: translateY(-1px); }
+  .ff-btn--ghost-dark { background: transparent; color: var(--ff-paper); border-color: rgba(255,255,255,0.35); }
+  .ff-btn--ghost-dark:hover { border-color: var(--ff-white); }
+</style>

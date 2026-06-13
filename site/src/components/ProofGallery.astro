@@ -1,0 +1,100 @@
+---
+import { t, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+
+// Phase 5 swaps these gradient placeholders for Higgsfield home photos.
+const homes = [
+  { label: t(locale, 'proof.home1'), grad: 'linear-gradient(150deg, #FFB81C 0%, var(--ff-accent) 70%)' },
+  { label: t(locale, 'proof.home2'), grad: 'linear-gradient(150deg, var(--ff-green-soft) 0%, var(--ff-ink) 90%)' },
+  { label: t(locale, 'proof.home3'), grad: 'linear-gradient(150deg, var(--ff-accent) 0%, var(--ff-ink) 90%)' },
+];
+
+// PLACEHOLDER testimonials — copy is illustrative until real customer quotes land.
+const testimonials = [
+  { quote: t(locale, 'proof.t1_quote'), author: t(locale, 'proof.t1_author') },
+  { quote: t(locale, 'proof.t2_quote'), author: t(locale, 'proof.t2_author') },
+];
+---
+<section class="ff-proof">
+  <div class="ff-proof__inner">
+    <header class="ff-proof__head">
+      <p class="ff-proof__eyebrow">{t(locale, 'proof.eyebrow')}</p>
+      <h2 class="ff-proof__title display">{t(locale, 'proof.title')}</h2>
+      <p class="ff-proof__sub">{t(locale, 'proof.sub')}</p>
+    </header>
+
+    <div class="ff-proof__rail" data-draggable>
+      {homes.map((h) => (
+        <figure class="ff-proof__home">
+          <div class="ff-proof__photo" style={`background:${h.grad}`}></div>
+          <figcaption>{h.label}</figcaption>
+        </figure>
+      ))}
+    </div>
+
+    <div class="ff-proof__quotes">
+      {testimonials.map((t2) => (
+        <blockquote class="ff-proof__quote">
+          <p>“{t2.quote}”</p>
+          <cite>{t2.author}</cite>
+        </blockquote>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .ff-proof { background: var(--ff-mist); padding: var(--sp-7) var(--sp-3); }
+  .ff-proof__inner { max-width: var(--container); margin: 0 auto; }
+  .ff-proof__head { max-width: var(--container-tight); margin: 0 auto var(--sp-5); text-align: center; }
+  .ff-proof__eyebrow {
+    text-transform: uppercase; letter-spacing: 0.12em; font-size: var(--fs-eyebrow);
+    font-weight: 700; color: var(--ff-accent-dk); margin: 0 0 var(--sp-2);
+  }
+  .ff-proof__title { font-size: var(--fs-h1); line-height: var(--lh-snug); margin: 0 0 var(--sp-2); }
+  .ff-proof__sub { font-size: var(--fs-lead); color: var(--ff-slate); margin: 0; }
+
+  .ff-proof__rail {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--sp-3);
+  }
+  .ff-proof__home { margin: 0; }
+  .ff-proof__photo {
+    aspect-ratio: 4 / 3;
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-md);
+  }
+  .ff-proof__home figcaption {
+    margin-top: var(--sp-1);
+    font-weight: 600;
+    font-size: var(--fs-small);
+    color: var(--ff-slate);
+  }
+
+  .ff-proof__quotes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sp-3);
+    margin-top: var(--sp-5);
+  }
+  .ff-proof__quote {
+    margin: 0;
+    background: var(--ff-white);
+    border: 1px solid var(--ff-line);
+    border-radius: var(--r-md);
+    padding: var(--sp-3);
+    box-shadow: var(--shadow-sm);
+  }
+  .ff-proof__quote p { font-size: var(--fs-lead); line-height: var(--lh-body); margin: 0 0 var(--sp-2); }
+  .ff-proof__quote cite { font-style: normal; font-weight: 700; color: var(--ff-ink); font-size: var(--fs-small); }
+
+  @media (max-width: 860px) {
+    .ff-proof__rail { grid-template-columns: 1fr; }
+    .ff-proof__quotes { grid-template-columns: 1fr; }
+  }
+</style>
