@@ -1,0 +1,178 @@
+---
+import { t, altUrl, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const other: Locale = locale === 'es' ? 'en' : 'es';
+
+const home = altUrl(locale, '');
+const links = [
+  { href: altUrl(locale, 'solutions'), label: t(locale, 'nav.solutions') },
+  { href: '#how-it-works', label: t(locale, 'nav.how_it_works') },
+  { href: altUrl(locale, 'industrial'), label: t(locale, 'nav.industrial') },
+  { href: altUrl(locale, 'calculator'), label: t(locale, 'nav.calculator') },
+];
+const ctaHref = altUrl(locale, 'calculator');
+// Toggle to the same logical page in the other locale (home for now).
+const toggleHref = altUrl(other, '');
+---
+<header class="ff-nav">
+  <div class="ff-nav__inner">
+    <a class="ff-nav__brand" href={home} aria-label={t(locale, 'nav.home_aria')}>
+      <img src="/assets/brand/firefly-logo.svg" alt={t(locale, 'common.brand')} width="132" height="32" />
+    </a>
+
+    <nav class="ff-nav__links" aria-label="Primary">
+      {links.map((l) => (
+        <a href={l.href}>{l.label}</a>
+      ))}
+    </nav>
+
+    <div class="ff-nav__right">
+      <a class="ff-nav__lang" href={toggleHref} aria-label={t(locale, 'common.locale_aria')}>
+        {t(locale, 'common.locale_label')}
+      </a>
+      <a class="ff-btn ff-btn--coral ff-nav__cta" href={ctaHref}>{t(locale, 'nav.cta')}</a>
+      <button class="ff-nav__burger" type="button" aria-label={t(locale, 'common.open_menu')} aria-expanded="false" aria-controls="ff-mobile-menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="ff-nav__mobile" id="ff-mobile-menu" hidden>
+    {links.map((l) => (
+      <a href={l.href}>{l.label}</a>
+    ))}
+    <a class="ff-btn ff-btn--coral" href={ctaHref}>{t(locale, 'nav.cta')}</a>
+    <a class="ff-nav__lang ff-nav__lang--block" href={toggleHref} aria-label={t(locale, 'common.locale_aria')}>
+      {t(locale, 'common.locale_label')}
+    </a>
+  </div>
+</header>
+
+<style>
+  .ff-nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--ff-paper) 88%, transparent);
+    backdrop-filter: saturate(140%) blur(10px);
+    border-bottom: 1px solid var(--ff-line);
+  }
+  .ff-nav__inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 0.85rem var(--sp-3);
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+  .ff-nav__brand { display: inline-flex; align-items: center; }
+  .ff-nav__brand img { display: block; height: 30px; width: auto; }
+  .ff-nav__links {
+    display: flex;
+    gap: var(--sp-3);
+    margin-left: auto;
+  }
+  .ff-nav__links a {
+    color: var(--ff-ink);
+    text-decoration: none;
+    font-size: var(--fs-small);
+    font-weight: 600;
+    padding: 0.4rem 0;
+    border-bottom: 2px solid transparent;
+    transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+  }
+  .ff-nav__links a:hover { color: var(--ff-accent-dk); border-bottom-color: var(--ff-green); }
+  .ff-nav__right { display: flex; align-items: center; gap: var(--sp-2); }
+  .ff-nav__lang {
+    font-size: var(--fs-small);
+    font-weight: 700;
+    color: var(--ff-ink);
+    text-decoration: none;
+    border: 1px solid var(--ff-line);
+    border-radius: var(--r-pill);
+    padding: 0.3rem 0.7rem;
+    line-height: 1;
+  }
+  .ff-nav__lang:hover { border-color: var(--ff-ink); }
+  .ff-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--r-pill);
+    font-weight: 700;
+    font-size: var(--fs-small);
+    text-decoration: none;
+    padding: 0.6rem 1.2rem;
+    border: 0;
+    cursor: pointer;
+    transition: transform var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+  .ff-btn--coral { background: var(--ff-accent); color: var(--ff-white); }
+  .ff-btn--coral:hover { background: var(--ff-accent-dk); transform: translateY(-1px); }
+
+  .ff-nav__burger {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: 0;
+    padding: 8px;
+    cursor: pointer;
+  }
+  .ff-nav__burger span {
+    width: 22px;
+    height: 2px;
+    background: var(--ff-ink);
+    border-radius: 2px;
+    transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
+  }
+  .ff-nav__burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .ff-nav__burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+  .ff-nav__burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  .ff-nav__mobile {
+    display: none;
+    flex-direction: column;
+    gap: var(--sp-1);
+    padding: var(--sp-2) var(--sp-3) var(--sp-3);
+    border-top: 1px solid var(--ff-line);
+  }
+  .ff-nav__mobile a {
+    color: var(--ff-ink);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.6rem 0;
+  }
+  .ff-nav__mobile .ff-btn { margin-top: var(--sp-1); }
+  .ff-nav__lang--block { display: inline-block; width: fit-content; }
+
+  @media (max-width: 860px) {
+    .ff-nav__links { display: none; }
+    .ff-nav__cta { display: none; }
+    .ff-nav__lang { display: none; }
+    .ff-nav__burger { display: flex; }
+    .ff-nav__mobile[data-open="true"] { display: flex; }
+  }
+</style>
+
+<script>
+  const burger = document.querySelector('.ff-nav__burger');
+  const menu = document.getElementById('ff-mobile-menu');
+  if (burger && menu) {
+    burger.addEventListener('click', () => {
+      const open = burger.getAttribute('aria-expanded') === 'true';
+      burger.setAttribute('aria-expanded', String(!open));
+      if (open) {
+        menu.removeAttribute('data-open');
+        menu.setAttribute('hidden', '');
+      } else {
+        menu.setAttribute('data-open', 'true');
+        menu.removeAttribute('hidden');
+      }
+    });
+  }
+</script>

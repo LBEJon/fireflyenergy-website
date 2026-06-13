@@ -1,0 +1,92 @@
+---
+import { t, altUrl, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const other: Locale = locale === 'es' ? 'en' : 'es';
+const year = new Date().getFullYear();
+
+const exploreLinks = [
+  { href: altUrl(locale, 'industrial'), label: t(locale, 'footer.industrial') },
+  { href: altUrl(locale, 'faq'), label: t(locale, 'footer.faq') },
+  { href: altUrl(locale, 'privacy'), label: t(locale, 'footer.privacy') },
+];
+
+const phone = t(locale, 'common.phone');
+const email = t(locale, 'common.email');
+const wa = t(locale, 'common.whatsapp');
+---
+<footer class="ff-footer">
+  <div class="ff-footer__inner">
+    <div class="ff-footer__brand">
+      <img src="/assets/brand/firefly-logo-white.svg" alt={t(locale, 'common.brand')} width="148" height="36" />
+      <p class="ff-footer__tagline">{t(locale, 'footer.tagline')}</p>
+      <p class="ff-footer__area">{t(locale, 'footer.service_area')}</p>
+    </div>
+
+    <nav class="ff-footer__col" aria-label={t(locale, 'footer.links_title')}>
+      <h2>{t(locale, 'footer.links_title')}</h2>
+      <ul>
+        {exploreLinks.map((l) => (
+          <li><a href={l.href}>{l.label}</a></li>
+        ))}
+        <li><a href={altUrl(other, '')}>{t(locale, 'common.locale_aria')}</a></li>
+      </ul>
+    </nav>
+
+    <div class="ff-footer__col">
+      <h2>{t(locale, 'footer.contact_title')}</h2>
+      <ul>
+        <li><a href={`tel:${phone.replace(/[^+\d]/g, '')}`}>{phone}</a></li>
+        <li><a href={`mailto:${email}`}>{email}</a></li>
+        <li><a href={`https://wa.me/${wa}`}>{t(locale, 'common.whatsapp_label')}</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ff-footer__bar">
+    <span>© {year} {t(locale, 'common.brand')}. {t(locale, 'footer.rights')}</span>
+  </div>
+</footer>
+
+<style>
+  .ff-footer {
+    background: var(--ff-ink);
+    color: var(--ff-mist);
+    padding: var(--sp-6) var(--sp-3) var(--sp-3);
+  }
+  .ff-footer__inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr;
+    gap: var(--sp-5);
+  }
+  .ff-footer__brand img { display: block; height: 34px; width: auto; }
+  .ff-footer__tagline { margin: var(--sp-2) 0 var(--sp-1); max-width: 32ch; line-height: var(--lh-body); }
+  .ff-footer__area { color: var(--ff-green-soft); font-weight: 600; font-size: var(--fs-small); }
+  .ff-footer__col h2 {
+    font-family: var(--ff-sans);
+    font-size: var(--fs-eyebrow);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ff-storm);
+    margin: 0 0 var(--sp-2);
+  }
+  .ff-footer__col ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+  .ff-footer__col a { color: var(--ff-mist); text-decoration: none; font-size: var(--fs-small); }
+  .ff-footer__col a:hover { color: var(--ff-green); }
+  .ff-footer__bar {
+    max-width: var(--container);
+    margin: var(--sp-5) auto 0;
+    padding-top: var(--sp-3);
+    border-top: 1px solid rgba(255,255,255,0.12);
+    font-size: var(--fs-small);
+    color: var(--ff-storm);
+  }
+  @media (max-width: 720px) {
+    .ff-footer__inner { grid-template-columns: 1fr; gap: var(--sp-4); }
+  }
+</style>
