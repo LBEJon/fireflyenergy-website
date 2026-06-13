@@ -1,0 +1,96 @@
+---
+import { t, type Locale } from '../../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+
+const steps = ['s1', 's2', 's3', 's4'] as const;
+---
+
+<section class="ind-path">
+  <div class="ind-path__inner">
+    <header class="ind-path__head">
+      <p class="ind-path__eyebrow">{t(locale, 'industrial.path.eyebrow')}</p>
+      <h2 class="ind-path__title display">{t(locale, 'industrial.path.title')}</h2>
+    </header>
+
+    <ol class="ind-path__steps" data-path-steps>
+      <span class="ind-path__line" data-path-line aria-hidden="true"></span>
+      {steps.map((s, i) => (
+        <li class="ind-path__step" data-path-step>
+          <span class="ind-path__num" aria-hidden="true">{i + 1}</span>
+          <h3 class="ind-path__step-title">{t(locale, `industrial.path.${s}.title`)}</h3>
+          <p class="ind-path__step-body">{t(locale, `industrial.path.${s}.body`)}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .ind-path { background: var(--ff-white); padding: var(--sp-7) var(--sp-3); }
+  .ind-path__inner { max-width: var(--container); margin: 0 auto; }
+  .ind-path__head { max-width: var(--container-tight); margin: 0 0 var(--sp-5); }
+  .ind-path__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: var(--fs-eyebrow);
+    font-weight: 700;
+    color: var(--ff-ink);
+    margin: 0 0 var(--sp-2);
+  }
+  .ind-path__title { font-size: var(--fs-h2); line-height: var(--lh-snug); margin: 0; }
+
+  .ind-path__steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--sp-4);
+  }
+  /* Connecting line behind the step numbers. GSAP scales it in; static = full width. */
+  .ind-path__line {
+    position: absolute;
+    top: 22px;
+    left: 7%;
+    right: 7%;
+    height: 2px;
+    background: var(--ff-line);
+    transform-origin: left center;
+    z-index: 0;
+  }
+  .ind-path__line::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--ff-green);
+    transform: scaleX(var(--path-progress, 1));
+    transform-origin: left center;
+  }
+  .ind-path__step { position: relative; z-index: 1; }
+  .ind-path__num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px; height: 44px;
+    border-radius: var(--r-pill);
+    background: var(--ff-ink);
+    color: var(--ff-green);
+    font-weight: 800;
+    font-size: 1.1rem;
+    margin-bottom: var(--sp-2);
+    border: 3px solid var(--ff-white);
+    box-shadow: 0 0 0 1px var(--ff-line);
+  }
+  .ind-path__step-title { font-size: var(--fs-h3); margin: 0 0 0.3rem; }
+  .ind-path__step-body { margin: 0; color: var(--ff-slate); line-height: var(--lh-body); }
+
+  @media (max-width: 720px) {
+    .ind-path__steps { grid-template-columns: 1fr; gap: var(--sp-4); }
+    .ind-path__line { display: none; }
+  }
+</style>

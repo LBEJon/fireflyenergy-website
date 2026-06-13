@@ -1,0 +1,114 @@
+---
+import { t, altUrl, type Locale } from '../../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const assessmentHref = '#assessment';
+const capabilitiesHref = '#capabilities';
+---
+
+<section class="ind-hero">
+  <div class="ind-hero__inner">
+    <div class="ind-hero__copy">
+      <p class="ind-hero__eyebrow">{t(locale, 'industrial.hero.eyebrow')}</p>
+      <h1 class="ind-hero__h1 display">{t(locale, 'industrial.hero.h1')}</h1>
+      <p class="ind-hero__sub">{t(locale, 'industrial.hero.sub')}</p>
+      <div class="ind-hero__actions">
+        <a class="ff-btn ff-btn--green" href={assessmentHref}>{t(locale, 'industrial.hero.cta_primary')}</a>
+        <a class="ff-btn ff-btn--ghost-dark" href={capabilitiesHref}>{t(locale, 'industrial.hero.cta_secondary')}</a>
+      </div>
+    </div>
+
+    <div class="ind-hero__media">
+      <!-- Phase 5.2 swaps in the real BESS image at #industrial-hero-image.
+           A steel/blue-hour gradient holds the box so there is no layout shift. -->
+      <div
+        id="industrial-hero-image"
+        class="ind-hero__image"
+        role="img"
+        aria-label={t(locale, 'industrial.hero.image_alt')}
+      ></div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ind-hero {
+    background:
+      radial-gradient(120% 100% at 85% 0%, rgba(158, 213, 0, 0.10) 0%, transparent 55%),
+      linear-gradient(170deg, #20232A 0%, var(--ff-ink) 60%, #23262E 100%);
+    color: var(--ff-paper);
+    padding: var(--sp-7) var(--sp-3) var(--sp-7);
+  }
+  .ind-hero__inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: var(--sp-5);
+    align-items: center;
+  }
+  .ind-hero__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: var(--fs-eyebrow);
+    font-weight: 700;
+    color: var(--ff-green);
+    margin: 0 0 var(--sp-2);
+  }
+  .ind-hero__h1 {
+    font-size: var(--fs-display);
+    line-height: var(--lh-tight);
+    color: var(--ff-white);
+    margin: 0 0 var(--sp-3);
+    max-width: 18ch;
+  }
+  .ind-hero__sub {
+    font-size: var(--fs-lead);
+    line-height: var(--lh-body);
+    color: var(--ff-mist);
+    max-width: 50ch;
+    margin: 0 0 var(--sp-4);
+  }
+  .ind-hero__actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+
+  .ff-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--r-pill);
+    font-weight: 700;
+    font-size: var(--fs-body);
+    text-decoration: none;
+    padding: 0.85rem 1.6rem;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+  .ff-btn--green { background: var(--ff-green); color: var(--ff-ink); }
+  .ff-btn--green:hover { background: var(--ff-green-soft); transform: translateY(-1px); }
+  .ff-btn--ghost-dark { background: transparent; color: var(--ff-paper); border-color: rgba(255, 255, 255, 0.35); }
+  .ff-btn--ghost-dark:hover { border-color: var(--ff-white); }
+
+  .ind-hero__media {
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lift);
+    aspect-ratio: 4 / 3;
+    width: 100%;
+  }
+  .ind-hero__image {
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(90% 70% at 75% 15%, rgba(158, 213, 0, 0.28) 0%, transparent 60%),
+      linear-gradient(155deg, #3A4350 0%, #2A2D34 50%, #11141A 100%);
+  }
+
+  @media (max-width: 860px) {
+    .ind-hero__inner { grid-template-columns: 1fr; }
+    .ind-hero__media { order: -1; aspect-ratio: 16 / 10; }
+  }
+</style>

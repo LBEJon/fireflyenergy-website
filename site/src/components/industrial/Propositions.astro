@@ -1,0 +1,118 @@
+---
+import { t, type Locale } from '../../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+
+const keys = ['p1', 'p2', 'p3', 'p4'] as const;
+
+// Simple line icons, stroked with currentColor.
+const icons: Record<(typeof keys)[number], string> = {
+  p1: '<path d="M3 17l5-6 4 3 5-8 4 5"/><path d="M3 21h18"/>',
+  p2: '<path d="M13 2L3 14h7l-1 8 10-12h-7z"/>',
+  p3: '<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',
+  p4: '<path d="M3 12h3l2-7 4 14 3-9 2 4 4 0"/>',
+};
+---
+
+<section class="ind-props" id="capabilities">
+  <div class="ind-props__inner">
+    <header class="ind-props__head">
+      <p class="ind-props__eyebrow">{t(locale, 'industrial.props.eyebrow')}</p>
+      <h2 class="ind-props__title display">{t(locale, 'industrial.props.title')}</h2>
+      <p class="ind-props__sub">{t(locale, 'industrial.props.sub')}</p>
+    </header>
+
+    <div class="ind-props__grid">
+      {keys.map((k) => (
+        <article class="ind-props__card">
+          <span class="ind-props__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" set:html={icons[k]} />
+          </span>
+          <h3 class="ind-props__card-title">{t(locale, `industrial.props.${k}.title`)}</h3>
+          <p class="ind-props__summary">{t(locale, `industrial.props.${k}.summary`)}</p>
+
+          <details class="ind-props__details">
+            <summary>{t(locale, 'industrial.props.expand')}</summary>
+            <div class="ind-props__detail-body">
+              <p>{t(locale, `industrial.props.${k}.problem`)}</p>
+              <p>{t(locale, `industrial.props.${k}.solves`)}</p>
+              <p>{t(locale, `industrial.props.${k}.deliver`)}</p>
+            </div>
+          </details>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .ind-props { background: var(--ff-paper); padding: var(--sp-7) var(--sp-3); }
+  .ind-props__inner { max-width: var(--container); margin: 0 auto; }
+  .ind-props__head { max-width: var(--container-tight); margin: 0 0 var(--sp-5); }
+  .ind-props__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: var(--fs-eyebrow);
+    font-weight: 700;
+    color: var(--ff-ink);
+    margin: 0 0 var(--sp-2);
+  }
+  .ind-props__title { font-size: var(--fs-h2); line-height: var(--lh-snug); margin: 0 0 var(--sp-2); }
+  .ind-props__sub { font-size: var(--fs-lead); color: var(--ff-slate); margin: 0; }
+
+  .ind-props__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sp-3);
+  }
+  .ind-props__card {
+    background: var(--ff-white);
+    border: 1px solid var(--ff-line);
+    border-radius: var(--r-md);
+    padding: var(--sp-4);
+    box-shadow: var(--shadow-sm);
+    border-top: 3px solid var(--ff-green);
+  }
+  .ind-props__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px; height: 48px;
+    border-radius: var(--r-sm);
+    background: var(--ff-ink);
+    color: var(--ff-green);
+    margin-bottom: var(--sp-2);
+  }
+  .ind-props__card-title { font-size: var(--fs-h3); margin: 0 0 0.3rem; }
+  .ind-props__summary { margin: 0; color: var(--ff-slate); line-height: var(--lh-body); font-weight: 600; }
+
+  .ind-props__details { margin-top: var(--sp-2); border-top: 1px solid var(--ff-line); padding-top: var(--sp-2); }
+  .ind-props__details summary {
+    cursor: pointer;
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 700;
+    font-size: var(--fs-small);
+    color: var(--ff-ink);
+  }
+  .ind-props__details summary::-webkit-details-marker { display: none; }
+  .ind-props__details summary::after { content: "＋"; font-weight: 700; color: var(--ff-slate); }
+  .ind-props__details[open] summary::after { content: "－"; }
+  .ind-props__detail-body { margin-top: var(--sp-2); }
+  .ind-props__detail-body p {
+    margin: 0 0 var(--sp-2);
+    color: var(--ff-slate);
+    line-height: var(--lh-body);
+    font-size: var(--fs-body);
+  }
+  .ind-props__detail-body p:last-child { margin-bottom: 0; }
+
+  @media (max-width: 720px) {
+    .ind-props__grid { grid-template-columns: 1fr; }
+  }
+</style>

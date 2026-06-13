@@ -1,0 +1,293 @@
+---
+import { t, type Locale } from '../../lib/i18n';
+
+interface Props {
+  locale: Locale;
+  baseUrl?: string;
+}
+const { locale, baseUrl = '' } = Astro.props;
+const wa = t(locale, 'common.whatsapp');
+
+const facilityOpts = ['o1', 'o2', 'o3', 'o4', 'o5', 'o6', 'o7', 'o8'] as const;
+const spendOpts = ['o1', 'o2', 'o3', 'o4', 'o5', 'o6'] as const;
+const tariffOpts = ['o1', 'o2', 'o3', 'o4', 'o5'] as const;
+---
+
+<section class="ind-form" id="assessment">
+  <div class="ind-form__inner">
+    <header class="ind-form__head">
+      <p class="ind-form__eyebrow">{t(locale, 'industrial.form.eyebrow')}</p>
+      <h2 class="ind-form__title display">{t(locale, 'industrial.form.title')}</h2>
+      <p class="ind-form__sub">{t(locale, 'industrial.form.sub')}</p>
+    </header>
+
+    <form
+      class="ind-form__form"
+      data-assessment-form
+      data-base-url={baseUrl}
+      data-locale={locale}
+      data-wa={wa}
+      novalidate
+    >
+      <div class="ind-form__grid">
+        <label class="ind-form__field">
+          <span class="ind-form__label">{t(locale, 'industrial.form.company')} *</span>
+          <input type="text" name="company" autocomplete="organization" required />
+        </label>
+
+        <label class="ind-form__field">
+          <span class="ind-form__label">{t(locale, 'industrial.form.name')} *</span>
+          <input type="text" name="name" autocomplete="name" required />
+        </label>
+
+        <label class="ind-form__field">
+          <span class="ind-form__label">{t(locale, 'industrial.form.facility')} *</span>
+          <select name="facility_type" required>
+            <option value="" selected disabled>{t(locale, 'industrial.form.facility_ph')}</option>
+            {facilityOpts.map((o) => (
+              <option value={o}>{t(locale, `industrial.form.facility_${o}`)}</option>
+            ))}
+          </select>
+        </label>
+
+        <label class="ind-form__field">
+          <span class="ind-form__label">{t(locale, 'industrial.form.spend')} *</span>
+          <select name="monthly_spend" required>
+            <option value="" selected disabled>{t(locale, 'industrial.form.spend_ph')}</option>
+            {spendOpts.map((o) => (
+              <option value={o}>{t(locale, `industrial.form.spend_${o}`)}</option>
+            ))}
+          </select>
+        </label>
+
+        <label class="ind-form__field">
+          <span class="ind-form__label">{t(locale, 'industrial.form.tariff')}</span>
+          <select name="tariff">
+            <option value="" selected disabled>{t(locale, 'industrial.form.tariff_ph')}</option>
+            {tariffOpts.map((o) => (
+              <option value={o}>{t(locale, `industrial.form.tariff_${o}`)}</option>
+            ))}
+          </select>
+        </label>
+
+        <label class="ind-form__field">
+          <span class="ind-form__label">{t(locale, 'industrial.form.contact')} *</span>
+          <input
+            type="text"
+            name="contact"
+            placeholder={t(locale, 'industrial.form.contact_ph')}
+            autocomplete="off"
+            required
+          />
+        </label>
+      </div>
+
+      <!-- Honeypot: visually hidden, off-screen, not announced to AT. -->
+      <div class="ind-form__hp" aria-hidden="true">
+        <label>
+          Company website
+          <input type="text" name="company_url" tabindex="-1" autocomplete="off" />
+        </label>
+      </div>
+
+      <p class="ind-form__note">{t(locale, 'industrial.form.required_note')}</p>
+
+      <button type="submit" class="ff-btn ff-btn--green" data-submit>
+        <span data-submit-label>{t(locale, 'industrial.form.submit')}</span>
+      </button>
+    </form>
+
+    <!-- Success message -->
+    <div class="ind-form__result ind-form__result--ok" data-result-ok hidden>
+      <h3>{t(locale, 'industrial.form.success_title')}</h3>
+      <p>{t(locale, 'industrial.form.success_body')}</p>
+    </div>
+
+    <!-- Error / WhatsApp fallback -->
+    <div class="ind-form__result ind-form__result--err" data-result-err hidden>
+      <h3>{t(locale, 'industrial.form.error_title')}</h3>
+      <p>{t(locale, 'industrial.form.error_body')}</p>
+      <a class="ff-btn ff-btn--green" href={`https://wa.me/${wa}`} target="_blank" rel="noopener">
+        {t(locale, 'industrial.form.error_cta')}
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { submitLead, type LeadPayload } from '../../lib/leadClient';
+
+  const form = document.querySelector<HTMLFormElement>('[data-assessment-form]');
+  if (form) {
+    const okBox = document.querySelector<HTMLElement>('[data-result-ok]');
+    const errBox = document.querySelector<HTMLElement>('[data-result-err]');
+    const submitBtn = form.querySelector<HTMLButtonElement>('[data-submit]');
+    const submitLabel = form.querySelector<HTMLElement>('[data-submit-label]');
+
+    const baseUrl = form.dataset.baseUrl || (import.meta.env.PUBLIC_SUPABASE_URL ?? '') || '';
+    const locale = form.dataset.locale || 'en';
+    const idleLabel = submitLabel?.textContent ?? '';
+
+    // Locale-aware "Sending…" without re-importing the dictionary.
+    const sendingLabel = locale === 'es' ? 'Enviando…' : 'Sending…';
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const data = new FormData(form);
+      const get = (k: string) => String(data.get(k) ?? '').trim();
+
+      // Honeypot — if filled, treat as a successful no-op (don't reveal it's a trap).
+      const hp = get('company_url');
+
+      const payload: LeadPayload = {
+        name: get('name'),
+        contact: get('contact'),
+        segment: 'industrial',
+        answers: {
+          company: get('company'),
+          facility_type: get('facility_type'),
+          monthly_spend: get('monthly_spend'),
+          tariff: get('tariff'),
+        },
+        config: null,
+        locale,
+        hp,
+      };
+
+      if (submitBtn) submitBtn.disabled = true;
+      if (submitLabel) submitLabel.textContent = sendingLabel;
+
+      let ok = false;
+      try {
+        const res = await submitLead(baseUrl, payload);
+        ok = res.ok;
+      } catch {
+        ok = false;
+      }
+
+      if (submitLabel) submitLabel.textContent = idleLabel;
+
+      if (ok) {
+        form.hidden = true;
+        if (errBox) errBox.hidden = true;
+        if (okBox) {
+          okBox.hidden = false;
+          okBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } else {
+        // Never report failure as success — surface the WhatsApp fallback.
+        if (submitBtn) submitBtn.disabled = false;
+        if (okBox) okBox.hidden = true;
+        if (errBox) {
+          errBox.hidden = false;
+          errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    });
+  }
+</script>
+
+<style>
+  .ind-form {
+    background: var(--ff-ink);
+    color: var(--ff-paper);
+    padding: var(--sp-7) var(--sp-3);
+  }
+  .ind-form__inner { max-width: var(--container-tight); margin: 0 auto; }
+  .ind-form__head { margin: 0 0 var(--sp-4); text-align: center; }
+  .ind-form__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: var(--fs-eyebrow);
+    font-weight: 700;
+    color: var(--ff-green);
+    margin: 0 0 var(--sp-2);
+  }
+  .ind-form__title { font-size: var(--fs-h2); line-height: var(--lh-snug); color: var(--ff-white); margin: 0 0 var(--sp-2); }
+  .ind-form__sub { font-size: var(--fs-lead); color: var(--ff-mist); margin: 0; }
+
+  .ind-form__form {
+    background: var(--ff-white);
+    color: var(--ff-ink);
+    border-radius: var(--r-lg);
+    padding: var(--sp-4);
+    box-shadow: var(--shadow-lift);
+  }
+  .ind-form__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sp-3);
+  }
+  .ind-form__field { display: flex; flex-direction: column; gap: 0.4rem; }
+  .ind-form__label { font-size: var(--fs-small); font-weight: 700; color: var(--ff-ink); }
+  .ind-form__field input,
+  .ind-form__field select {
+    font: inherit;
+    font-size: var(--fs-body);
+    color: var(--ff-ink);
+    background: var(--ff-paper);
+    border: 1px solid var(--ff-line);
+    border-radius: var(--r-sm);
+    padding: 0.7rem 0.9rem;
+    width: 100%;
+  }
+  .ind-form__field input:focus,
+  .ind-form__field select:focus {
+    outline: 2px solid var(--ff-green);
+    outline-offset: 1px;
+    border-color: var(--ff-green);
+  }
+
+  .ind-form__hp {
+    position: absolute !important;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .ind-form__note { font-size: var(--fs-small); color: var(--ff-slate); margin: var(--sp-3) 0 var(--sp-3); }
+
+  .ff-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--r-pill);
+    font-weight: 700;
+    font-size: var(--fs-body);
+    text-decoration: none;
+    padding: 0.85rem 1.6rem;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+  .ff-btn--green { background: var(--ff-green); color: var(--ff-ink); }
+  .ff-btn--green:hover { background: var(--ff-green-soft); transform: translateY(-1px); }
+  .ff-btn[disabled] { opacity: 0.65; cursor: progress; }
+
+  .ind-form__result {
+    margin-top: var(--sp-4);
+    background: var(--ff-white);
+    color: var(--ff-ink);
+    border-radius: var(--r-lg);
+    padding: var(--sp-4);
+    text-align: center;
+    box-shadow: var(--shadow-lift);
+  }
+  .ind-form__result h3 { margin: 0 0 0.5rem; font-size: var(--fs-h3); }
+  .ind-form__result p { margin: 0 0 var(--sp-3); color: var(--ff-slate); line-height: var(--lh-body); }
+  .ind-form__result p:last-child { margin-bottom: 0; }
+  .ind-form__result--ok { border-top: 4px solid var(--ff-green); }
+  .ind-form__result--err { border-top: 4px solid var(--ff-accent); }
+
+  @media (max-width: 620px) {
+    .ind-form__grid { grid-template-columns: 1fr; }
+  }
+</style>

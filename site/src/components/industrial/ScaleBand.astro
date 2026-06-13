@@ -1,0 +1,109 @@
+---
+import { t, type Locale } from '../../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+
+// Relative bar heights (percent of the tallest). Static render is final state.
+const tiers = [
+  { k: 't1', height: 38 },
+  { k: 't2', height: 66 },
+  { k: 't3', height: 100 },
+] as const;
+---
+
+<section class="ind-scale">
+  <div class="ind-scale__inner">
+    <header class="ind-scale__head">
+      <p class="ind-scale__eyebrow">{t(locale, 'industrial.scale.eyebrow')}</p>
+      <h2 class="ind-scale__title display">{t(locale, 'industrial.scale.title')}</h2>
+      <p class="ind-scale__sub">{t(locale, 'industrial.scale.sub')}</p>
+    </header>
+
+    <div class="ind-scale__chart" data-scale-chart>
+      {tiers.map((tier) => (
+        <div class="ind-scale__col">
+          <div class="ind-scale__bar-track">
+            <div
+              class="ind-scale__bar"
+              data-scale-bar
+              style={`height:${tier.height}%`}
+            ></div>
+          </div>
+          <p class="ind-scale__range" data-countup>{t(locale, `industrial.scale.${tier.k}.range`)}</p>
+          <p class="ind-scale__label">{t(locale, `industrial.scale.${tier.k}.label`)}</p>
+          <p class="ind-scale__desc">{t(locale, `industrial.scale.${tier.k}.desc`)}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .ind-scale {
+    background: var(--ff-ink);
+    color: var(--ff-paper);
+    padding: var(--sp-7) var(--sp-3);
+  }
+  .ind-scale__inner { max-width: var(--container); margin: 0 auto; }
+  .ind-scale__head { max-width: var(--container-tight); margin: 0 0 var(--sp-5); }
+  .ind-scale__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: var(--fs-eyebrow);
+    font-weight: 700;
+    color: var(--ff-green);
+    margin: 0 0 var(--sp-2);
+  }
+  .ind-scale__title { font-size: var(--fs-h2); line-height: var(--lh-snug); color: var(--ff-white); margin: 0 0 var(--sp-2); }
+  .ind-scale__sub { font-size: var(--fs-lead); color: var(--ff-mist); margin: 0; }
+
+  .ind-scale__chart {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--sp-4);
+    align-items: end;
+  }
+  .ind-scale__col { display: flex; flex-direction: column; }
+  .ind-scale__bar-track {
+    height: 220px;
+    display: flex;
+    align-items: flex-end;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    margin-bottom: var(--sp-2);
+  }
+  .ind-scale__bar {
+    width: 100%;
+    border-radius: var(--r-sm) var(--r-sm) 0 0;
+    background: linear-gradient(180deg, var(--ff-green) 0%, var(--ff-green-deep) 100%);
+    box-shadow: 0 0 24px rgba(158, 213, 0, 0.25);
+    transform-origin: bottom;
+  }
+  .ind-scale__range {
+    font-size: var(--fs-h3);
+    font-weight: 800;
+    color: var(--ff-white);
+    margin: 0 0 0.2rem;
+  }
+  .ind-scale__label {
+    font-size: var(--fs-small);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    color: var(--ff-green);
+    margin: 0 0 0.5rem;
+  }
+  .ind-scale__desc {
+    font-size: var(--fs-body);
+    color: var(--ff-mist);
+    line-height: var(--lh-body);
+    margin: 0;
+  }
+
+  @media (max-width: 720px) {
+    .ind-scale__chart { grid-template-columns: 1fr; gap: var(--sp-5); }
+    .ind-scale__bar-track { height: 120px; }
+  }
+</style>

@@ -1,0 +1,100 @@
+---
+import { t, type Locale } from '../../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+
+const keys = ['e1', 'e2', 'e3', 'e4'] as const;
+
+const icons: Record<(typeof keys)[number], string> = {
+  // cabinet
+  e1: '<rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 7h6M9 11h6M9 15h6"/>',
+  // container
+  e2: '<rect x="2" y="6" width="20" height="12" rx="1.5"/><path d="M6 6v12M10 6v12M14 6v12M18 6v12"/>',
+  // inverter / parallel
+  e3: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9l3 3-3 3M14 15h2"/>',
+  // monitoring
+  e4: '<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M7 12l2.5-3 2 2L15 8"/>',
+};
+---
+
+<section class="ind-equip">
+  <div class="ind-equip__inner">
+    <header class="ind-equip__head">
+      <p class="ind-equip__eyebrow">{t(locale, 'industrial.equip.eyebrow')}</p>
+      <h2 class="ind-equip__title display">{t(locale, 'industrial.equip.title')}</h2>
+      <p class="ind-equip__sub">{t(locale, 'industrial.equip.sub')}</p>
+    </header>
+
+    <div class="ind-equip__grid">
+      {keys.map((k) => (
+        <article class="ind-equip__card">
+          <span class="ind-equip__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" set:html={icons[k]} />
+          </span>
+          <h3 class="ind-equip__card-title">{t(locale, `industrial.equip.${k}.title`)}</h3>
+          <p class="ind-equip__specs">{t(locale, `industrial.equip.${k}.specs`)}</p>
+          <p class="ind-equip__body">{t(locale, `industrial.equip.${k}.body`)}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .ind-equip { background: var(--ff-paper); padding: var(--sp-7) var(--sp-3); }
+  .ind-equip__inner { max-width: var(--container); margin: 0 auto; }
+  .ind-equip__head { max-width: var(--container-tight); margin: 0 0 var(--sp-5); }
+  .ind-equip__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: var(--fs-eyebrow);
+    font-weight: 700;
+    color: var(--ff-ink);
+    margin: 0 0 var(--sp-2);
+  }
+  .ind-equip__title { font-size: var(--fs-h2); line-height: var(--lh-snug); margin: 0 0 var(--sp-2); }
+  .ind-equip__sub { font-size: var(--fs-lead); color: var(--ff-slate); margin: 0; }
+
+  .ind-equip__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sp-3);
+  }
+  .ind-equip__card {
+    background: var(--ff-white);
+    border: 1px solid var(--ff-line);
+    border-radius: var(--r-md);
+    padding: var(--sp-4);
+    box-shadow: var(--shadow-sm);
+  }
+  .ind-equip__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px; height: 52px;
+    border-radius: var(--r-sm);
+    background: var(--ff-mist);
+    color: var(--ff-ink);
+    margin-bottom: var(--sp-2);
+  }
+  .ind-equip__card-title { font-size: var(--fs-h3); margin: 0 0 0.3rem; }
+  .ind-equip__specs {
+    font-size: var(--fs-small);
+    font-weight: 700;
+    color: var(--ff-ink);
+    background: var(--ff-green-tint);
+    border: 1px solid var(--ff-line);
+    border-radius: var(--r-pill);
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    margin: 0 0 var(--sp-2);
+  }
+  .ind-equip__body { margin: 0; color: var(--ff-slate); line-height: var(--lh-body); }
+
+  @media (max-width: 720px) {
+    .ind-equip__grid { grid-template-columns: 1fr; }
+  }
+</style>
