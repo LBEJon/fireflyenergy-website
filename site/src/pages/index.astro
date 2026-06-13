@@ -6,12 +6,11 @@ import TrustStrip from '../components/TrustStrip.astro';
 import FlowDiagram from '../components/FlowDiagram.astro';
 import DefenseCards from '../components/DefenseCards.astro';
 import EquipmentShowcase from '../components/EquipmentShowcase.astro';
-import Estimator from '../components/Estimator.astro';
 import ProofGallery from '../components/ProofGallery.astro';
 import CTASection from '../components/CTASection.astro';
 import Footer from '../components/Footer.astro';
 import WhatsAppBubble from '../components/WhatsAppBubble.astro';
-import { t } from '../lib/i18n';
+import { t, altUrl } from '../lib/i18n';
 import { homeGraph } from '../lib/jsonld';
 
 const locale = 'en' as const;
@@ -27,13 +26,40 @@ const jsonLd = homeGraph(locale, Astro.site);
     <FlowDiagram locale={locale} />
     <DefenseCards locale={locale} />
     <EquipmentShowcase locale={locale} />
-    <Estimator locale={locale} />
+
+    <section class="ff-calc-teaser" aria-labelledby="ff-calc-teaser-title">
+      <div class="ff-calc-teaser__inner">
+        <h2 id="ff-calc-teaser-title" class="ff-calc-teaser__title display">{t(locale, 'home.teaser.title')}</h2>
+        <p class="ff-calc-teaser__sub">{t(locale, 'home.teaser.sub')}</p>
+        <a class="ff-btn ff-btn--coral" href={altUrl(locale, 'calculator')}>{t(locale, 'home.teaser.cta')}</a>
+      </div>
+    </section>
+
     <ProofGallery locale={locale} />
     <CTASection locale={locale} />
   </main>
   <Footer locale={locale} />
   <WhatsAppBubble locale={locale} />
 </Base>
+
+<style>
+  .ff-calc-teaser { background: var(--ff-paper); padding: var(--sp-7) var(--sp-3); }
+  .ff-calc-teaser__inner { max-width: var(--container-tight); margin: 0 auto; text-align: center; }
+  .ff-calc-teaser__title { font-size: var(--fs-h1); line-height: var(--lh-snug); margin: 0 0 var(--sp-2); }
+  .ff-calc-teaser__sub { font-size: var(--fs-lead); color: var(--ff-slate); margin: 0 0 var(--sp-4); }
+  .ff-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--r-pill);
+    font-weight: 700;
+    font-size: var(--fs-body);
+    text-decoration: none;
+    padding: 0.85rem 1.6rem;
+  }
+  .ff-btn--coral { background: var(--ff-coral); color: var(--ff-white); }
+  .ff-btn--coral:hover { filter: brightness(1.05); }
+</style>
 
 <script>
   import { initMotion } from '../lib/motion';

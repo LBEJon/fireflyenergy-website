@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Nav from '../components/Nav.astro';
-import Estimator from '../components/Estimator.astro';
+import AssessmentEntry from '../components/assessment/AssessmentEntry.astro';
 import Footer from '../components/Footer.astro';
 import WhatsAppBubble from '../components/WhatsAppBubble.astro';
 import { t } from '../lib/i18n';
@@ -28,7 +28,7 @@ const faqs = [
       </div>
     </section>
 
-    <Estimator locale={locale} />
+    <AssessmentEntry locale={locale} />
 
     <section class="ff-calc-faq" aria-labelledby="ff-calc-faq-title">
       <div class="ff-calc-faq__inner">
