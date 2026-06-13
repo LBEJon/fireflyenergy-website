@@ -1,0 +1,156 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FireflyEnergy.mx Redesign — Design Spec</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Narrow:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--lime:#9ED500;--ink:#2A2D34;--coral:#FF6A3D;--slate:#5B606B;--paper:#FDFBF7;--line:#E7E2D6}
+body{font-family:Archivo,system-ui,sans-serif;color:var(--ink);background:var(--paper);margin:0;line-height:1.6}
+.wrap{max-width:860px;margin:0 auto;padding:48px 28px 80px}
+h1{font-family:'Archivo Narrow',sans-serif;font-size:2.6rem;line-height:1.05;margin:.2em 0 .1em;border-bottom:5px solid var(--lime);padding-bottom:14px}
+h2{font-family:'Archivo Narrow',sans-serif;font-size:1.7rem;margin:2em 0 .4em;padding-left:14px;border-left:6px solid var(--lime)}
+h3{font-size:1.15rem;margin:1.4em 0 .3em;color:var(--ink)}
+h4{font-size:1rem;margin:1.1em 0 .2em;color:var(--slate)}
+p{margin:.5em 0;color:#3d4147}
+code{background:#F2F8E0;color:#3d4147;padding:.1em .4em;border-radius:5px;font-size:.9em}
+strong{color:var(--ink)}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.95rem}
+td{border:1px solid var(--line);padding:9px 12px;vertical-align:top;background:#fff}
+tr td:first-child{background:#F8FCEB;font-weight:600;white-space:nowrap}
+ul,ol{margin:.4em 0 .9em;padding-left:1.4em}li{margin:.25em 0;color:#3d4147}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+.badge{display:inline-block;background:var(--coral);color:#fff;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 12px;border-radius:999px}
+</style></head><body><div class="wrap"><span class="badge">Firefly · Design Spec</span>
+<h1>FireflyEnergy.mx — Website Redesign Design Spec</h1>
+
+<p><strong>Date:</strong> 2026-06-13</p>
+<p><strong>Status:</strong> Approved (sections 1–3 reviewed in brainstorming)</p>
+<p><strong>Scope:</strong> Full marketing-site rebuild, developed on localhost only. The live site at fireflyenergy.mx is NOT touched until explicitly launched.</p>
+
+<hr>
+
+<h2>1. Goal</h2>
+
+<p>Rebuild FireflyEnergy.mx as a modern, lead-generation website that communicates Firefly&#x27;s value proposition for battery backup + solar in San Miguel de Allende and Mexico nationally. Two audiences:</p>
+
+<ol>
+<li><strong>Residential / light-commercial</strong> — fast, low-friction funnel ending in a CRM lead.</li>
+<li><strong>Industrial / BESS</strong> — consultative showcase ending in a booked energy assessment (no calculator).</li>
+</ol>
+
+<p>Lead with energy independence and the positives. Never disparage CFE.</p>
+
+<h2>2. Decisions (locked)</h2>
+
+<table>
+<tr><td>Decision</td><td>Choice</td></tr>
+<tr><td><strong>Stack</strong></td><td>Astro static site (built-in i18n, sitemap, SEO meta/OG); GSAP + Three.js as lightweight islands; pure static output for Cloudflare.</td></tr>
+<tr><td><strong>Design direction</strong></td><td><strong>Warm Editorial</strong> (&quot;San Miguel at Dusk&quot;) — warm paper background, golden-hour photography, plain-spoken copy, generous whitespace, rounded cards, pill buttons, soft shadows. Pure C language (NOT the Barragán hybrid).</td></tr>
+<tr><td><strong>Site architecture</strong></td><td><strong>A — &quot;One story, two doors&quot;:</strong> homepage IS the residential story; <code>/industrial</code> is a flagship sibling page with a steelier palette; <code>/calculator</code> dedicated page + homepage teaser.</td></tr>
+<tr><td><strong>Languages</strong></td><td>Bilingual ES + EN at launch. Every page has an <code>/es/</code> route.</td></tr>
+<tr><td><strong>Lead capture</strong></td><td>Direct CRM edge function (<code>POST /site-lead</code>) in firefly-crm Supabase. Creates contact + deal, <code>source = website</code>, estimator/assessment inputs attached. Honeypot + rate limit + dedupe.</td></tr>
+<tr><td><strong>Pricing source</strong></td><td>Live pricing endpoint (<code>GET /site-pricing</code>) — active products → <strong>MSRP only</strong>, cached ~1h. Dealer/landed cost/margins never exposed publicly. <strong>Pricing algorithm is a pluggable module — deferred</strong> until the CRM pricing-schema rebuild lands.</td></tr>
+<tr><td><strong>Industrial CTA</strong></td><td>Book an energy assessment (structured form: facility type, monthly CFE spend, tariff).</td></tr>
+<tr><td><strong>Image/video generation</strong></td><td>Higgsfield CLI for golden-hour SMA/colonial/hacienda/Barragán-modern home photography, product-context shots, industrial blue-hour BESS imagery, and an optional ambient hero video loop.</td></tr>
+</table>
+
+<h2>3. Brand (canonical 2026)</h2>
+
+<ul>
+<li><strong>Source of truth:</strong> <code>~/Claude Code/Firefly/design-system/web/tokens.css</code> + logo SVGs in <code>design-system/web/assets/</code>.</li>
+<li><strong>Colors:</strong> lime <code>#9ED500</code> (large/display + fills only, never small text on white), charcoal <code>#2A2D34</code>, sunset coral <code>#FF6A3D</code> (the single &quot;look here&quot; accent — primary CTA only), warm paper neutrals.</li>
+<li><strong>Type:</strong> <code>Archivo Narrow</code> for display moments only (H1, big stats, CTA headlines); <code>Archivo</code> for body/UI.</li>
+<li><strong>Logo:</strong> canonical 2026 wordmark/icon SVGs (on-dark variants for charcoal sections). All mockups and the build use these.</li>
+</ul>
+
+<h2>4. Content rules (MANDATORY — apply to all copy, EN + ES)</h2>
+
+<ol>
+<li><strong>No &quot;weatherproof&quot; / no IP65 as a selling point.</strong> IP65 is incidental to current sourcing and not stable in the portfolio. Weatherproof solutions exist but are consultation-only, not marketed.</li>
+<li><strong>Installation framing:</strong> professionally installed in a covered location — garage, utility closet, or covered patio. Compact, wall-mounted, tucked away.</li>
+<li><strong>No &quot;silent&quot; / &quot;0 dB&quot; claims.</strong> There is a cooling fan. Frame by what it lacks: &quot;no fuel, no fumes, no generator roar.&quot; Honest, benefit-led.</li>
+<li><strong>No equipment brand names or model numbers</strong> — specs only (kW / kWh / amps). (Existing Firefly rule.)</li>
+<li><strong>Positive framing</strong> — energy independence over fear; never disparage CFE.</li>
+<li><strong>Plain, non-technical language</strong> — clear, concise, easy to understand.</li>
+</ol>
+
+<h2>5. Residential homepage (8 sections)</h2>
+
+<ol>
+<li><strong>Hero</strong> — &quot;Your home, glowing through any outage.&quot; Golden-hour SMA dusk photo. GSAP staggered headline + scroll scale; Three.js firefly particles (only WebGL on initial load); Higgsfield photo or 6s ambient loop. CTA: *Get my estimate* (coral).</li>
+<li><strong>Trust strip</strong> — 20 yrs serving Mexico · &lt;20ms switchover · 100% automatic · no fuel/no fumes/no maintenance. Numbers count up on scroll.</li>
+<li><strong>How it works — enhanced flow diagram</strong> — the CRM proposal power-flow topology redrawn as a living scene: energy pulses travel wires (GSAP motion-path); sunny/night/outage scenario tabs re-route flow (grid dims in outage, home stays lit). Built as a <strong>shared component the CRM proposals can reuse</strong>. Scroll-scrubbed desktop, tap-tabs mobile.</li>
+<li><strong>Power Defense layer</strong> — current 6-row table distilled to 3 friendly cards (outages / weak power / dirty power) + &quot;see all 6&quot; expander. GSAP stagger.</li>
+<li><strong>Equipment showcase</strong> — Three.js drag-to-rotate of the most common config (12 kW inverter + 16 kWh battery) built from real product renders as textured cards; spec hotspots; lazy-loaded.</li>
+<li><strong>Calculator teaser → estimator</strong> (see §6).</li>
+<li><strong>Proof — homes like yours</strong> — 3-home Higgsfield gallery (colonial / hacienda / Mexican-modern) + 2–3 testimonials. GSAP horizontal drag.</li>
+<li><strong>Final CTA + footer</strong> — estimate or WhatsApp now. Footer: NAP + service area (local SEO), <code>/industrial</code> link, ES/EN, FAQ, privacy.</li>
+</ol>
+
+<p><strong>Funnel:</strong> one primary action sitewide — *Get my estimate* (coral; hero, sticky nav, mid-page, footer). Soft-capture nets for the not-ready: persistent WhatsApp bubble + &quot;email me my estimate.&quot;</p>
+
+<h2>6. Residential estimator (4 steps, ~45s)</h2>
+
+<ul>
+<li><strong>Step 1 — Your home:</strong> cozy casa / family home / large estate or B&amp;B / small business (closest match, no bills).</li>
+<li><strong>Step 2 — What stays on in an outage:</strong> essentials / life as usual / everything (sizes the battery).</li>
+<li><strong>Step 3 — Solar:</strong> already have / add with my system / battery-only (solar-ready).</li>
+<li><strong>Step 4 — Results first, capture second:</strong> recommended config (e.g. 12 kW + 16 kWh + N panels), installed price <strong>range</strong> USD/MXN toggle, then name + WhatsApp/email → *Get my exact quote*. Abandon net: &quot;email me this estimate.&quot;</li>
+</ul>
+
+<p><strong>Sizing logic:</strong> small client-side mapping derived from the proposal engine&#x27;s tiers (same vocabulary; respects the 4-panel inverter-string minimum) so the website estimate never contradicts the real proposal. <strong>Pricing/range computation is an isolated module with a defined interface (<code>PriceRange = f(config, pricingData)</code>), implementation deferred</strong> to the pricing-schema rebuild. Until then it renders from a stub/placeholder band so the UX is fully buildable.</p>
+
+<h2>7. Industrial page <code>/industrial</code> (6 sections)</h2>
+
+<ol>
+<li><strong>Hero</strong> — &quot;Energy storage that pays for itself — and protects everything.&quot; Charcoal, blue-hour BESS imagery. CTA: *Book an energy assessment*.</li>
+<li><strong>Four propositions</strong> — peak shaving (reduce GDMTH demand charges) / backup at scale / solar + storage self-supply / power quality. Cards expand to problem → how BESS solves it → what we deliver.</li>
+<li><strong>Scale band</strong> — 30–50 kWh commercial → 100–500 kWh light industrial → 1 MWh+ industrial. GSAP bars grow + count up.</li>
+<li><strong>Equipment we deploy</strong> — cabinet BESS, containerized MWh-class, three-phase hybrid PCS, monitoring/EMS. Specs only. Optional Three.js container model.</li>
+<li><strong>Engagement path</strong> — Assess → Engineer → Install → Operate; GSAP connecting line.</li>
+<li><strong>Assessment CTA</strong> — form (company, name, facility type, monthly CFE spend, tariff if known, contact) → same <code>POST /site-lead</code>, <code>segment = industrial</code>, flagged high-value in CRM.</li>
+</ol>
+
+<h2>8. CRM integration (firefly-crm Supabase)</h2>
+
+<ul>
+<li><strong><code>GET /site-pricing</code></strong> — new public edge function. Returns active-product MSRP map only, cached ~1h (CDN/edge). No auth required; read-only; no cost/margin fields.</li>
+<li><strong><code>POST /site-lead</code></strong> — new public edge function. Validates payload, honeypot + rate-limit, dedupes by contact, creates contact + deal with <code>source=website</code>, segment (residential|industrial), and all estimator/assessment inputs in deal metadata so the rep&#x27;s wizard starts pre-filled.</li>
+<li>Both are <strong>additive</strong> to firefly-crm; no schema migration required for the website beyond what the lead payload needs (confirm <code>contact</code>/<code>deal</code> accept a website source + metadata blob; add a minimal migration only if needed).</li>
+</ul>
+
+<h2>9. SEO + AI-search (LLM) optimization</h2>
+
+<ul>
+<li>Astro per-page <code>&lt;title&gt;</code>/meta/canonical/OG/Twitter; hreflang for ES/EN.</li>
+<li><strong>JSON-LD:</strong> <code>LocalBusiness</code> (NAP, service area = San Miguel de Allende + Mexico), <code>Product</code>/<code>Service</code> for residential + BESS, <code>FAQPage</code>, <code>BreadcrumbList</code>.</li>
+<li>Auto <code>sitemap.xml</code> (Astro integration) + <code>robots.txt</code>.</li>
+<li><strong>AI/LLM capture:</strong> clear question-shaped H2s, concise factual answer blocks, a rich FAQ, semantic HTML, an <code>llms.txt</code> summary of offerings/service area. Plain-language definitional copy that answers &quot;battery backup San Miguel,&quot; &quot;BESS peak shaving Mexico,&quot; etc.</li>
+<li>Performance for Core Web Vitals: static HTML, lazy-loaded WebGL, responsive images, minimal JS islands.</li>
+</ul>
+
+<h2>10. Architecture &amp; isolation</h2>
+
+<ul>
+<li><strong>Astro project</strong> at repo root of <code>fireflyenergy-website</code>. <code>src/pages/</code> (EN) + <code>src/pages/es/</code>; shared <code>src/components/</code> (Hero, TrustStrip, FlowDiagram, DefenseCards, EquipmentShowcase, Estimator, ProofGallery, CTA, Footer, industrial variants); <code>src/content/</code> i18n strings (one source, two locales); <code>src/lib/</code> (sizing map, pricing client, lead client, analytics).</li>
+<li><strong>FlowDiagram</strong> and <strong>EquipmentShowcase</strong> are self-contained islands with documented props; FlowDiagram is authored so the CRM proposal can import the same component.</li>
+<li><strong>Estimator</strong> = pure state machine + pluggable <code>sizing</code> and <code>pricing</code> modules; testable independently of the DOM.</li>
+<li>Each unit: single purpose, well-defined props/interface, independently understandable.</li>
+</ul>
+
+<h2>11. Out of scope / deferred</h2>
+
+<ul>
+<li>Pricing algorithm + install band (gated on CRM pricing-schema rebuild).</li>
+<li>Migrating/redirecting the live domain (launch is a separate, explicit step).</li>
+<li>Industrial calculator (intentionally excluded).</li>
+<li>Real testimonials/case studies content (placeholders until provided).</li>
+</ul>
+
+<h2>12. Open items to confirm at build time</h2>
+
+<ul>
+<li>Typical install % or proposal-derived band (when pricing module is wired).</li>
+<li>Final hero media: still photo vs ambient video loop.</li>
+<li>Whether a minimal CRM migration is needed for the website lead source/metadata.</li>
+</ul>
+
+</div></body></html>
