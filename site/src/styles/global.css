@@ -14,3 +14,26 @@ h1,
 .stat-num {
   font-family: var(--ff-display);
 }
+
+/* ProofGallery drag-rail: only applied when the motion layer turns the rail
+   into a horizontal scroller (it stays a static grid without JS / with
+   reduced motion). Progressive enhancement — no layout change by default. */
+.ff-proof__rail.is-draggable {
+  display: flex;
+  grid-template-columns: none;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  cursor: grab;
+  touch-action: pan-y;
+}
+.ff-proof__rail.is-draggable > * {
+  flex: 0 0 min(78%, 340px);
+  scroll-snap-align: start;
+}
+.ff-proof__rail.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+  scroll-snap-type: none;
+}

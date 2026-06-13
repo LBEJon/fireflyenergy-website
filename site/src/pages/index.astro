@@ -1,25 +1,41 @@
 ---
 import Base from '../layouts/Base.astro';
-import { getLocale } from '../lib/i18n';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import TrustStrip from '../components/TrustStrip.astro';
+import FlowDiagram from '../components/FlowDiagram.astro';
+import DefenseCards from '../components/DefenseCards.astro';
+import EquipmentShowcase from '../components/EquipmentShowcase.astro';
+import Estimator from '../components/Estimator.astro';
+import ProofGallery from '../components/ProofGallery.astro';
+import CTASection from '../components/CTASection.astro';
+import Footer from '../components/Footer.astro';
+import WhatsAppBubble from '../components/WhatsAppBubble.astro';
+import { t } from '../lib/i18n';
+import { homeGraph } from '../lib/jsonld';
 
-const locale = getLocale(Astro.url);
-
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'Firefly Energy',
-  url: Astro.site?.href ?? 'https://fireflyenergy.mx/',
-};
+const locale = 'en' as const;
+const title = `${t(locale, 'common.brand')} — ${t(locale, 'hero.h1')}`;
+const description = t(locale, 'hero.sub');
+const jsonLd = homeGraph(locale, Astro.site);
 ---
-<Base
-  title="Firefly Energy"
-  description="Solar and battery backup for homes and businesses in Mexico."
-  locale={locale}
-  path=""
-  jsonLd={jsonLd}
->
+<Base title={title} description={description} locale={locale} path="" jsonLd={jsonLd}>
+  <Nav locale={locale} />
   <main>
-    <h1 class="display">Firefly Energy</h1>
-    <p>Redesign in progress.</p>
+    <Hero locale={locale} />
+    <TrustStrip locale={locale} />
+    <FlowDiagram locale={locale} />
+    <DefenseCards locale={locale} />
+    <EquipmentShowcase locale={locale} />
+    <Estimator locale={locale} />
+    <ProofGallery locale={locale} />
+    <CTASection locale={locale} />
   </main>
+  <Footer locale={locale} />
+  <WhatsAppBubble locale={locale} />
 </Base>
+
+<script>
+  import { initMotion } from '../lib/motion';
+  initMotion();
+</script>
