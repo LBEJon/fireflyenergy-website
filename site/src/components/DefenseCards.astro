@@ -1,0 +1,138 @@
+---
+import { t, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+
+// Simple inline-SVG icons keyed by card.
+const icons: Record<string, string> = {
+  outage:
+    '<path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/>',
+  weak:
+    '<path d="M3 12h4l2 6 4-12 2 6h6"/>',
+  quality:
+    '<path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/>',
+  spike:
+    '<path d="M3 12h3l3-7 4 14 3-7h5"/>',
+  long:
+    '<path d="M5 8h11v8H5z"/><path d="M16 11h3v2h-3z"/><path d="M8 8V6h5v2"/>',
+  lightning:
+    '<path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/><path d="M9 21h6"/>',
+};
+
+const cards = [
+  { k: 'outage', title: t(locale, 'defense.c1_title'), body: t(locale, 'defense.c1_body') },
+  { k: 'weak', title: t(locale, 'defense.c2_title'), body: t(locale, 'defense.c2_body') },
+  { k: 'quality', title: t(locale, 'defense.c3_title'), body: t(locale, 'defense.c3_body') },
+];
+const more = [
+  { k: 'spike', title: t(locale, 'defense.c4_title'), body: t(locale, 'defense.c4_body') },
+  { k: 'long', title: t(locale, 'defense.c5_title'), body: t(locale, 'defense.c5_body') },
+  { k: 'lightning', title: t(locale, 'defense.c6_title'), body: t(locale, 'defense.c6_body') },
+];
+---
+<section class="ff-defense">
+  <div class="ff-defense__inner">
+    <header class="ff-defense__head">
+      <p class="ff-defense__eyebrow">{t(locale, 'defense.eyebrow')}</p>
+      <h2 class="ff-defense__title display">{t(locale, 'defense.title')}</h2>
+      <p class="ff-defense__sub">{t(locale, 'defense.sub')}</p>
+    </header>
+
+    <div class="ff-defense__grid">
+      {cards.map((c) => (
+        <article class="ff-defense__card">
+          <span class="ff-defense__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" set:html={icons[c.k]} />
+          </span>
+          <h3>{c.title}</h3>
+          <p>{c.body}</p>
+        </article>
+      ))}
+    </div>
+
+    <details class="ff-defense__more">
+      <summary>{t(locale, 'defense.see_all')}</summary>
+      <div class="ff-defense__grid ff-defense__grid--more">
+        {more.map((c) => (
+          <article class="ff-defense__card">
+            <span class="ff-defense__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" set:html={icons[c.k]} />
+            </span>
+            <h3>{c.title}</h3>
+            <p>{c.body}</p>
+          </article>
+        ))}
+      </div>
+    </details>
+
+    <p class="ff-defense__chips">{t(locale, 'defense.chips')}</p>
+  </div>
+</section>
+
+<style>
+  .ff-defense { background: var(--ff-paper); padding: var(--sp-7) var(--sp-3); }
+  .ff-defense__inner { max-width: var(--container); margin: 0 auto; }
+  .ff-defense__head { max-width: var(--container-tight); margin: 0 auto var(--sp-5); text-align: center; }
+  .ff-defense__eyebrow {
+    text-transform: uppercase; letter-spacing: 0.12em; font-size: var(--fs-eyebrow);
+    font-weight: 700; color: var(--ff-accent-dk); margin: 0 0 var(--sp-2);
+  }
+  .ff-defense__title { font-size: var(--fs-h1); line-height: var(--lh-snug); margin: 0 0 var(--sp-2); }
+  .ff-defense__sub { font-size: var(--fs-lead); color: var(--ff-slate); margin: 0; }
+
+  .ff-defense__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--sp-3);
+  }
+  .ff-defense__grid--more { margin-top: var(--sp-3); }
+  .ff-defense__card {
+    background: var(--ff-white);
+    border: 1px solid var(--ff-line);
+    border-radius: var(--r-md);
+    padding: var(--sp-3);
+    box-shadow: var(--shadow-sm);
+  }
+  .ff-defense__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px; height: 48px;
+    border-radius: var(--r-sm);
+    background: var(--ff-green-tint);
+    color: var(--ff-ink);
+    margin-bottom: var(--sp-2);
+  }
+  .ff-defense__card h3 { font-size: var(--fs-h3); margin: 0 0 0.4rem; }
+  .ff-defense__card p { margin: 0; color: var(--ff-slate); line-height: var(--lh-body); }
+
+  .ff-defense__more { margin-top: var(--sp-3); }
+  .ff-defense__more summary {
+    cursor: pointer;
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 700;
+    color: var(--ff-accent-dk);
+    padding: 0.6rem 0;
+  }
+  .ff-defense__more summary::-webkit-details-marker { display: none; }
+  .ff-defense__more summary::after { content: "＋"; font-weight: 700; }
+  .ff-defense__more[open] summary::after { content: "－"; }
+
+  .ff-defense__chips {
+    text-align: center;
+    margin: var(--sp-5) 0 0;
+    font-weight: 600;
+    color: var(--ff-slate);
+    font-size: var(--fs-small);
+  }
+
+  @media (max-width: 860px) {
+    .ff-defense__grid { grid-template-columns: 1fr; }
+  }
+</style>
