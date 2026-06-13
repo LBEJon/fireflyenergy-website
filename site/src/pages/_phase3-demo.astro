@@ -4,6 +4,7 @@ import Base from '../layouts/Base.astro';
 import Nav from '../components/Nav.astro';
 import FlowDiagram from '../components/FlowDiagram.astro';
 import EquipmentShowcase from '../components/EquipmentShowcase.astro';
+import Estimator from '../components/Estimator.astro';
 import Footer from '../components/Footer.astro';
 import { getLocale } from '../lib/i18n';
 
@@ -14,6 +15,7 @@ const locale = getLocale(Astro.url);
   <main>
     <FlowDiagram locale={locale} />
     <EquipmentShowcase locale={locale} />
+    <Estimator locale={locale} />
   </main>
   <Footer locale={locale} />
 </Base>

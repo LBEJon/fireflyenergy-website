@@ -1,0 +1,498 @@
+---
+import { t, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+  /** CRM base URL; falls back to PUBLIC_SUPABASE_URL or '' (→ placeholder pricing / WhatsApp). */
+  baseUrl?: string;
+}
+const { locale, baseUrl } = Astro.props;
+const resolvedBase = baseUrl ?? import.meta.env.PUBLIC_SUPABASE_URL ?? '';
+
+// WhatsApp deep link for the soft-net / error fallback.
+const waNumber = t(locale, 'common.whatsapp');
+const waHref = `https://wa.me/${waNumber}`;
+const emailAddr = t(locale, 'common.email');
+
+// Step 1 choices → home value.
+const homeChoices = [
+  { value: 'cozy', title: 'estimator.home_cozy', note: 'estimator.home_cozy_note' },
+  { value: 'family', title: 'estimator.home_family', note: 'estimator.home_family_note' },
+  { value: 'estate', title: 'estimator.home_estate', note: 'estimator.home_estate_note' },
+  { value: 'business', title: 'estimator.home_business', note: 'estimator.home_business_note' },
+];
+// Step 2 choices → backup value.
+const backupChoices = [
+  { value: 'essentials', title: 'estimator.backup_essentials', note: 'estimator.backup_essentials_note' },
+  { value: 'usual', title: 'estimator.backup_usual', note: 'estimator.backup_usual_note' },
+  { value: 'everything', title: 'estimator.backup_everything', note: 'estimator.backup_everything_note' },
+];
+// Step 3 choices → solar value.
+const solarChoices = [
+  { value: 'have', title: 'estimator.solar_have', note: 'estimator.solar_have_note' },
+  { value: 'add', title: 'estimator.solar_add', note: 'estimator.solar_add_note' },
+  { value: 'none', title: 'estimator.solar_none', note: 'estimator.solar_none_note' },
+];
+
+const steps = [
+  { key: 'home', legend: 'estimator.step1_legend', choices: homeChoices },
+  { key: 'backup', legend: 'estimator.step2_legend', choices: backupChoices },
+  { key: 'solar', legend: 'estimator.step3_legend', choices: solarChoices },
+];
+---
+<section
+  id="estimator"
+  class="ff-est"
+  aria-labelledby="ff-est-title"
+  data-estimator
+  data-base-url={resolvedBase}
+  data-wa-href={waHref}
+>
+  <div class="ff-est__inner">
+    <header class="ff-est__head">
+      <p class="ff-est__eyebrow">{t(locale, 'estimator.eyebrow')}</p>
+      <h2 id="ff-est-title" class="ff-est__title display">{t(locale, 'estimator.title')}</h2>
+      <p class="ff-est__sub">{t(locale, 'estimator.sub')}</p>
+    </header>
+
+    <div class="ff-est__card">
+      <!-- Progress dots (steps 1..4) -->
+      <ol class="ff-est__progress" data-progress aria-label={t(locale, 'estimator.progress_label').replace('{step}', '1').replace('{total}', '4')}>
+        {[1, 2, 3, 4].map((n) => (
+          <li class={`ff-est__dot${n === 1 ? ' is-active' : ''}`} data-dot={n} aria-hidden="true"></li>
+        ))}
+      </ol>
+
+      <!-- Steps 1-3: radio-group choice fieldsets -->
+      {steps.map((s, i) => (
+        <fieldset class={`ff-est__step${i === 0 ? ' is-current' : ''}`} data-step={i + 1} hidden={i !== 0}>
+          <legend class="ff-est__legend">{t(locale, s.legend)}</legend>
+          <div class="ff-est__choices" role="radiogroup" aria-label={t(locale, s.legend)}>
+            {s.choices.map((c) => (
+              <button
+                type="button"
+                class="ff-est__choice"
+                role="radio"
+                aria-checked="false"
+                data-answer-key={s.key}
+                data-answer-value={c.value}
+              >
+                <span class="ff-est__choice-title">{t(locale, c.title)}</span>
+                <span class="ff-est__choice-note">{t(locale, c.note)}</span>
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      ))}
+
+      <!-- Step 4: RESULTS FIRST, then capture -->
+      <div class="ff-est__step ff-est__results" data-step="4" hidden>
+        <div class="ff-est__result-block">
+          <p class="ff-est__result-intro">{t(locale, 'estimator.result_intro')}</p>
+          <h3 class="ff-est__result-title">{t(locale, 'estimator.result_title')}</h3>
+
+          <ul class="ff-est__chips" data-chips aria-live="polite">
+            <li class="ff-est__chip" data-chip-inverter></li>
+            <li class="ff-est__chip" data-chip-battery></li>
+            <li class="ff-est__chip" data-chip-panels></li>
+          </ul>
+
+          <div class="ff-est__price">
+            <div class="ff-est__price-row">
+              <span class="ff-est__price-label">{t(locale, 'estimator.price_label')}</span>
+              <div class="ff-est__currency" role="radiogroup" aria-label={t(locale, 'estimator.currency_aria')}>
+                <button type="button" class="ff-est__cur is-active" role="radio" aria-checked="true" data-currency="USD">{t(locale, 'estimator.currency_usd')}</button>
+                <button type="button" class="ff-est__cur" role="radio" aria-checked="false" data-currency="MXN">{t(locale, 'estimator.currency_mxn')}</button>
+              </div>
+            </div>
+            <p class="ff-est__price-value" data-price aria-live="polite"></p>
+            <p class="ff-est__price-note" data-price-note hidden>{t(locale, 'estimator.price_placeholder_note')}</p>
+          </div>
+        </div>
+
+        <!-- Capture form sits BELOW the result -->
+        <form class="ff-est__capture" data-capture novalidate>
+          <h3 class="ff-est__capture-title">{t(locale, 'estimator.capture_title')}</h3>
+          <p class="ff-est__capture-sub">{t(locale, 'estimator.capture_sub')}</p>
+
+          <label class="ff-est__field">
+            <span class="ff-est__field-label">{t(locale, 'estimator.name_label')}</span>
+            <input type="text" name="name" autocomplete="name" required
+              placeholder={t(locale, 'estimator.name_placeholder')} data-name />
+          </label>
+
+          <label class="ff-est__field">
+            <span class="ff-est__field-label">{t(locale, 'estimator.contact_label')}</span>
+            <input type="text" name="contact" autocomplete="off" required
+              placeholder={t(locale, 'estimator.contact_placeholder')} data-contact />
+          </label>
+
+          <!-- Honeypot: visually hidden, off the tab order, ignored by humans. -->
+          <div class="ff-est__hp" aria-hidden="true">
+            <label>{t(locale, 'estimator.company_label')}
+              <input type="text" name="company_url" tabindex="-1" autocomplete="off" data-hp />
+            </label>
+          </div>
+
+          <button type="submit" class="ff-est__submit" data-submit disabled>{t(locale, 'estimator.submit')}</button>
+
+          <div class="ff-est__softnets">
+            <a class="ff-est__soft" href={`mailto:${emailAddr}`} data-soft-email>{t(locale, 'estimator.soft_email')}</a>
+            <a class="ff-est__soft" href={waHref} target="_blank" rel="noopener" data-soft-wa>{t(locale, 'estimator.soft_whatsapp')}</a>
+          </div>
+        </form>
+
+        <!-- Thank-you / error states (toggled by script) -->
+        <div class="ff-est__state ff-est__state--ok" data-state-ok hidden role="status">
+          <h3 class="ff-est__state-title">{t(locale, 'estimator.thanks_title')}</h3>
+          <p>{t(locale, 'estimator.thanks_body')}</p>
+        </div>
+        <div class="ff-est__state ff-est__state--err" data-state-err hidden role="alert">
+          <h3 class="ff-est__state-title">{t(locale, 'estimator.error_title')}</h3>
+          <p>{t(locale, 'estimator.error_body')}</p>
+          <a class="ff-est__wa-btn" href={waHref} target="_blank" rel="noopener">{t(locale, 'common.whatsapp_label')}</a>
+        </div>
+      </div>
+
+      <!-- Step navigation (hidden on results until restart) -->
+      <div class="ff-est__nav" data-nav>
+        <button type="button" class="ff-est__back" data-back hidden>{t(locale, 'estimator.back')}</button>
+        <button type="button" class="ff-est__restart" data-restart hidden>{t(locale, 'estimator.restart')}</button>
+      </div>
+
+      <p class="ff-est__disclaimer">{t(locale, 'estimator.disclaimer')}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ff-est { background: var(--ff-green-tint); padding: var(--sp-7) var(--sp-3); }
+  .ff-est__inner { max-width: var(--container-tight); margin: 0 auto; }
+  .ff-est__head { text-align: center; margin-bottom: var(--sp-4); }
+  .ff-est__eyebrow {
+    text-transform: uppercase; letter-spacing: 0.12em; font-size: var(--fs-eyebrow);
+    font-weight: 700; color: var(--ff-accent-dk); margin: 0 0 var(--sp-2);
+  }
+  .ff-est__title { font-size: var(--fs-h1); line-height: var(--lh-snug); margin: 0 0 var(--sp-2); }
+  .ff-est__sub { font-size: var(--fs-lead); color: var(--ff-slate); margin: 0; }
+
+  .ff-est__card {
+    background: var(--ff-white); border: 1px solid var(--ff-line);
+    border-radius: var(--r-lg); box-shadow: var(--shadow-md);
+    padding: var(--sp-5) var(--sp-4);
+  }
+
+  /* ---- Progress dots ---- */
+  .ff-est__progress { list-style: none; display: flex; gap: var(--sp-1); justify-content: center; margin: 0 0 var(--sp-4); padding: 0; }
+  .ff-est__dot { width: 10px; height: 10px; border-radius: var(--r-pill); background: var(--ff-mist); transition: background var(--dur) var(--ease), width var(--dur) var(--ease); }
+  .ff-est__dot.is-active { background: var(--ff-accent); width: 26px; }
+  .ff-est__dot.is-done { background: var(--ff-green); }
+
+  /* ---- Step / choices ---- */
+  .ff-est__step { border: 0; margin: 0; padding: 0; }
+  .ff-est__legend { font-size: var(--fs-h3); font-weight: 700; color: var(--ff-ink); text-align: center; width: 100%; margin: 0 auto var(--sp-3); padding: 0; }
+  .ff-est__choices { display: grid; gap: var(--sp-2); }
+  @media (min-width: 560px) { .ff-est__choices { grid-template-columns: 1fr 1fr; } }
+
+  .ff-est__choice {
+    display: flex; flex-direction: column; gap: 0.2rem; text-align: left;
+    background: var(--ff-paper); border: 2px solid var(--ff-line);
+    border-radius: var(--r-md); padding: var(--sp-3); cursor: pointer;
+    transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease), transform var(--dur) var(--ease);
+    font-family: var(--ff-sans);
+  }
+  .ff-est__choice:hover { border-color: var(--ff-green); transform: translateY(-2px); }
+  .ff-est__choice:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-est__choice[aria-checked='true'] { border-color: var(--ff-accent); background: var(--ff-accent-tint); }
+  .ff-est__choice-title { font-weight: 700; color: var(--ff-ink); font-size: var(--fs-body); }
+  .ff-est__choice-note { color: var(--ff-slate); font-size: var(--fs-small); }
+
+  /* ---- Results ---- */
+  .ff-est__result-intro { color: var(--ff-slate); margin: 0 0 0.25rem; font-size: var(--fs-small); }
+  .ff-est__result-title { font-size: var(--fs-h3); margin: 0 0 var(--sp-3); color: var(--ff-ink); }
+  .ff-est__chips { list-style: none; display: flex; flex-wrap: wrap; gap: var(--sp-1); padding: 0; margin: 0 0 var(--sp-4); }
+  .ff-est__chip { background: var(--ff-green); color: var(--ff-ink); font-weight: 700; font-size: var(--fs-body); padding: 0.4rem 1rem; border-radius: var(--r-pill); }
+  .ff-est__chip:empty { display: none; }
+
+  .ff-est__price { background: var(--ff-paper); border: 1px solid var(--ff-line); border-radius: var(--r-md); padding: var(--sp-3); margin-bottom: var(--sp-4); }
+  .ff-est__price-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); flex-wrap: wrap; }
+  .ff-est__price-label { font-weight: 700; color: var(--ff-ink); }
+  .ff-est__currency { display: inline-flex; border: 1px solid var(--ff-line); border-radius: var(--r-pill); overflow: hidden; }
+  .ff-est__cur { background: var(--ff-white); border: 0; padding: 0.35rem 0.9rem; font-weight: 700; font-size: var(--fs-small); color: var(--ff-slate); cursor: pointer; font-family: var(--ff-sans); }
+  .ff-est__cur.is-active { background: var(--ff-ink); color: var(--ff-white); }
+  .ff-est__cur:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: -3px; }
+  .ff-est__price-value { font-family: var(--ff-display); font-size: var(--fs-h2); color: var(--ff-accent-dk); margin: var(--sp-2) 0 0; line-height: var(--lh-snug); }
+  .ff-est__price-note { color: var(--ff-slate); font-size: var(--fs-small); margin: 0.5rem 0 0; }
+
+  /* ---- Capture ---- */
+  .ff-est__capture-title { font-size: var(--fs-h3); margin: 0 0 0.25rem; color: var(--ff-ink); }
+  .ff-est__capture-sub { color: var(--ff-slate); font-size: var(--fs-small); margin: 0 0 var(--sp-3); }
+  .ff-est__field { display: block; margin-bottom: var(--sp-2); }
+  .ff-est__field-label { display: block; font-weight: 700; font-size: var(--fs-small); color: var(--ff-ink); margin-bottom: 0.3rem; }
+  .ff-est__field input {
+    width: 100%; box-sizing: border-box; padding: 0.7rem 0.9rem;
+    border: 2px solid var(--ff-line); border-radius: var(--r-md);
+    font-family: var(--ff-sans); font-size: var(--fs-body); background: var(--ff-paper);
+  }
+  .ff-est__field input:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 1px; border-color: var(--ff-accent); }
+
+  /* Honeypot — hidden from people, present for bots. */
+  .ff-est__hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+  .ff-est__submit, .ff-est__wa-btn {
+    display: inline-block; width: 100%; box-sizing: border-box; text-align: center;
+    background: var(--ff-accent); color: var(--ff-white); border: 0;
+    font-weight: 700; font-size: var(--fs-body); padding: 0.85rem 1.5rem;
+    border-radius: var(--r-pill); cursor: pointer; margin-top: var(--sp-2);
+    font-family: var(--ff-sans); text-decoration: none;
+    transition: background var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .ff-est__submit:hover:not(:disabled), .ff-est__wa-btn:hover { background: var(--ff-accent-dk); transform: translateY(-2px); }
+  .ff-est__submit:disabled { background: var(--ff-storm); cursor: not-allowed; }
+  .ff-est__submit:focus-visible, .ff-est__wa-btn:focus-visible { outline: 3px solid var(--ff-ink); outline-offset: 2px; }
+
+  .ff-est__softnets { display: flex; flex-direction: column; gap: 0.4rem; margin-top: var(--sp-3); text-align: center; }
+  .ff-est__soft { color: var(--ff-slate); font-size: var(--fs-small); text-decoration: underline; }
+  .ff-est__soft:hover { color: var(--ff-accent-dk); }
+
+  .ff-est__state { text-align: center; padding: var(--sp-3) 0; }
+  .ff-est__state-title { font-size: var(--fs-h3); margin: 0 0 0.5rem; color: var(--ff-ink); }
+  .ff-est__state--err .ff-est__state-title { color: var(--ff-accent-dk); }
+  .ff-est__wa-btn { max-width: 320px; margin: var(--sp-2) auto 0; }
+
+  /* ---- Nav / disclaimer ---- */
+  .ff-est__nav { display: flex; justify-content: space-between; margin-top: var(--sp-4); }
+  .ff-est__back, .ff-est__restart {
+    background: transparent; border: 2px solid var(--ff-line); color: var(--ff-ink);
+    font-weight: 700; padding: 0.55rem 1.2rem; border-radius: var(--r-pill);
+    cursor: pointer; font-family: var(--ff-sans);
+  }
+  .ff-est__back:hover, .ff-est__restart:hover { border-color: var(--ff-ink); }
+  .ff-est__back:focus-visible, .ff-est__restart:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-est__disclaimer { text-align: center; color: var(--ff-storm); font-size: var(--fs-small); margin: var(--sp-4) 0 0; }
+
+  @media (max-width: 560px) {
+    .ff-est__card { padding: var(--sp-4) var(--sp-3); }
+  }
+</style>
+
+<script>
+  import { createEstimator } from './Estimator.client';
+  import { fetchPricing } from '../lib/pricingClient';
+  import { submitLead, type LeadPayload } from '../lib/leadClient';
+
+  // Fixed display FX rate — PLACEHOLDER. Refine / wire to a live rate later.
+  const MXN_PER_USD = 18;
+
+  const root = document.querySelector<HTMLElement>('[data-estimator]');
+  if (root) {
+    initEstimator(root);
+  }
+
+  function initEstimator(root: HTMLElement) {
+    const baseUrl = root.dataset.baseUrl ?? '';
+    const TOTAL = 4;
+
+    const dots = Array.from(root.querySelectorAll<HTMLElement>('[data-dot]'));
+    const stepEls = Array.from(root.querySelectorAll<HTMLElement>('[data-step]'));
+    const backBtn = root.querySelector<HTMLButtonElement>('[data-back]');
+    const restartBtn = root.querySelector<HTMLButtonElement>('[data-restart]');
+    const choices = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-answer-key]'));
+
+    const chipInv = root.querySelector<HTMLElement>('[data-chip-inverter]');
+    const chipBat = root.querySelector<HTMLElement>('[data-chip-battery]');
+    const chipPan = root.querySelector<HTMLElement>('[data-chip-panels]');
+    const priceEl = root.querySelector<HTMLElement>('[data-price]');
+    const priceNote = root.querySelector<HTMLElement>('[data-price-note]');
+    const curBtns = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-currency]'));
+
+    const form = root.querySelector<HTMLFormElement>('[data-capture]');
+    const nameInput = root.querySelector<HTMLInputElement>('[data-name]');
+    const contactInput = root.querySelector<HTMLInputElement>('[data-contact]');
+    const hpInput = root.querySelector<HTMLInputElement>('[data-hp]');
+    const submitBtn = root.querySelector<HTMLButtonElement>('[data-submit]');
+    const okState = root.querySelector<HTMLElement>('[data-state-ok]');
+    const errState = root.querySelector<HTMLElement>('[data-state-err]');
+
+    // i18n templates pulled from existing rendered chips' siblings: read from data.
+    const locale = document.documentElement.lang === 'es' ? 'es' : 'en';
+    const T = {
+      chipInverter: (kw: number) => `${kw} kW`,
+      chipBattery: (kwh: number) => `${kwh} kWh`,
+      chipPanels: (n: number) =>
+        n > 0
+          ? (locale === 'es' ? `${n} paneles` : `${n} panels`)
+          : (locale === 'es' ? 'Solo batería' : 'Battery only'),
+    };
+
+    let currency: 'USD' | 'MXN' = 'USD';
+    // Mirror answers locally so a rebuilt store can be re-synced.
+    const answers: Record<string, string> = {};
+    let uiStep = 1;
+
+    // Estimator store: pricing resolved async; rebuild deps once it arrives.
+    let store = createEstimator({
+      pricing: null,
+      leadClient: (p: LeadPayload) => submitLead(baseUrl, p),
+    });
+
+    fetchPricing(baseUrl)
+      .then((pricing) => {
+        store = createEstimator({
+          pricing,
+          leadClient: (p: LeadPayload) => submitLead(baseUrl, p),
+        });
+        // Re-apply any answers already chosen so the new store stays in sync.
+        for (const [k, v] of Object.entries(answers)) {
+          store.setAnswer(k as 'home' | 'backup' | 'solar', v as never);
+        }
+        if (store.step !== uiStep) {
+          while (store.step < uiStep) store.next();
+          while (store.step > uiStep) store.back();
+        }
+        if (uiStep === TOTAL && store.isComplete()) renderResult();
+      })
+      .catch(() => {
+        /* keep placeholder pricing */
+      });
+
+    function showStep(n: number) {
+      uiStep = n;
+      for (const el of stepEls) {
+        el.hidden = Number(el.dataset.step) !== n;
+      }
+      dots.forEach((d, i) => {
+        const idx = i + 1;
+        d.classList.toggle('is-active', idx === n);
+        d.classList.toggle('is-done', idx < n);
+      });
+      if (backBtn) backBtn.hidden = n === 1 || n === TOTAL;
+      if (restartBtn) restartBtn.hidden = n !== TOTAL;
+      // Move focus to the step legend / heading for screen-reader continuity.
+      const cur = stepEls.find((el) => Number(el.dataset.step) === n);
+      const heading = cur?.querySelector<HTMLElement>('legend, .ff-est__result-title');
+      heading?.setAttribute('tabindex', '-1');
+      heading?.focus({ preventScroll: false });
+      if (n === TOTAL && store.isComplete()) renderResult();
+    }
+
+    function selectAnswer(btn: HTMLButtonElement) {
+      const key = btn.dataset.answerKey as 'home' | 'backup' | 'solar';
+      const value = btn.dataset.answerValue as string;
+      answers[key] = value;
+      store.setAnswer(key, value as never);
+      // Update radio visual state within this group.
+      const group = root.querySelectorAll<HTMLButtonElement>(`[data-answer-key="${key}"]`);
+      group.forEach((b) => b.setAttribute('aria-checked', String(b === btn)));
+      // Auto-advance (UI nicety) — stay explicit in the store.
+      const cur = uiStep;
+      if (cur < 3) {
+        store.next();
+        window.setTimeout(() => showStep(cur + 1), 180);
+      } else if (cur === 3 && store.isComplete()) {
+        store.next();
+        window.setTimeout(() => showStep(TOTAL), 180);
+      }
+    }
+
+    function fmt(n: number, cur: 'USD' | 'MXN') {
+      const val = cur === 'MXN' ? n * MXN_PER_USD : n;
+      const loc = locale === 'es' ? 'es-MX' : 'en-US';
+      return new Intl.NumberFormat(loc, {
+        style: 'currency',
+        currency: cur,
+        maximumFractionDigits: 0,
+      }).format(val);
+    }
+
+    function renderResult() {
+      if (!store.isComplete()) return;
+      const { config, price } = store.getResult();
+      if (chipInv) chipInv.textContent = T.chipInverter(config.inverterKw);
+      if (chipBat) chipBat.textContent = T.chipBattery(config.batteryKwh);
+      if (chipPan) chipPan.textContent = T.chipPanels(config.panels);
+      if (priceEl) {
+        priceEl.textContent = `${fmt(price.low, currency)} – ${fmt(price.high, currency)}`;
+      }
+      if (priceNote) priceNote.hidden = !price.placeholder;
+    }
+
+    // ---- Wire up choices ----
+    for (const btn of choices) {
+      btn.addEventListener('click', () => selectAnswer(btn));
+    }
+
+    backBtn?.addEventListener('click', () => {
+      const target = Math.max(1, uiStep - 1);
+      store.back();
+      showStep(target);
+    });
+
+    restartBtn?.addEventListener('click', () => {
+      // Reset store + UI.
+      store = createEstimator({
+        pricing: null,
+        leadClient: (p: LeadPayload) => submitLead(baseUrl, p),
+      });
+      for (const k of Object.keys(answers)) delete answers[k];
+      root.querySelectorAll('[data-answer-key]').forEach((b) => b.setAttribute('aria-checked', 'false'));
+      if (form) form.hidden = false;
+      if (okState) okState.hidden = true;
+      if (errState) errState.hidden = true;
+      showStep(1);
+      // Re-fetch pricing for the fresh store (cached, so cheap).
+      fetchPricing(baseUrl).then((pricing) => {
+        const fresh = createEstimator({ pricing, leadClient: (p: LeadPayload) => submitLead(baseUrl, p) });
+        store = fresh;
+      });
+    });
+
+    // ---- Currency toggle ----
+    for (const cb of curBtns) {
+      cb.addEventListener('click', () => {
+        currency = (cb.dataset.currency as 'USD' | 'MXN') ?? 'USD';
+        curBtns.forEach((b) => {
+          const on = b === cb;
+          b.classList.toggle('is-active', on);
+          b.setAttribute('aria-checked', String(on));
+        });
+        renderResult();
+      });
+    }
+
+    // ---- Capture form ----
+    function syncSubmit() {
+      if (!submitBtn) return;
+      const can = store.canSubmit({
+        name: nameInput?.value ?? '',
+        contact: contactInput?.value ?? '',
+      });
+      submitBtn.disabled = !can;
+    }
+    nameInput?.addEventListener('input', syncSubmit);
+    contactInput?.addEventListener('input', syncSubmit);
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (submitBtn) submitBtn.disabled = true;
+      const res = await store.submit({
+        name: nameInput?.value ?? '',
+        contact: contactInput?.value ?? '',
+        locale,
+        hp: hpInput?.value ?? '',
+      });
+      if (res.ok) {
+        if (form) form.hidden = true;
+        if (okState) okState.hidden = false;
+        okState?.focus?.();
+      } else {
+        // Submission failed (no endpoint / network) → surface WhatsApp fallback.
+        if (errState) errState.hidden = false;
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+
+    // Initial paint.
+    showStep(1);
+  }
+</script>
