@@ -174,5 +174,14 @@
   "industrial.eyebrow": "Para empresas",
   "industrial.title": "Mantén tu operación funcionando.",
   "industrial.sub": "Respaldo de energía y solar dimensionados para comercios, oficinas e instalaciones en todo México.",
-  "industrial.cta": "Habla con nuestro equipo"
+  "industrial.cta": "Habla con nuestro equipo",
+  "calc.title": "Dimensiona tu sistema en un minuto.",
+  "calc.intro": "Responde tres preguntas rápidas y verás un punto de partida para tu hogar — sin datos de contacto para ver tu estimado.",
+  "calc.faq_title": "Bueno saberlo",
+  "calc.faq_q1": "¿Qué tan exacto es este estimado?",
+  "calc.faq_a1": "Es un punto de partida sólido basado en tus respuestas. Tu diseño y precio finales se ajustan tras una breve visita, donde confirmamos tus cargas y dónde vivirá el equipo.",
+  "calc.faq_q2": "¿Necesito solar?",
+  "calc.faq_a2": "No. Muchos hogares empiezan solo con respaldo de batería y agregan paneles después. Si ya tienes solar, simplemente añadimos respaldo a tus paneles existentes.",
+  "calc.faq_q3": "¿Qué pasa después de enviar?",
+  "calc.faq_a3": "Te contactamos por WhatsApp o correo para confirmar algunos detalles y preparar un diseño a tu medida. Sin compromiso y sin presión."
 }

@@ -1,0 +1,75 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Estimator from '../components/Estimator.astro';
+import Footer from '../components/Footer.astro';
+import WhatsAppBubble from '../components/WhatsAppBubble.astro';
+import { t } from '../lib/i18n';
+import { faqGraph } from '../lib/jsonld';
+
+const locale = 'en' as const;
+const title = `${t(locale, 'calc.title')} — ${t(locale, 'common.brand')}`;
+const description = t(locale, 'calc.intro');
+const jsonLd = faqGraph(locale);
+
+const faqs = [
+  { q: t(locale, 'calc.faq_q1'), a: t(locale, 'calc.faq_a1') },
+  { q: t(locale, 'calc.faq_q2'), a: t(locale, 'calc.faq_a2') },
+  { q: t(locale, 'calc.faq_q3'), a: t(locale, 'calc.faq_a3') },
+];
+---
+<Base title={title} description={description} locale={locale} path="calculator" jsonLd={jsonLd}>
+  <Nav locale={locale} />
+  <main>
+    <section class="ff-calc-intro">
+      <div class="ff-calc-intro__inner">
+        <h1 class="ff-calc-intro__title display">{t(locale, 'calc.title')}</h1>
+        <p class="ff-calc-intro__sub">{t(locale, 'calc.intro')}</p>
+      </div>
+    </section>
+
+    <Estimator locale={locale} />
+
+    <section class="ff-calc-faq" aria-labelledby="ff-calc-faq-title">
+      <div class="ff-calc-faq__inner">
+        <h2 id="ff-calc-faq-title" class="ff-calc-faq__title display">{t(locale, 'calc.faq_title')}</h2>
+        <dl class="ff-calc-faq__list">
+          {faqs.map((f) => (
+            <div class="ff-calc-faq__item">
+              <dt>{f.q}</dt>
+              <dd>{f.a}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+  </main>
+  <Footer locale={locale} />
+  <WhatsAppBubble locale={locale} />
+</Base>
+
+<style>
+  .ff-calc-intro { background: var(--ff-paper); padding: var(--sp-6) var(--sp-3) var(--sp-3); }
+  .ff-calc-intro__inner { max-width: var(--container-tight); margin: 0 auto; text-align: center; }
+  .ff-calc-intro__title { font-size: var(--fs-h1); line-height: var(--lh-snug); margin: 0 0 var(--sp-2); }
+  .ff-calc-intro__sub { font-size: var(--fs-lead); color: var(--ff-slate); margin: 0; }
+
+  .ff-calc-faq { background: var(--ff-mist); padding: var(--sp-6) var(--sp-3) var(--sp-7); }
+  .ff-calc-faq__inner { max-width: var(--container-tight); margin: 0 auto; }
+  .ff-calc-faq__title { font-size: var(--fs-h2, 1.6rem); margin: 0 0 var(--sp-4); text-align: center; }
+  .ff-calc-faq__list { margin: 0; display: grid; gap: var(--sp-3); }
+  .ff-calc-faq__item {
+    background: var(--ff-white);
+    border: 1px solid var(--ff-line);
+    border-radius: var(--r-md);
+    padding: var(--sp-3);
+    box-shadow: var(--shadow-sm);
+  }
+  .ff-calc-faq__item dt { font-weight: 700; color: var(--ff-ink); margin: 0 0 var(--sp-1); font-size: var(--fs-lead); }
+  .ff-calc-faq__item dd { margin: 0; color: var(--ff-slate); line-height: var(--lh-body); }
+</style>
+
+<script>
+  import { initMotion } from '../lib/motion';
+  initMotion();
+</script>
