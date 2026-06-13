@@ -491,12 +491,10 @@ export function initAssessment(root: HTMLElement): void {
 
   const TIER_NAME: Record<string, string> = {
     essentials: 'assessment.result.tier_essentials_name',
-    critical: 'assessment.result.tier_critical_name',
     recommended: 'assessment.result.tier_recommended_name',
   };
   const TIER_COVER: Record<string, string> = {
     essentials: 'assessment.result.tier_essentials_cover',
-    critical: 'assessment.result.tier_critical_cover',
     recommended: 'assessment.result.tier_recommended_cover',
   };
 
@@ -514,16 +512,30 @@ export function initAssessment(root: HTMLElement): void {
       btn.className = 'ff-as__tier-btn';
       btn.setAttribute('role', 'radio');
       btn.setAttribute('aria-checked', String(isSel));
+      // Data-driven price: a tier carrying a `range` (e.g. Recommended) renders
+      // as a low–high band; a single-price tier (e.g. Essentials) renders the
+      // pre-IVA estimate alone, framed as a "from" floor.
+      const priceHtml = tier.range
+        ? `
+          <span class="ff-as__tier-amount">${esc(
+            tr('assessment.result.price_range')
+              .replace('{low}', fmt(tier.range.lowUsd))
+              .replace('{high}', fmt(tier.range.highUsd)),
+          )}</span>
+          <span class="ff-as__tier-iva">${esc(tr('assessment.result.price_iva_note'))}</span>
+          <span class="ff-as__tier-final">${esc(tr('assessment.result.price_after_visit'))}</span>
+        `
+        : `
+          <span class="ff-as__tier-from">${esc(tr('assessment.result.price_from'))}</span>
+          <span class="ff-as__tier-amount">${esc(fmt(tier.price.preIvaUsd))}</span>
+          <span class="ff-as__tier-iva">${esc(tr('assessment.result.price_iva_line').replace('{iva}', fmt(tier.price.ivaUsd)))}</span>
+        `;
       btn.innerHTML = `
         ${tier.highlighted ? `<span class="ff-as__tier-badge">${esc(tr('assessment.result.tier_badge'))}</span>` : ''}
         <span class="ff-as__tier-name">${esc(tr(nameKey))}</span>
         <span class="ff-as__tier-cover">${esc(tr(coverKey))}</span>
         <span class="ff-as__tier-chips">${esc(tierChips(tier.config))}</span>
-        <span class="ff-as__tier-price">
-          <span class="ff-as__tier-from">${esc(tr('assessment.result.price_from'))}</span>
-          <span class="ff-as__tier-amount">${esc(fmt(tier.price.preIvaUsd))}</span>
-          <span class="ff-as__tier-iva">${esc(tr('assessment.result.price_iva_line').replace('{iva}', fmt(tier.price.ivaUsd)))}</span>
-        </span>
+        <span class="ff-as__tier-price">${priceHtml}</span>
         <span class="ff-as__tier-cta">${esc(isSel ? tr('assessment.result.tier_selected') : tr('assessment.result.tier_select'))}</span>
       `;
       btn.addEventListener('click', () => {

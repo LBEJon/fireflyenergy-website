@@ -17,6 +17,16 @@ export interface EstimateTier {
     ivaUsd: number;
     totalUsd: number;
   };
+  /**
+   * Optional pre-IVA price band (USD). Present on tiers shown as a RANGE
+   * (e.g. Recommended): lowUsd is the estimate, highUsd is +headroom. Absent on
+   * single-price tiers (e.g. Essentials). The renderer is data-driven: it shows
+   * a range when this is present, otherwise the single preIvaUsd price.
+   */
+  range?: {
+    lowUsd: number;
+    highUsd: number;
+  };
   highlighted: boolean;
 }
 
