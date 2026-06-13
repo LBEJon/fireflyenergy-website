@@ -1,5 +1,11 @@
 export type CoverageTier = 'essential' | 'comfort' | 'full';
 
+export interface OtherLoad {
+  name: string;
+  watts: number;
+  critical?: boolean;
+}
+
 export interface ApplianceAnswers {
   miniSplits?: number;
   refrigerators?: number;
@@ -8,6 +14,7 @@ export interface ApplianceAnswers {
   electricOven?: boolean;
   inductionCooktop?: boolean;
   elevator?: boolean;
+  otherLoads?: OtherLoad[];
 }
 
 export interface AssessmentAnswers {
@@ -42,7 +49,49 @@ const APPLIANCE_DEFAULTS: Required<ApplianceAnswers> = {
   electricOven: false,
   inductionCooktop: false,
   elevator: false,
+  otherLoads: [],
 };
+
+/** Engine solar constants (FIXED — mirror the site-estimate engine). */
+export const PANEL_WATTS = 645;
+export const PSH = 5.5; // peak sun hours/day
+export const SYSTEM_EFF = 0.8; // system efficiency
+
+/** Daily production (kWh) of a single panel at the fixed engine constants. */
+export function perPanelDailyKwh(panelWatts = PANEL_WATTS): number {
+  return (panelWatts / 1000) * PSH * SYSTEM_EFF;
+}
+
+/**
+ * Panels to offset ~100% of daily usage, crediting existing solar, floored to
+ * the 4-panel inverter-string minimum (0 allowed when existing already covers
+ * it). Non-finite or non-positive consumption returns 0.
+ */
+export function recommendPanels(
+  cfeKwhPerDay: number,
+  existingSolarKw = 0,
+  panelWatts = PANEL_WATTS,
+): number {
+  if (!Number.isFinite(cfeKwhPerDay) || cfeKwhPerDay <= 0) return 0;
+  const existingDaily = existingSolarKw * PSH * SYSTEM_EFF;
+  const need = Math.max(0, cfeKwhPerDay - existingDaily);
+  const n = Math.ceil(need / perPanelDailyKwh(panelWatts));
+  if (n > 0 && n < 4) return 4;
+  return n;
+}
+
+/** % of daily usage offset by N new panels plus existing solar, capped 100. */
+export function offsetPct(
+  panels: number,
+  cfeKwhPerDay: number,
+  existingSolarKw = 0,
+  panelWatts = PANEL_WATTS,
+): number {
+  if (!Number.isFinite(cfeKwhPerDay) || cfeKwhPerDay <= 0) return 0;
+  const prod =
+    panels * perPanelDailyKwh(panelWatts) + existingSolarKw * PSH * SYSTEM_EFF;
+  return Math.min(100, Math.round((prod / cfeKwhPerDay) * 100));
+}
 
 /**
  * Existing rooftop solar capacity in kW from panel count and per-panel watts.

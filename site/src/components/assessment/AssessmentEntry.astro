@@ -152,6 +152,26 @@ const backupOpts = ['4', '8', '12', '24'];
             </label>
           </div>
 
+          <!-- Add a custom appliance not in the list -->
+          <div class="ff-as__add-appliance">
+            <h4 class="ff-as__subhead">{t(locale, 'assessment.appliances.add_title')}</h4>
+            <div class="ff-as__add-row">
+              <label class="ff-as__field">
+                <span class="ff-as__field-label">{t(locale, 'assessment.appliances.add_name')}</span>
+                <input type="text" data-add-name autocomplete="off" />
+              </label>
+              <label class="ff-as__field">
+                <span class="ff-as__field-label">{t(locale, 'assessment.appliances.add_watts')}</span>
+                <input type="number" inputmode="numeric" min="0" step="10" data-add-watts />
+              </label>
+              <label class="ff-as__check-row">
+                <input type="checkbox" data-add-critical /><span>{t(locale, 'assessment.appliances.add_critical')}</span>
+              </label>
+              <button type="button" class="ff-as__add-btn" data-add-appliance disabled>{t(locale, 'assessment.appliances.add_button')}</button>
+            </div>
+            <ul class="ff-as__added-list" data-added-list></ul>
+          </div>
+
           <h4 class="ff-as__subhead">{t(locale, 'assessment.coverage.heading')}</h4>
           <div class="ff-as__choices" role="radiogroup" aria-label={t(locale, 'assessment.coverage.heading')}>
             {coverageOpts.map((c) => (
@@ -164,7 +184,21 @@ const backupOpts = ['4', '8', '12', '24'];
 
           <h4 class="ff-as__subhead">{t(locale, 'assessment.addsolar.heading')}</h4>
           <p class="ff-as__help">{t(locale, 'assessment.addsolar.help')}</p>
-          <div class="ff-as__pills" role="radiogroup" aria-label={t(locale, 'assessment.addsolar.heading')}>
+
+          <!-- Recommendation-anchored stepper (shown when consumption is known) -->
+          <div class="ff-as__solar-rec" data-solar-rec hidden>
+            <p class="ff-as__rec-line" data-rec-line></p>
+            <div class="ff-as__stepper" role="group" aria-label={t(locale, 'assessment.addsolar.heading')}>
+              <button type="button" class="ff-as__step-btn" data-panel-dec aria-label={t(locale, 'assessment.solar.fewer')}>−</button>
+              <span class="ff-as__step-val" data-panel-val aria-live="polite">0</span>
+              <button type="button" class="ff-as__step-btn" data-panel-inc aria-label={t(locale, 'assessment.solar.more')}>+</button>
+            </div>
+            <p class="ff-as__offset-line" data-offset-line aria-live="polite"></p>
+            <button type="button" class="ff-as__none-btn" data-panel-none>{t(locale, 'assessment.solar.none')}</button>
+          </div>
+
+          <!-- Fallback fixed chips (only if consumption is somehow unknown here) -->
+          <div class="ff-as__pills" role="radiogroup" aria-label={t(locale, 'assessment.addsolar.heading')} data-add-solar-fallback hidden>
             {addSolarOpts.map((v, i) => (
               <button type="button" class={`ff-as__pill${i === 0 ? ' is-active' : ''}`} role="radio" aria-checked={i === 0 ? 'true' : 'false'} data-add-solar={v}>
                 {v === '0' ? t(locale, 'assessment.addsolar.none') : t(locale, 'assessment.addsolar.count').replace('{n}', v)}
@@ -393,6 +427,47 @@ const backupOpts = ['4', '8', '12', '24'];
   }
   .ff-as__pill.is-active { border-color: var(--ff-accent); background: var(--ff-accent-tint); }
   .ff-as__pill:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+
+  /* ---- Solar recommendation + stepper ---- */
+  .ff-as__solar-rec { display: flex; flex-direction: column; gap: var(--sp-2); align-items: flex-start; }
+  .ff-as__rec-line { margin: 0; color: var(--ff-ink); font-size: var(--fs-lead); }
+  .ff-as__rec-line strong { color: var(--ff-accent-dk); }
+  .ff-as__stepper { display: inline-flex; align-items: center; gap: var(--sp-2); }
+  .ff-as__step-btn {
+    width: 2.5rem; height: 2.5rem; border-radius: var(--r-pill); border: 2px solid var(--ff-line);
+    background: var(--ff-paper); font-size: 1.4rem; font-weight: 700; line-height: 1; color: var(--ff-ink); cursor: pointer;
+  }
+  .ff-as__step-btn:hover { border-color: var(--ff-green); }
+  .ff-as__step-btn:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__step-val { min-width: 6rem; text-align: center; font-weight: 700; color: var(--ff-ink); }
+  .ff-as__offset-line { margin: 0; color: var(--ff-slate); font-size: var(--fs-small); }
+  .ff-as__none-btn {
+    background: none; border: none; padding: 0; color: var(--ff-accent-dk);
+    font-family: var(--ff-sans); font-weight: 600; text-decoration: underline; cursor: pointer;
+  }
+  .ff-as__none-btn:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+
+  /* ---- Custom appliance add ---- */
+  .ff-as__add-appliance { margin-top: var(--sp-3); }
+  .ff-as__add-row { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: flex-end; }
+  .ff-as__add-btn {
+    background: var(--ff-accent); border: none; border-radius: var(--r-pill); color: var(--ff-white);
+    padding: 0.55rem 1.2rem; font-weight: 700; font-family: var(--ff-sans); cursor: pointer;
+  }
+  .ff-as__add-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .ff-as__add-btn:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__added-list { list-style: none; margin: var(--sp-2) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--sp-1); }
+  .ff-as__added-item {
+    display: flex; justify-content: space-between; align-items: center; gap: var(--sp-2);
+    background: var(--ff-paper); border: 1px solid var(--ff-line); border-radius: var(--r-md);
+    padding: 0.4rem 0.75rem;
+  }
+  .ff-as__added-label { color: var(--ff-ink); font-size: var(--fs-small); }
+  .ff-as__added-remove {
+    background: none; border: none; padding: 0; color: var(--ff-accent-dk);
+    font-family: var(--ff-sans); font-weight: 600; text-decoration: underline; cursor: pointer;
+  }
+  .ff-as__added-remove:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
 
   /* ---- Results (mirror Estimator look) ---- */
   .ff-as__loading { text-align: center; color: var(--ff-slate); font-size: var(--fs-small); }

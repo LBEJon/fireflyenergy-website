@@ -2,8 +2,11 @@ import {
   toEstimateBody,
   consumptionKnown,
   existingSolarKw,
+  recommendPanels,
+  offsetPct,
   type AssessmentAnswers,
   type CoverageTier,
+  type OtherLoad,
 } from '../../lib/assessment';
 import { fetchEstimate, type EstimateResult, type EstimateTier } from '../../lib/estimateClient';
 import { parseCfe, fileToB64 } from '../../lib/cfeUploadClient';
@@ -40,6 +43,7 @@ export function initAssessment(root: HTMLElement): void {
       electricOven: false,
       inductionCooktop: false,
       elevator: false,
+      otherLoads: [],
     },
   };
   let uiStep = 1;
@@ -102,6 +106,7 @@ export function initAssessment(root: HTMLElement): void {
       ?.querySelector<HTMLElement>('.ff-as__legend, .ff-as__result-title, .ff-as__loading');
     heading?.setAttribute('tabindex', '-1');
     heading?.focus({ preventScroll: false });
+    if (n === 3) prepareSolarStep();
     if (n === TOTAL) runResult();
   }
 
@@ -247,6 +252,61 @@ export function initAssessment(root: HTMLElement): void {
     ap.waterPump = (e.target as HTMLSelectElement).value as 'none' | '110' | '220';
   });
 
+  // ---- Custom appliance ("add an appliance that's not listed") ----
+  if (!ap.otherLoads) ap.otherLoads = [];
+  const addNameInput = root.querySelector<HTMLInputElement>('[data-add-name]');
+  const addWattsInput = root.querySelector<HTMLInputElement>('[data-add-watts]');
+  const addCriticalInput = root.querySelector<HTMLInputElement>('[data-add-critical]');
+  const addApplianceBtn = root.querySelector<HTMLButtonElement>('[data-add-appliance]');
+  const addedList = root.querySelector<HTMLElement>('[data-added-list]');
+
+  function syncAddBtn() {
+    if (!addApplianceBtn) return;
+    const name = addNameInput?.value.trim() ?? '';
+    const watts = Number(addWattsInput?.value ?? 0);
+    addApplianceBtn.disabled = !(name.length > 0 && watts > 0);
+  }
+  function renderAddedLoads() {
+    if (!addedList) return;
+    const loads = ap.otherLoads ?? [];
+    addedList.innerHTML = '';
+    loads.forEach((load, i) => {
+      const li = document.createElement('li');
+      li.className = 'ff-as__added-item';
+      const label = document.createElement('span');
+      label.className = 'ff-as__added-label';
+      const critTag = load.critical ? ' · ' + tr('assessment.appliances.add_critical_tag') : '';
+      label.textContent = `${load.name} — ${load.watts} W${critTag}`;
+      const rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'ff-as__added-remove';
+      rm.textContent = tr('assessment.appliances.add_remove');
+      rm.setAttribute('aria-label', tr('assessment.appliances.add_remove') + ': ' + load.name);
+      rm.addEventListener('click', () => {
+        (ap.otherLoads ?? []).splice(i, 1);
+        renderAddedLoads();
+      });
+      li.appendChild(label);
+      li.appendChild(rm);
+      addedList.appendChild(li);
+    });
+  }
+  addNameInput?.addEventListener('input', syncAddBtn);
+  addWattsInput?.addEventListener('input', syncAddBtn);
+  addApplianceBtn?.addEventListener('click', () => {
+    const name = addNameInput?.value.trim() ?? '';
+    const watts = Number(addWattsInput?.value ?? 0);
+    if (!(name.length > 0 && watts > 0)) return;
+    const load: OtherLoad = { name, watts, critical: !!addCriticalInput?.checked };
+    (ap.otherLoads ??= []).push(load);
+    if (addNameInput) addNameInput.value = '';
+    if (addWattsInput) addWattsInput.value = '';
+    if (addCriticalInput) addCriticalInput.checked = false;
+    syncAddBtn();
+    renderAddedLoads();
+  });
+  renderAddedLoads();
+
   root.querySelectorAll<HTMLButtonElement>('[data-coverage]').forEach((btn) => {
     btn.addEventListener('click', () => {
       answers.coverageTier = btn.dataset.coverage as CoverageTier;
@@ -254,9 +314,91 @@ export function initAssessment(root: HTMLElement): void {
         .forEach((b) => b.setAttribute('aria-checked', String(b === btn)));
     });
   });
+  // ---- Add-solar: recommendation-anchored stepper ----
+  const solarRec = root.querySelector<HTMLElement>('[data-solar-rec]');
+  const solarFallback = root.querySelector<HTMLElement>('[data-add-solar-fallback]');
+  const recLine = root.querySelector<HTMLElement>('[data-rec-line]');
+  const panelVal = root.querySelector<HTMLElement>('[data-panel-val]');
+  const offsetLine = root.querySelector<HTMLElement>('[data-offset-line]');
+  let solarTouched = false; // once the user adjusts, stop auto-resetting to rec
+
+  // Current consumption (kWh/day) from a parsed bill or manual monthly entry.
+  function currentCfeKwhPerDay(): number {
+    if (typeof answers.billKwhPerDay === 'number' && answers.billKwhPerDay > 0) {
+      return answers.billKwhPerDay;
+    }
+    if (typeof answers.monthlyKwh === 'number' && answers.monthlyKwh > 0) {
+      return answers.monthlyKwh / 30;
+    }
+    return 0;
+  }
+  function currentExistingKw(): number {
+    return answers.hasExistingSolar
+      ? existingSolarKw(answers.panelCount ?? 0, answers.panelWatts ?? 0)
+      : 0;
+  }
+
+  function renderSolarReadout() {
+    const cfe = currentCfeKwhPerDay();
+    const existing = currentExistingKw();
+    const n = answers.addSolarPanels ?? 0;
+    if (panelVal) {
+      panelVal.textContent = tr('assessment.addsolar.count').replace('{n}', String(n));
+    }
+    if (offsetLine) {
+      offsetLine.textContent = tr('assessment.solar.offset').replace(
+        '{pct}',
+        String(offsetPct(n, cfe, existing)),
+      );
+    }
+  }
+
+  // Bounded panel change: 0 allowed; first positive snaps to the 4-panel min.
+  function setPanels(n: number) {
+    let v = Math.max(0, Math.round(n));
+    if (v > 0 && v < 4) v = 4;
+    answers.addSolarPanels = v;
+    solarTouched = true;
+    renderSolarReadout();
+  }
+  root.querySelector<HTMLButtonElement>('[data-panel-inc]')?.addEventListener('click', () => {
+    const cur = answers.addSolarPanels ?? 0;
+    setPanels(cur === 0 ? 4 : cur + 1);
+  });
+  root.querySelector<HTMLButtonElement>('[data-panel-dec]')?.addEventListener('click', () => {
+    const cur = answers.addSolarPanels ?? 0;
+    setPanels(cur <= 4 ? 0 : cur - 1);
+  });
+  root.querySelector<HTMLButtonElement>('[data-panel-none]')?.addEventListener('click', () => setPanels(0));
+
+  // Recompute + default-select the recommendation when entering the solar step.
+  function prepareSolarStep() {
+    const cfe = currentCfeKwhPerDay();
+    if (cfe <= 0) {
+      // Consumption unknown here (shouldn't happen) → fixed-chip fallback.
+      if (solarRec) solarRec.hidden = true;
+      if (solarFallback) solarFallback.hidden = false;
+      return;
+    }
+    if (solarFallback) solarFallback.hidden = true;
+    if (solarRec) solarRec.hidden = false;
+    const rec = recommendPanels(cfe, currentExistingKw());
+    if (recLine) {
+      recLine.innerHTML = tr('assessment.solar.recommend').replace(
+        '{rec}',
+        `<strong>${rec}</strong>`,
+      );
+    }
+    // Default-select the recommendation until the user adjusts the stepper.
+    if (!solarTouched) answers.addSolarPanels = rec;
+    renderSolarReadout();
+  }
+
+  // Fallback fixed-chip selection (only used when consumption is unknown).
   root.querySelectorAll<HTMLButtonElement>('[data-add-solar]').forEach((btn) => {
     btn.addEventListener('click', () => {
       answers.addSolarPanels = Number(btn.dataset.addSolar ?? 0);
+      solarTouched = true;
       root.querySelectorAll<HTMLButtonElement>('[data-add-solar]').forEach((b) => {
         const on = b === btn;
         b.classList.toggle('is-active', on);
