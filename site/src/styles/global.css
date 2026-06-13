@@ -1,0 +1,16 @@
+@import "./tokens.css";
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Narrow:wght@600;700&display=swap");
+
+body {
+  font-family: var(--ff-sans);
+  color: var(--ff-ink);
+  background: var(--ff-paper, #FDFBF7);
+  line-height: 1.6;
+  margin: 0;
+}
+
+h1,
+.display,
+.stat-num {
+  font-family: var(--ff-display);
+}
