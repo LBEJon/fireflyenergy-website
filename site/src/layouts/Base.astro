@@ -1,0 +1,53 @@
+---
+import '../styles/global.css';
+import { altUrl, type Locale } from '../lib/i18n';
+
+interface Props {
+  title: string;
+  description: string;
+  locale: Locale;
+  /** Locale-agnostic logical path, e.g. '' (home), 'compare', 'faq'. */
+  path: string;
+  jsonLd?: unknown;
+}
+
+const { title, description, locale, path, jsonLd } = Astro.props;
+
+const ogLocale = locale === 'es' ? 'es_MX' : 'en_US';
+const canonical = new URL(altUrl(locale, path), Astro.site).href;
+const enHref = new URL(altUrl('en', path), Astro.site).href;
+const esHref = new URL(altUrl('es', path), Astro.site).href;
+---
+<!DOCTYPE html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <link rel="alternate" hreflang="en" href={enHref} />
+    <link rel="alternate" hreflang="es" href={esHref} />
+    <link rel="alternate" hreflang="x-default" href={enHref} />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={ogLocale} />
+    <meta property="og:url" content={canonical} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <link rel="icon" type="image/svg+xml" href="/assets/brand/firefly-icon.svg" />
+
+    {jsonLd && (
+      <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    )}
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
