@@ -1,0 +1,19 @@
+---
+// TEMPORARY Phase 3 verification page. Underscore prefix = not routed in build.
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import FlowDiagram from '../components/FlowDiagram.astro';
+import EquipmentShowcase from '../components/EquipmentShowcase.astro';
+import Footer from '../components/Footer.astro';
+import { getLocale } from '../lib/i18n';
+
+const locale = getLocale(Astro.url);
+---
+<Base title="Phase 3 demo" description="Interactive component demo" locale={locale} path="">
+  <Nav locale={locale} />
+  <main>
+    <FlowDiagram locale={locale} />
+    <EquipmentShowcase locale={locale} />
+  </main>
+  <Footer locale={locale} />
+</Base>
