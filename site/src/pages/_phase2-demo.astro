@@ -5,6 +5,7 @@ import Nav from '../components/Nav.astro';
 import Hero from '../components/Hero.astro';
 import TrustStrip from '../components/TrustStrip.astro';
 import DefenseCards from '../components/DefenseCards.astro';
+import FlowDiagram from '../components/FlowDiagram.astro';
 import ProofGallery from '../components/ProofGallery.astro';
 import CTASection from '../components/CTASection.astro';
 import Footer from '../components/Footer.astro';
@@ -18,7 +19,7 @@ const locale = getLocale(Astro.url);
   <main>
     <Hero locale={locale} />
     <TrustStrip locale={locale} />
-    <section id="how-it-works"></section>
+    <FlowDiagram locale={locale} />
     <DefenseCards locale={locale} />
     <ProofGallery locale={locale} />
     <CTASection locale={locale} />

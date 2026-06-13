@@ -1,0 +1,307 @@
+---
+import { t, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+
+const scenes = [
+  { id: 'sun', label: t(locale, 'flow.scene_sun'), desc: t(locale, 'flow.scene_sun_desc') },
+  { id: 'night', label: t(locale, 'flow.scene_night'), desc: t(locale, 'flow.scene_night_desc') },
+  { id: 'outage', label: t(locale, 'flow.scene_outage'), desc: t(locale, 'flow.scene_outage_desc') },
+];
+---
+<section id="how-it-works" class="ff-flow" aria-labelledby="ff-flow-title">
+  <div class="ff-flow__inner">
+    <header class="ff-flow__head">
+      <p class="ff-flow__eyebrow">{t(locale, 'flow.eyebrow')}</p>
+      <h2 id="ff-flow-title" class="ff-flow__title display">{t(locale, 'flow.title')}</h2>
+      <p class="ff-flow__sub">{t(locale, 'flow.sub')}</p>
+    </header>
+
+    <div class="ff-flow__scene">
+      <div class="ff-flow__tabs" role="tablist" aria-label={t(locale, 'flow.scene_tablist')}>
+        {scenes.map((s, i) => (
+          <button
+            type="button"
+            class="ff-flow__tab"
+            role="tab"
+            id={`ff-flow-tab-${s.id}`}
+            data-scenario={s.id}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            aria-controls="ff-flow-svg"
+          >{s.label}</button>
+        ))}
+      </div>
+
+      <div class="ff-flow__stage">
+        <svg
+          id="ff-flow-svg"
+          class="ff-flow__svg"
+          viewBox="0 0 760 460"
+          role="img"
+          aria-label={t(locale, 'flow.diagram_aria')}
+          preserveAspectRatio="xMidYMid meet"
+        >
+          <!-- ===== Edges (drawn first, under the nodes) ===== -->
+          <!-- solar (left, 130,150) -> inverter (380,150) -->
+          <path data-edge="solar-inverter" class="ff-edge" d="M196 165 H316" />
+          <!-- inverter -> home (right, 630,150) -->
+          <path data-edge="inverter-home" class="ff-edge" d="M444 165 H566" />
+          <!-- inverter -> battery (below, 380,330) -->
+          <path data-edge="inverter-battery" class="ff-edge" d="M380 200 V300" />
+          <!-- grid (right-bottom, 630,330) -> inverter -->
+          <path data-edge="grid-inverter" class="ff-edge" d="M600 318 Q470 300 412 200" />
+          <!-- "cut" marker that appears on the grid edge during an outage -->
+          <g class="ff-cut-mark" aria-hidden="true">
+            <line x1="498" y1="262" x2="520" y2="284" />
+            <line x1="520" y1="262" x2="498" y2="284" />
+          </g>
+
+          <!-- ===== Nodes ===== -->
+          <!-- Solar (optional) -->
+          <g data-node="solar" class="ff-node">
+            <circle class="ff-node__disc" cx="130" cy="150" r="46" />
+            <g class="ff-node__icon" transform="translate(130 150)" aria-hidden="true">
+              <rect x="-22" y="-15" width="44" height="30" rx="3" />
+              <line x1="-22" y1="-5" x2="22" y2="-5" /><line x1="-22" y1="5" x2="22" y2="5" />
+              <line x1="-7" y1="-15" x2="-7" y2="15" /><line x1="7" y1="-15" x2="7" y2="15" />
+            </g>
+            <text class="ff-node__label" x="130" y="222">{t(locale, 'flow.node_solar')}</text>
+            <text class="ff-node__note" x="130" y="240">{t(locale, 'flow.node_solar_note')}</text>
+          </g>
+
+          <!-- Firefly inverter (center hub) -->
+          <g data-node="inverter" class="ff-node ff-node--hub">
+            <rect class="ff-node__disc" x="316" y="106" width="128" height="88" rx="14" />
+            <g class="ff-node__icon" transform="translate(380 150)" aria-hidden="true">
+              <path d="M2 -20 L-12 4 H0 L-2 20 L12 -4 H0 Z" />
+            </g>
+            <text class="ff-node__label" x="380" y="222">{t(locale, 'flow.node_inverter')}</text>
+          </g>
+
+          <!-- Your home -->
+          <g data-node="home" class="ff-node">
+            <circle class="ff-node__disc" cx="630" cy="150" r="46" />
+            <g class="ff-node__icon" transform="translate(630 150)" aria-hidden="true">
+              <path d="M-20 2 L0 -16 L20 2" />
+              <path d="M-14 0 V18 H14 V0" />
+              <rect x="-5" y="6" width="10" height="12" />
+            </g>
+            <text class="ff-node__label" x="630" y="222">{t(locale, 'flow.node_home')}</text>
+          </g>
+
+          <!-- Battery -->
+          <g data-node="battery" class="ff-node">
+            <circle class="ff-node__disc" cx="380" cy="330" r="44" />
+            <g class="ff-node__icon" transform="translate(380 330)" aria-hidden="true">
+              <rect x="-16" y="-11" width="32" height="22" rx="3" />
+              <rect x="16" y="-5" width="4" height="10" />
+              <path class="ff-bolt" d="M-2 -7 L-8 1 H-1 L-3 7 L6 -2 H-1 Z" />
+            </g>
+            <text class="ff-node__label" x="380" y="398">{t(locale, 'flow.node_battery')}</text>
+            <text class="ff-node__note" x="380" y="416">{t(locale, 'flow.node_battery_note')}</text>
+          </g>
+
+          <!-- Grid -->
+          <g data-node="grid" class="ff-node">
+            <circle class="ff-node__disc" cx="630" cy="330" r="44" />
+            <g class="ff-node__icon" transform="translate(630 330)" aria-hidden="true">
+              <path d="M-12 16 L0 -16 L12 16" />
+              <line x1="-8" y1="4" x2="8" y2="4" /><line x1="-5" y1="-4" x2="5" y2="-4" />
+              <line x1="-10" y1="12" x2="10" y2="12" />
+            </g>
+            <text class="ff-node__label" x="630" y="398">{t(locale, 'flow.node_grid')}</text>
+          </g>
+        </svg>
+
+        <div class="ff-flow__banner" aria-live="polite">
+          {scenes.map((s, i) => (
+            <p class="ff-flow__desc" data-scenario-desc={s.id} hidden={i !== 0}>{s.desc}</p>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ff-flow { background: var(--ff-paper); padding: var(--sp-7) var(--sp-3); }
+  .ff-flow__inner { max-width: var(--container); margin: 0 auto; }
+  .ff-flow__head { max-width: var(--container-tight); margin: 0 auto var(--sp-5); text-align: center; }
+  .ff-flow__eyebrow {
+    text-transform: uppercase; letter-spacing: 0.12em; font-size: var(--fs-eyebrow);
+    font-weight: 700; color: var(--ff-accent-dk); margin: 0 0 var(--sp-2);
+  }
+  .ff-flow__title { font-size: var(--fs-h1); line-height: var(--lh-snug); margin: 0 0 var(--sp-2); }
+  .ff-flow__sub { font-size: var(--fs-lead); color: var(--ff-slate); margin: 0; }
+
+  /* ---- The dark editorial scene card ---- */
+  .ff-flow__scene {
+    background: var(--ff-ink);
+    border-radius: var(--r-lg, 22px);
+    padding: var(--sp-4) var(--sp-3) var(--sp-5);
+    box-shadow: var(--shadow-md, 0 18px 40px rgba(42, 45, 52, 0.22));
+    overflow: hidden;
+  }
+
+  /* ---- Scenario tabs ---- */
+  .ff-flow__tabs {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    margin: 0 auto var(--sp-4);
+    border-radius: var(--r-pill);
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .ff-flow__tabs { display: flex; justify-content: center; width: fit-content; margin-inline: auto; }
+  .ff-flow__tab {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.72);
+    font: inherit;
+    font-weight: 700;
+    font-size: var(--fs-small);
+    letter-spacing: 0.02em;
+    padding: 0.55rem 1.1rem;
+    min-height: 40px;
+    border-radius: var(--r-pill);
+    cursor: pointer;
+    transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+  }
+  .ff-flow__tab:hover { color: #fff; }
+  .ff-flow__tab[aria-selected='true'] {
+    background: var(--ff-green);
+    color: var(--ff-ink);
+    box-shadow: 0 0 16px var(--ff-glow);
+  }
+  .ff-flow__tab[data-scenario='outage'][aria-selected='true'] {
+    background: var(--ff-gold);
+    box-shadow: 0 0 16px rgba(255, 184, 28, 0.5);
+  }
+
+  .ff-flow__stage { display: block; }
+  .ff-flow__svg { width: 100%; height: auto; display: block; }
+
+  /* ---- Edges ---- */
+  .ff-edge {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.16);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .ff-edge.is-active {
+    stroke: var(--ff-green);
+    stroke-dasharray: 9 11;
+    animation: ff-flow-dash 1.1s linear infinite;
+  }
+  .ff-edge.is-cut {
+    stroke: rgba(255, 106, 61, 0.55);
+    stroke-dasharray: 2 9;
+  }
+  @keyframes ff-flow-dash { to { stroke-dashoffset: -40; } }
+
+  /* "X" cut marker — only visible when the grid edge is cut */
+  .ff-cut-mark { opacity: 0; transition: opacity var(--dur) var(--ease); }
+  .ff-cut-mark line { stroke: var(--ff-accent); stroke-width: 3.5; stroke-linecap: round; }
+  .ff-flow__svg:has([data-edge='grid-inverter'].is-cut) .ff-cut-mark { opacity: 1; }
+
+  /* ---- Nodes ---- */
+  .ff-node__disc {
+    fill: rgba(255, 255, 255, 0.05);
+    stroke: rgba(255, 255, 255, 0.16);
+    stroke-width: 1.5;
+    transition: fill var(--dur) var(--ease), stroke var(--dur) var(--ease), opacity var(--dur) var(--ease);
+  }
+  .ff-node__icon { fill: none; stroke: rgba(255, 255, 255, 0.78); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .ff-node__label {
+    fill: rgba(255, 255, 255, 0.88);
+    font-family: var(--ff-sans, system-ui, sans-serif);
+    font-size: 15px; font-weight: 700; text-anchor: middle;
+  }
+  .ff-node__note {
+    fill: rgba(255, 255, 255, 0.5);
+    font-family: var(--ff-sans, system-ui, sans-serif);
+    font-size: 11.5px; font-weight: 600; text-anchor: middle;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  .ff-node.is-active .ff-node__disc {
+    fill: rgba(158, 213, 0, 0.16);
+    stroke: var(--ff-green);
+  }
+  .ff-node.is-active .ff-node__icon { stroke: var(--ff-green); }
+  .ff-node.is-active .ff-node__label { fill: #fff; }
+
+  /* hub (inverter) reads a touch brighter when live */
+  .ff-node--hub.is-active .ff-node__disc { fill: rgba(158, 213, 0, 0.22); }
+
+  /* dimmed grid during outage */
+  .ff-node.is-dim .ff-node__disc { opacity: 0.4; stroke: rgba(255, 255, 255, 0.12); }
+  .ff-node.is-dim .ff-node__icon { opacity: 0.4; }
+  .ff-node.is-dim .ff-node__label { fill: rgba(255, 255, 255, 0.45); }
+
+  /* ---- Scenario description banner ---- */
+  .ff-flow__banner { margin-top: var(--sp-4); text-align: center; min-height: 3.2em; }
+  .ff-flow__desc {
+    margin: 0 auto;
+    max-width: 56ch;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: var(--fs-lead, 1.06rem);
+    line-height: var(--lh-body, 1.55);
+  }
+
+  @media (max-width: 600px) {
+    .ff-flow__scene { padding: var(--sp-3) var(--sp-2) var(--sp-4); border-radius: 16px; }
+    .ff-flow__tab { padding: 0.55rem 0.85rem; }
+    .ff-node__label { font-size: 14px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ff-edge.is-active { animation: none; stroke-dasharray: none; }
+  }
+</style>
+
+<script>
+  import { setScenario, type FlowScenario } from './FlowDiagram.client';
+
+  const root = document.getElementById('ff-flow-svg');
+  const tabs = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('.ff-flow__tab')
+  );
+  const descs = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-scenario-desc]')
+  );
+
+  function select(scenario: FlowScenario) {
+    if (root) setScenario(root, scenario);
+    for (const tab of tabs) {
+      tab.setAttribute('aria-selected', String(tab.dataset.scenario === scenario));
+    }
+    for (const d of descs) {
+      d.hidden = d.dataset.scenarioDesc !== scenario;
+    }
+  }
+
+  for (const tab of tabs) {
+    tab.addEventListener('click', () => select(tab.dataset.scenario as FlowScenario));
+  }
+
+  // Keyboard: arrow keys move between scenario tabs (roving tabindex pattern).
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault();
+      const dir = e.key === 'ArrowRight' ? 1 : -1;
+      const next = tabs[(i + dir + tabs.length) % tabs.length];
+      next.focus();
+      select(next.dataset.scenario as FlowScenario);
+    });
+  });
+
+  // Initial state.
+  if (root) select('sun');
+</script>
