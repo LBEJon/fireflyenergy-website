@@ -1,0 +1,117 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Firefly — Engine-Backed Assessment (design)</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Narrow:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--lime:#9ED500;--ink:#2A2D34;--coral:#FF6A3D;--slate:#5B606B;--paper:#FDFBF7;--line:#E7E2D6}
+body{font-family:Archivo,system-ui,sans-serif;color:var(--ink);background:var(--paper);margin:0;line-height:1.6}
+.wrap{max-width:860px;margin:0 auto;padding:44px 28px 80px}
+h1{font-family:'Archivo Narrow',sans-serif;font-size:2.4rem;line-height:1.07;margin:.2em 0 .25em;border-bottom:5px solid var(--lime);padding-bottom:14px}
+h2{font-family:'Archivo Narrow',sans-serif;font-size:1.55rem;margin:1.8em 0 .35em;padding-left:13px;border-left:6px solid var(--coral)}
+h3{font-size:1.08rem;margin:1.2em 0 .2em}
+p{margin:.45em 0;color:#3d4147}
+code{background:#F2F8E0;color:#3d4147;padding:.1em .4em;border-radius:5px;font-size:.85em;word-break:break-word}
+strong{color:var(--ink)}
+ul,ol{margin:.35em 0 1em;padding-left:1.4em}li{margin:.28em 0;color:#3d4147}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+.badge{display:inline-block;background:var(--coral);color:#fff;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 12px;border-radius:999px;margin-bottom:8px}
+</style></head><body><div class="wrap"><span class="badge">Firefly · Assessment redesign · DRAFT for review</span>
+<h1>FireflyEnergy.mx — Engine-Backed Assessment Estimator (design)</h1>
+
+<p><strong>Date:</strong> 2026-06-13</p>
+<p><strong>Supersedes:</strong> the assumption-based quick estimator (Phase 3.3 / <code>sizing.ts</code> client-side guess). Pricing is now <strong>gated behind real customer data</strong>.</p>
+<p><strong>Status:</strong> DRAFT — for review before planning/build.</p>
+
+<h2>1. Principle</h2>
+<p><strong>Never show a price from assumptions.</strong> A number appears only after the customer gives enough real data for the same engine the CRM proposal uses to size and price the system. Customers who don&#x27;t want to answer questions skip straight to a site-visit lead.</p>
+
+<h2>2. Two doors (estimator entry)</h2>
+<ul>
+<li><strong>Door A — &quot;Get my accurate estimate&quot; (the assessment):</strong> guided steps collect consumption + existing solar + appliance loads → the <strong>real engine</strong> returns a 3-tier estimate. Ends with lead capture (&quot;Get my exact quote&quot;) with all inputs attached.</li>
+<li><strong>Door B — &quot;Have an expert contact me&quot;:</strong> short lead capture (name, WhatsApp/email, location, optional note) → CRM lead flagged <code>site_visit_requested</code>. <strong>No price shown.</strong> This is the low-friction escape hatch.</li>
+</ul>
+
+<p>Both doors create a CRM lead; Door A&#x27;s lead carries the full assessment so a rep&#x27;s wizard is pre-filled.</p>
+
+<h2>3. The assessment (Door A) — steps</h2>
+<p>Mirrors the proposal intake. Each step plain-language, bilingual, no price until the end.</p>
+
+<ol>
+<li><strong>Your consumption</strong> — two ways:</li>
+<p>   - <strong>Upload your CFE bill</strong> (recommended): file → parsed → we read kWh + billing days → <strong>kWh/day</strong>. Reuses CRM CFE parsing.</p>
+<p>   - <strong>Or enter it manually:</strong> average monthly kWh (or &quot;I don&#x27;t know&quot; → fall back to appliance-derived load only).</p>
+<li><strong>Existing solar</strong> — &quot;Do you already have panels?&quot; → if yes: <strong>panel count + watts per panel</strong> → production = <code>count × watts/1000 × 5.5 PSH × system_eff</code> (engine constants) → offsets consumption. Sets <code>hasExistingSolar</code>, <code>existingSolarKw</code>.</li>
+<li><strong>Appliance &amp; critical loads</strong> — mirror the engine&#x27;s list (exact wattages live in the engine):</li>
+<p>   - mini-splits (count), refrigerators (count), water pump (none / 110V / 220V), pool pump (y/n), electric oven (y/n), induction cooktop (y/n), elevator (y/n), + base household load (assumed ~600 W).</p>
+<p>   - &quot;What must stay on in an outage?&quot; → coverage tier (essential / comfort / full).</p>
+<li><strong>Backup goal</strong> — desired backup hours (sizes battery: <code>(kWh/day ÷ 24) × hours ÷ 0.9</code>).</li>
+<li><strong>Result (price revealed)</strong> — run the engine → 3-tier ladder (Essentials / Critical-circuits + Essential Loads Panel / Recommended), each with the <strong>real</strong> config + price (equipment MSRP + $400 + solar 90% model, IVA separate, USD/MXN) + estimated CFE offset / savings if solar. Then the capture form.</li>
+</ol>
+
+<h2>4. Architecture — reuse the proposal engine</h2>
+<p><strong>New edge function <code>POST /site-estimate</code> (firefly-crm, additive, public, read-only):</strong></p>
+<ul>
+<li>Imports the vendored <code>_engine.bundle.mjs</code> (same one <code>generate-proposal</code> uses) → calls <code>analyze(input)</code> with the website&#x27;s assessment mapped to the engine input shape (the <code>dealToInput</code> contract, but from the request body, not a deal row).</li>
+<li>Injects live catalog MSRP (the website pricing snapshot / or queries active products) so equipment numbers match.</li>
+<li><strong>Writes nothing.</strong> Returns the 3-tier estimate JSON.</li>
+<li>CORS, rate-limited, input-validated. No cost/dealer data in or out.</li>
+<li>Website <code>lib/estimateClient.ts</code> calls it; on failure → graceful &quot;we&#x27;ll prepare your estimate&quot; + lead capture (never a fake price).</li>
+</ul>
+
+<p>This makes the website estimate identical to the eventual proposal — one engine, one source of truth.</p>
+
+<h2>5. CFE bill parsing — path + hardening (the sensitive part)</h2>
+<p><strong>New edge function <code>POST /site-cfe-parse</code> (firefly-crm, public):</strong></p>
+<ul>
+<li>Accepts a single image/PDF (multipart or base64), size-limited (e.g. ≤ 8 MB), type-allowlisted (jpg/png/pdf).</li>
+<li>Stores to a dedicated <strong>public-intake</strong> storage prefix (not the private <code>cfe-bills</code> bucket used by staff), or a temp object with TTL.</li>
+<li>Calls the same Anthropic forced-tool extraction as <code>extract-cfe-bill</code> → returns <code>{ kwh_total, billing_days, kwh_per_day, tariff? }</code>. Persists nothing to deal/proposal tables.</li>
+<li><strong>Abuse controls (REQUIRED — this calls the Anthropic API = real cost):</strong></li>
+</ul>
+<p>  - Per-IP rate limit (e.g. N/hour) + global daily cap.</p>
+<p>  - File size/type limits; reject non-bills cheaply.</p>
+<p>  - Honeypot + optional lightweight challenge if volume spikes.</p>
+<p>  - A hard monthly spend ceiling (fail closed → &quot;enter kWh manually&quot; fallback).</p>
+<ul>
+<li>If the customer skips upload, this endpoint is never hit (manual entry path).</li>
+</ul>
+
+<h2>6. What changes in the current build</h2>
+<ul>
+<li><code>Estimator.astro</code> / <code>Estimator.client.ts</code>: replaced by the two-door <strong>Assessment</strong> flow. The 3-tier <strong>result UI</strong> is kept (it already renders tiers) but now fed by <code>/site-estimate</code>, not client-side <code>sizing.ts</code>.</li>
+<li><code>sizing.ts</code> / client <code>pricing.ts</code> / <code>tiers.ts</code>: demoted to a <strong>fallback only</strong> (used if the endpoint is down) OR removed if we always require the live engine. Decision: keep a minimal fallback that shows &quot;estimate unavailable — request a visit,&quot; never a guessed price.</li>
+<li>Homepage calculator teaser → points to the assessment; messaging shifts from &quot;2-minute price&quot; to &quot;get an accurate estimate.&quot;</li>
+<li>New: <code>AssessmentWizard</code> component(s), <code>estimateClient.ts</code>, <code>cfeUploadClient.ts</code>, plus the two CRM functions.</li>
+</ul>
+
+<h2>7. Lead capture (both doors)</h2>
+<ul>
+<li>Door A submit → <code>POST /site-lead</code> with <code>segment:&#x27;residential&#x27;</code>, <code>assessment:{consumption, existingSolar, appliances, coverage, backupHours}</code>, <code>estimate:{selectedTier, configs}</code>.</li>
+<li>Door B submit → <code>POST /site-lead</code> with <code>site_visit_requested:true</code>, minimal contact.</li>
+<li>Honeypot + rate limit on both.</li>
+</ul>
+
+<h2>8. Security summary (why this needed a spec)</h2>
+<ul>
+<li>Three new <strong>public</strong> endpoints (<code>site-estimate</code>, <code>site-cfe-parse</code>, <code>site-lead</code>) → all rate-limited, validated, CORS-scoped, no secrets/cost data exposed.</li>
+<li><strong>File upload + paid AI call</strong> on <code>site-cfe-parse</code> → the main risk; mitigated by size/type limits, per-IP + global caps, hard spend ceiling, fail-closed to manual entry.</li>
+<li>Engine endpoint is read-only and writes nothing.</li>
+<li>All built + tested on localhost; <strong>no deploy</strong> until explicitly approved.</li>
+</ul>
+
+<h2>9. Open questions</h2>
+<ol>
+<li><strong>CFE parse exposure:</strong> OK to spend Anthropic credits on a public (rate-limited, capped) parse, or gate it behind a quick &quot;verify you&#x27;re human&quot; step / require it only after an email is entered?</li>
+<li><strong>Fallback when no consumption given:</strong> if the customer won&#x27;t upload a bill or enter kWh, do we (a) estimate from appliances alone with a clear &quot;rough&quot; caveat, or (b) route them to Door B (site visit)?</li>
+<li><strong>Result tiers:</strong> keep the 3-tier ladder, or — now that it&#x27;s accurate — show a single engine &quot;Recommended&quot; with the other two as alternates?</li>
+<li><strong>Engine pricing vs website pricing:</strong> have <code>/site-estimate</code> price with the engine&#x27;s own MSRP+rules, or pass the website pricing snapshot in? (Prefer engine-native for true parity.)</li>
+<li><strong>Industrial:</strong> unchanged (still consultative, no calculator)?</li>
+</ol>
+
+<h2>10. Out of scope / deferred</h2>
+<ul>
+<li>Deploying the endpoints (separate, explicit step).</li>
+<li>Daily-FX CRM job (still Phase 6b).</li>
+<li>Higgsfield imagery (in progress separately).</li>
+</ul>
+
+</div></body></html>

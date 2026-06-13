@@ -1,0 +1,69 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Firefly — Higgsfield Image Prompts</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Narrow:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--lime:#9ED500;--ink:#2A2D34;--coral:#FF6A3D;--slate:#5B606B;--paper:#FDFBF7;--line:#E7E2D6}
+body{font-family:Archivo,system-ui,sans-serif;color:var(--ink);background:var(--paper);margin:0;line-height:1.6}
+.wrap{max-width:820px;margin:0 auto;padding:44px 28px 80px}
+h1{font-family:'Archivo Narrow',sans-serif;font-size:2.5rem;line-height:1.05;margin:.2em 0 .3em;border-bottom:5px solid var(--lime);padding-bottom:14px}
+h2{font-family:'Archivo Narrow',sans-serif;font-size:1.5rem;margin:1.8em 0 .3em;padding-left:13px;border-left:6px solid var(--coral)}
+h3{font-size:1.05rem;margin:1.2em 0 .2em}
+p{margin:.5em 0;color:#3d4147}
+.prompt{background:#fff;border:1px solid var(--line);border-left:4px solid var(--lime);border-radius:8px;padding:12px 16px;margin:.6em 0;font-size:.96rem}
+code{background:#F2F8E0;color:#3d4147;padding:.1em .4em;border-radius:5px;font-size:.86em;word-break:break-word}
+strong{color:var(--ink)}
+ul{margin:.4em 0 1em;padding-left:1.3em}li{margin:.3em 0;color:#3d4147}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+.badge{display:inline-block;background:var(--coral);color:#fff;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 12px;border-radius:999px;margin-bottom:8px}
+</style></head><body><div class="wrap"><span class="badge">Firefly · Image Prompts · review before generating</span>
+<h1>FireflyEnergy.mx — Higgsfield Image Prompts (for review before generating)</h1>
+
+<p>Brand: warm, premium, trustworthy. Golden/blue-hour light. NEVER show generator/fuel imagery. Equipment is wall-mounted in a <strong>covered</strong> space (garage/utility closet/covered patio) — never shown outdoors exposed to weather. Photoreal, editorial, architectural-digest quality. 3:2 or 16:9 landscape unless noted.</p>
+
+<p><strong>Brand-mark rule (UPDATED):</strong> Any logo, wordmark, or text that appears in an image must be <strong>Firefly&#x27;s</strong> logo/wordmark or Firefly text — and nothing else. <strong>No third-party / OEM brand names, logos, or model numbers anywhere.</strong> Where equipment is shown, it should read as a clean, unbranded-or-Firefly-branded unit; we composite the official Firefly logo on afterward when needed rather than letting the model invent a brand.</p>
+
+<p><strong>Reference assets (use as image-to-image / reference inputs where noted):</strong></p>
+<ul>
+<li>Equipment renders: <code>~/Library/Mobile Documents/com~apple~CloudDocs/Firefly/Equipment Images/</code> — <code>12kw/</code>, <code>12kw plus/</code>, <code>7.2kw/</code> (inverters), <code>Batteries/16KWh-IP65/</code>, <code>Batteries/5KWh-IP-65/</code>.</li>
+<li>Logo files (2026): <code>~/Library/Mobile Documents/com~apple~CloudDocs/Firefly/Logo Files (2026)/</code> — <code>firefly-logo.svg</code>, <code>firefly-logo-white.svg</code>, <code>firefly-icon.svg</code>, transparent PNGs.</li>
+</ul>
+
+<p>Default model: <strong>GPT Image 2</strong> (photoreal + clean) for scenes; <strong>Nano Banana 2/Pro</strong> (reference/character image work) for the equipment-in-context shot so it stays faithful to the real Firefly units. Use Seedance 2.0 only if we decide on the ambient hero video later.</p>
+
+<hr>
+
+<h2>1. Residential hero — &quot;San Miguel at dusk&quot; (<code>hero-dusk.jpg</code>) — HERO, most important</h2>
+<p class="prompt"><strong>Prompt:</strong> &quot;Golden-hour exterior of an upscale San Miguel de Allende home — warm terracotta and cream stone facade, traditional Mexican colonial architecture with a flat roof and a cantera stone doorway, soft string lights and warm interior lights glowing through windows at dusk, deep blue twilight sky with the first stars, a few warm bougainvillea accents. The home looks calm, lived-in, and luminous — the only lit, serene house on the street. Cinematic, photoreal, architectural photography, shallow depth of field, warm color grade, no people, no text, no logos.&quot; </p>
+<p class="prompt"><strong>Aspect:</strong> 16:9 (also request a 4:5 crop for mobile).</p>
+
+<h2>2. Proof gallery — three home styles (each <code>proof-colonial.jpg</code>, <code>proof-hacienda.jpg</code>, <code>proof-modern.jpg</code>)</h2>
+<p class="prompt"><strong>2a. Colonial / centro:</strong> &quot;Warm dusk photo of a classic San Miguel de Allende colonial townhouse facade in centro — rich ochre and rose walls, wooden balcony, cantera trim, glowing interior lights, cobblestone street, blue-hour sky. Photoreal, editorial, no people, no text.&quot;</p>
+<p class="prompt"><strong>2b. Hacienda / countryside:</strong> &quot;Golden-hour photo of a Mexican hacienda-style country home — long covered portico with arches, warm adobe walls, terracotta roof tiles, mature trees, soft warm interior glow, expansive sky. Serene, affluent, photoreal, no people, no text.&quot;</p>
+<p class="prompt"><strong>2c. Mexican modern / Barragán-inspired:</strong> &quot;Dusk photo of a mid-century Mexican-modern home inspired by Luis Barragán — bold flat planes of warm pink and earth-toned stucco, dramatic geometry, a calm reflecting pool, warm concealed lighting, deep blue sky. Minimal, architectural, photoreal, no people, no text.&quot;</p>
+
+<h2>3. Equipment in context — REAL Firefly equipment (<code>equip-incontext.jpg</code>)</h2>
+<p class="prompt"><strong>Method:</strong> image-to-image / reference using the actual Firefly renders so the units stay faithful. References: the <strong>12 kW inverter</strong> (<code>Equipment Images/12kw/12KW - Front.png</code>) and the <strong>16 kWh battery</strong> (<code>Equipment Images/Batteries/16KWh-IP65/</code>). Composite the official <strong>Firefly logo</strong> (<code>Logo Files (2026)/firefly-logo-white.svg</code> on the dark unit) onto the equipment.</p>
+<p class="prompt"><strong>Prompt:</strong> &quot;Place these exact Firefly inverter and battery units, wall-mounted side by side, in a clean modern home utility space — a tidy garage or utility closet, soft daylight from a doorway, neat conduit, polished concrete floor. Keep the equipment&#x27;s real form and proportions; the only branding visible is the Firefly logo. Tucked-away, premium, reassuring. Photoreal, no people, no third-party brands, no model numbers.&quot;</p>
+<p>*(Because this uses our real renders, the equipment stays accurate — the earlier &#x27;no logos&#x27; note is replaced by &#x27;Firefly logo only&#x27;.)*</p>
+
+<h2>4. Industrial hero — blue-hour BESS facility (<code>industrial-hero.jpg</code>)</h2>
+<p class="prompt"><strong>Prompt:</strong> &quot;Blue-hour exterior of a modern Mexican industrial facility — a row of sleek containerized battery energy storage units (matte charcoal, subtle lime-green accent lighting, no visible branding) beside a clean warehouse, a few solar panels on the roof, dramatic twilight sky, crisp professional lighting. Powerful, dependable, high-tech but warm. Photoreal, architectural/industrial photography, no people, no text, no logos.&quot; </p>
+<p class="prompt"><strong>Aspect:</strong> 16:9.</p>
+
+<h2>5. (Optional) Industrial scale/operations accent (<code>industrial-scale.jpg</code>)</h2>
+<p class="prompt"><strong>Prompt:</strong> &quot;Wide blue-hour shot of solar panels and containerized battery storage at a Mexican agricultural or manufacturing site, mountains in the distance, warm sky — conveying scale from megawatt-class clean energy. Photoreal, no people, no text, no logos.&quot;</p>
+
+<hr>
+
+<h2>Notes / safeguards baked into every prompt</h2>
+<ul>
+<li><strong>Firefly brand only:</strong> the only logo/wordmark/text permitted in any image is Firefly&#x27;s. No third-party or OEM brand names, logos, or model numbers — ever.</li>
+<li>Equipment always <strong>covered/indoor</strong>, never weather-exposed (matches the install-framing content rule).</li>
+<li>No fuel cans, generators, or smoke anywhere.</li>
+<li>Warm, calm, affluent, energy-independence tone — never fear/disaster imagery.</li>
+<li>Equipment-in-context (#3) is generated from our <strong>real</strong> Firefly renders (image-to-image) so the units are accurate, with the Firefly logo composited on.</li>
+</ul>
+
+<p><strong>Generation order if approved:</strong> #1 hero first (most visible), then #4 industrial hero, then the three #2 proof homes, then optional #3/#5. We review each and regenerate any that miss before wiring them in.</p>
+
+</div></body></html>
