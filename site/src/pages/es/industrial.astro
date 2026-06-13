@@ -1,0 +1,39 @@
+---
+import Base from '../../layouts/Base.astro';
+import Nav from '../../components/Nav.astro';
+import IndustrialHero from '../../components/industrial/IndustrialHero.astro';
+import Propositions from '../../components/industrial/Propositions.astro';
+import ScaleBand from '../../components/industrial/ScaleBand.astro';
+import IndustrialEquipment from '../../components/industrial/IndustrialEquipment.astro';
+import EngagementPath from '../../components/industrial/EngagementPath.astro';
+import AssessmentForm from '../../components/industrial/AssessmentForm.astro';
+import Footer from '../../components/Footer.astro';
+import WhatsAppBubble from '../../components/WhatsAppBubble.astro';
+import { t } from '../../lib/i18n';
+import { serviceGraph } from '../../lib/jsonld';
+
+const locale = 'es' as const;
+const title = t(locale, 'industrial.meta_title');
+const description = t(locale, 'industrial.meta_desc');
+const jsonLd = serviceGraph(locale, Astro.site);
+const baseUrl = import.meta.env.PUBLIC_SUPABASE_URL ?? '';
+---
+
+<Base title={title} description={description} locale={locale} path="industrial" jsonLd={jsonLd}>
+  <Nav locale={locale} />
+  <main>
+    <IndustrialHero locale={locale} />
+    <Propositions locale={locale} />
+    <ScaleBand locale={locale} />
+    <IndustrialEquipment locale={locale} />
+    <EngagementPath locale={locale} />
+    <AssessmentForm locale={locale} baseUrl={baseUrl} />
+  </main>
+  <Footer locale={locale} />
+  <WhatsAppBubble locale={locale} />
+</Base>
+
+<script>
+  import { initMotion } from '../../lib/motion';
+  initMotion();
+</script>

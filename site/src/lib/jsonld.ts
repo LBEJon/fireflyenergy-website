@@ -91,3 +91,91 @@ export function faqGraph(locale: Locale) {
     })),
   };
 }
+
+/**
+ * Service @graph for the industrial / commercial BESS page.
+ * Specs only — described by capability (BESS, kW/kWh/MWh), never by brand/model.
+ */
+export function serviceGraph(locale: Locale, site: URL | undefined) {
+  const base = site?.href ?? 'https://fireflyenergy.mx/';
+  const url = new URL(altUrl(locale, 'industrial'), base).href;
+
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'LocalBusiness',
+        '@id': `${base}#business`,
+        name: 'Firefly Energy',
+        url: new URL(altUrl(locale, ''), base).href,
+        email: t(locale, 'common.email'),
+        telephone: t(locale, 'common.phone'),
+        description: t(locale, 'footer.tagline'),
+        areaServed: { '@type': 'Country', name: 'Mexico' },
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'San Miguel de Allende',
+          addressCountry: 'MX',
+        },
+      },
+      {
+        '@type': 'Service',
+        '@id': `${base}#industrial-bess`,
+        name:
+          locale === 'es'
+            ? 'Sistemas de almacenamiento de energía en baterías (BESS) industriales y comerciales'
+            : 'Industrial and commercial battery energy storage systems (BESS)',
+        serviceType:
+          locale === 'es'
+            ? 'Sistemas de almacenamiento de energía en baterías / BESS'
+            : 'Battery energy storage systems / BESS',
+        description:
+          locale === 'es'
+            ? 'Almacenamiento de energía en baterías y autoabasto solar para empresas e instalaciones: reducción de cargos por demanda, respaldo a gran escala y calidad de energía, desde 30 kWh hasta más de 1 MWh.'
+            : 'Battery energy storage and solar self-supply for businesses and facilities: demand-charge reduction, backup at scale, and power quality, from 30 kWh to over 1 MWh.',
+        provider: { '@id': `${base}#business` },
+        url,
+        areaServed: { '@type': 'Country', name: 'Mexico' },
+        audience: {
+          '@type': 'BusinessAudience',
+          audienceType:
+            locale === 'es' ? 'Empresas e instalaciones industriales' : 'Businesses and industrial facilities',
+        },
+        hasOfferCatalog: {
+          '@type': 'OfferCatalog',
+          name: locale === 'es' ? 'Capacidades de almacenamiento' : 'Storage capabilities',
+          itemListElement: [
+            {
+              '@type': 'Offer',
+              itemOffered: {
+                '@type': 'Service',
+                name: locale === 'es' ? 'Reducción de picos (cargos por demanda)' : 'Peak shaving (demand charges)',
+              },
+            },
+            {
+              '@type': 'Offer',
+              itemOffered: {
+                '@type': 'Service',
+                name: locale === 'es' ? 'Respaldo a gran escala' : 'Backup at scale',
+              },
+            },
+            {
+              '@type': 'Offer',
+              itemOffered: {
+                '@type': 'Service',
+                name: locale === 'es' ? 'Autoabasto con solar + almacenamiento' : 'Solar + storage self-supply',
+              },
+            },
+            {
+              '@type': 'Offer',
+              itemOffered: {
+                '@type': 'Service',
+                name: locale === 'es' ? 'Calidad de la energía' : 'Power quality',
+              },
+            },
+          ],
+        },
+      },
+    ],
+  };
+}

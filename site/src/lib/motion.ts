@@ -32,9 +32,53 @@ export function initMotion(): void {
   flowEdgeGlow();
   defenseCards();
   proofDrag();
+  // Industrial page — these no-op on the residential page (elements absent).
+  scaleBars();
+  engagementLine();
 
   // Recompute trigger positions once images/fonts settle.
   ScrollTrigger.refresh();
+}
+
+/* ------------------------------------------------------------------ */
+/* ScaleBand (industrial): bars grow from the baseline when scrolled in. */
+/* Static render already shows final heights (set inline), so this only  */
+/* animates the reveal from a scaleY of 0.                               */
+/* ------------------------------------------------------------------ */
+function scaleBars(): void {
+  const chart = document.querySelector<HTMLElement>('[data-scale-chart]');
+  if (!chart) return;
+  const bars = gsap.utils.toArray<HTMLElement>('[data-scale-bar]', chart);
+  if (!bars.length) return;
+
+  gsap.from(bars, {
+    scaleY: 0,
+    transformOrigin: 'bottom',
+    duration: 0.9,
+    ease: 'power3.out',
+    stagger: 0.12,
+    scrollTrigger: { trigger: chart, start: 'top 80%', once: true },
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/* EngagementPath (industrial): the lime connecting line wipes left→right */
+/* via the --path-progress custom property (drives a scaleX on ::after).  */
+/* ------------------------------------------------------------------ */
+function engagementLine(): void {
+  const steps = document.querySelector<HTMLElement>('[data-path-steps]');
+  const line = document.querySelector<HTMLElement>('[data-path-line]');
+  if (!steps || !line) return;
+
+  const state = { p: 0 };
+  line.style.setProperty('--path-progress', '0');
+  gsap.to(state, {
+    p: 1,
+    duration: 1,
+    ease: 'power2.out',
+    scrollTrigger: { trigger: steps, start: 'top 75%', once: true },
+    onUpdate: () => line.style.setProperty('--path-progress', String(state.p)),
+  });
 }
 
 /* ------------------------------------------------------------------ */
