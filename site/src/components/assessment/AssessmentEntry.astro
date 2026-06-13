@@ -1,0 +1,485 @@
+---
+import { t, type Locale } from '../../lib/i18n';
+import SiteVisitLead from './SiteVisitLead.astro';
+
+interface Props {
+  locale: Locale;
+  /** CRM base URL; falls back to PUBLIC_SUPABASE_URL or '' (→ no live estimate → Door B). */
+  baseUrl?: string;
+}
+const { locale, baseUrl } = Astro.props;
+const resolvedBase = baseUrl ?? import.meta.env.PUBLIC_SUPABASE_URL ?? '';
+
+const waNumber = t(locale, 'common.whatsapp');
+const waHref = `https://wa.me/${waNumber}`;
+
+// Door A appliance rows rendered as count steppers / selects.
+const waterPumpOpts = [
+  { value: 'none', label: 'assessment.appliances.pump_none' },
+  { value: '110', label: 'assessment.appliances.pump_110' },
+  { value: '220', label: 'assessment.appliances.pump_220' },
+];
+const coverageOpts = [
+  { value: 'essential', title: 'assessment.coverage.essential', note: 'assessment.coverage.essential_note' },
+  { value: 'comfort', title: 'assessment.coverage.comfort', note: 'assessment.coverage.comfort_note' },
+  { value: 'full', title: 'assessment.coverage.full', note: 'assessment.coverage.full_note' },
+];
+const addSolarOpts = ['0', '4', '8', '12'];
+const backupOpts = ['4', '8', '12', '24'];
+---
+<section
+  id="assessment"
+  class="ff-as"
+  aria-labelledby="ff-as-title"
+  data-assessment
+  data-base-url={resolvedBase}
+  data-wa-href={waHref}
+  data-locale={locale}
+>
+  <div class="ff-as__inner">
+    <header class="ff-as__head">
+      <p class="ff-as__eyebrow">{t(locale, 'assessment.eyebrow')}</p>
+      <h2 id="ff-as-title" class="ff-as__title display">{t(locale, 'assessment.title')}</h2>
+      <p class="ff-as__sub">{t(locale, 'assessment.sub')}</p>
+    </header>
+
+    <div class="ff-as__card">
+      <!-- ============ DOORS ============ -->
+      <div class="ff-as__doors" data-view="doors">
+        <div class="ff-as__door-grid">
+          <button type="button" class="ff-as__door ff-as__door--a" data-door="A">
+            <span class="ff-as__door-title">{t(locale, 'assessment.door_a.title')}</span>
+            <span class="ff-as__door-desc">{t(locale, 'assessment.door_a.desc')}</span>
+            <span class="ff-as__door-cta">{t(locale, 'assessment.door_a.cta')}</span>
+          </button>
+          <button type="button" class="ff-as__door ff-as__door--b" data-door="B">
+            <span class="ff-as__door-title">{t(locale, 'assessment.door_b.title')}</span>
+            <span class="ff-as__door-desc">{t(locale, 'assessment.door_b.desc')}</span>
+            <span class="ff-as__door-cta">{t(locale, 'assessment.door_b.cta')}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ============ DOOR A — WIZARD ============ -->
+      <div class="ff-as__wizard" data-view="wizard" hidden>
+        <button type="button" class="ff-as__exit" data-exit-doora>{t(locale, 'assessment.back_to_doors')}</button>
+
+        <!-- Progress dots (5 steps) -->
+        <ol class="ff-as__progress" data-progress aria-hidden="true">
+          {[1, 2, 3, 4, 5].map((n) => (
+            <li class={`ff-as__dot${n === 1 ? ' is-active' : ''}`} data-dot={n}></li>
+          ))}
+        </ol>
+
+        <!-- STEP 1: Consumption -->
+        <div class="ff-as__step is-current" data-step="1">
+          <h3 class="ff-as__legend">{t(locale, 'assessment.step.consumption_heading')}</h3>
+          <p class="ff-as__help">{t(locale, 'assessment.step.consumption_help')}</p>
+
+          <div class="ff-as__consume">
+            <label class="ff-as__upload">
+              <span class="ff-as__upload-label">{t(locale, 'assessment.consumption.upload_label')}</span>
+              <input type="file" accept="image/*,application/pdf" data-cfe-file />
+              <span class="ff-as__upload-hint">{t(locale, 'assessment.consumption.upload_hint')}</span>
+            </label>
+            <p class="ff-as__cfe-status" data-cfe-status role="status" hidden></p>
+
+            <p class="ff-as__or"><span>{t(locale, 'assessment.consumption.or')}</span></p>
+
+            <div class="ff-as__manual" data-manual>
+              <label class="ff-as__field">
+                <span class="ff-as__field-label">{t(locale, 'assessment.consumption.manual_label')}</span>
+                <input type="number" inputmode="numeric" min="0" step="1"
+                  placeholder={t(locale, 'assessment.consumption.manual_placeholder')} data-monthly-kwh />
+              </label>
+            </div>
+
+            <button type="button" class="ff-as__unknown" data-dont-know>{t(locale, 'assessment.consumption.dont_know')}</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: Existing solar -->
+        <div class="ff-as__step" data-step="2" hidden>
+          <h3 class="ff-as__legend">{t(locale, 'assessment.step.solar_heading')}</h3>
+          <div class="ff-as__yesno" role="radiogroup" aria-label={t(locale, 'assessment.step.solar_heading')}>
+            <button type="button" class="ff-as__yn" role="radio" aria-checked="false" data-existing-solar="yes">{t(locale, 'assessment.common.yes')}</button>
+            <button type="button" class="ff-as__yn" role="radio" aria-checked="false" data-existing-solar="no">{t(locale, 'assessment.common.no')}</button>
+          </div>
+          <div class="ff-as__solar-detail" data-solar-detail hidden>
+            <label class="ff-as__field">
+              <span class="ff-as__field-label">{t(locale, 'assessment.solar.panel_count')}</span>
+              <input type="number" inputmode="numeric" min="0" step="1" value="0" data-panel-count />
+            </label>
+            <label class="ff-as__field">
+              <span class="ff-as__field-label">{t(locale, 'assessment.solar.panel_watts')}</span>
+              <input type="number" inputmode="numeric" min="0" step="5" value="0" data-panel-watts />
+            </label>
+            <p class="ff-as__kwp" data-existing-kwp></p>
+          </div>
+        </div>
+
+        <!-- STEP 3: Appliances + coverage + add solar -->
+        <div class="ff-as__step" data-step="3" hidden>
+          <h3 class="ff-as__legend">{t(locale, 'assessment.step.appliances_heading')}</h3>
+          <p class="ff-as__help">{t(locale, 'assessment.step.appliances_help')}</p>
+
+          <div class="ff-as__appliances">
+            <label class="ff-as__num-row">
+              <span>{t(locale, 'assessment.appliances.mini_splits')}</span>
+              <input type="number" inputmode="numeric" min="0" step="1" value="0" data-mini-splits />
+            </label>
+            <label class="ff-as__num-row">
+              <span>{t(locale, 'assessment.appliances.refrigerators')}</span>
+              <input type="number" inputmode="numeric" min="0" step="1" value="0" data-refrigerators />
+            </label>
+            <label class="ff-as__num-row">
+              <span>{t(locale, 'assessment.appliances.water_pump')}</span>
+              <select data-water-pump>
+                {waterPumpOpts.map((o) => (<option value={o.value}>{t(locale, o.label)}</option>))}
+              </select>
+            </label>
+            <label class="ff-as__check-row">
+              <input type="checkbox" data-pool-pump /><span>{t(locale, 'assessment.appliances.pool_pump')}</span>
+            </label>
+            <label class="ff-as__check-row">
+              <input type="checkbox" data-electric-oven /><span>{t(locale, 'assessment.appliances.electric_oven')}</span>
+            </label>
+            <label class="ff-as__check-row">
+              <input type="checkbox" data-induction /><span>{t(locale, 'assessment.appliances.induction')}</span>
+            </label>
+            <label class="ff-as__check-row">
+              <input type="checkbox" data-elevator /><span>{t(locale, 'assessment.appliances.elevator')}</span>
+            </label>
+          </div>
+
+          <h4 class="ff-as__subhead">{t(locale, 'assessment.coverage.heading')}</h4>
+          <div class="ff-as__choices" role="radiogroup" aria-label={t(locale, 'assessment.coverage.heading')}>
+            {coverageOpts.map((c) => (
+              <button type="button" class="ff-as__choice" role="radio" aria-checked="false" data-coverage={c.value}>
+                <span class="ff-as__choice-title">{t(locale, c.title)}</span>
+                <span class="ff-as__choice-note">{t(locale, c.note)}</span>
+              </button>
+            ))}
+          </div>
+
+          <h4 class="ff-as__subhead">{t(locale, 'assessment.addsolar.heading')}</h4>
+          <p class="ff-as__help">{t(locale, 'assessment.addsolar.help')}</p>
+          <div class="ff-as__pills" role="radiogroup" aria-label={t(locale, 'assessment.addsolar.heading')}>
+            {addSolarOpts.map((v, i) => (
+              <button type="button" class={`ff-as__pill${i === 0 ? ' is-active' : ''}`} role="radio" aria-checked={i === 0 ? 'true' : 'false'} data-add-solar={v}>
+                {v === '0' ? t(locale, 'assessment.addsolar.none') : t(locale, 'assessment.addsolar.count').replace('{n}', v)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <!-- STEP 4: Backup goal -->
+        <div class="ff-as__step" data-step="4" hidden>
+          <h3 class="ff-as__legend">{t(locale, 'assessment.step.backup_heading')}</h3>
+          <p class="ff-as__help">{t(locale, 'assessment.step.backup_help')}</p>
+          <div class="ff-as__pills" role="radiogroup" aria-label={t(locale, 'assessment.step.backup_heading')}>
+            {backupOpts.map((v) => (
+              <button type="button" class={`ff-as__pill${v === '12' ? ' is-active' : ''}`} role="radio" aria-checked={v === '12' ? 'true' : 'false'} data-backup-hours={v}>
+                {t(locale, 'assessment.backup.hours').replace('{n}', v)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <!-- STEP 5: Result -->
+        <div class="ff-as__step ff-as__results" data-step="5" hidden>
+          <!-- Loading / routing notice -->
+          <p class="ff-as__loading" data-result-loading role="status">{t(locale, 'assessment.result.loading')}</p>
+
+          <div class="ff-as__result-block" data-result-block hidden>
+            <p class="ff-as__daily" data-daily-note hidden></p>
+            <p class="ff-as__offset" data-offset-note hidden></p>
+
+            <div class="ff-as__result-head">
+              <h3 class="ff-as__result-title">{t(locale, 'assessment.result.tiers_heading')}</h3>
+              <div class="ff-as__currency" role="radiogroup" aria-label={t(locale, 'assessment.result.currency_aria')}>
+                <button type="button" class="ff-as__cur is-active" role="radio" aria-checked="true" data-currency="USD">{t(locale, 'assessment.result.currency_usd')}</button>
+                <button type="button" class="ff-as__cur" role="radio" aria-checked="false" data-currency="MXN">{t(locale, 'assessment.result.currency_mxn')}</button>
+              </div>
+            </div>
+
+            <ul class="ff-as__tiers" data-tiers aria-live="polite"></ul>
+
+            <p class="ff-as__qualifier">{t(locale, 'assessment.result.qualifier')}</p>
+
+            <!-- Capture form -->
+            <form class="ff-as__capture" data-capture novalidate>
+              <h3 class="ff-as__capture-title">{t(locale, 'assessment.form.capture_title')}</h3>
+              <p class="ff-as__capture-sub">{t(locale, 'assessment.form.capture_sub')}</p>
+
+              <label class="ff-as__field">
+                <span class="ff-as__field-label">{t(locale, 'assessment.form.name_label')}</span>
+                <input type="text" name="name" autocomplete="name" required
+                  placeholder={t(locale, 'assessment.form.name_placeholder')} data-name />
+              </label>
+              <label class="ff-as__field">
+                <span class="ff-as__field-label">{t(locale, 'assessment.form.contact_label')}</span>
+                <input type="text" name="contact" autocomplete="off" required
+                  placeholder={t(locale, 'assessment.form.contact_placeholder')} data-contact />
+              </label>
+
+              <div class="ff-as__hp" aria-hidden="true">
+                <label>{t(locale, 'assessment.form.company_label')}
+                  <input type="text" name="company_url" tabindex="-1" autocomplete="off" data-hp />
+                </label>
+              </div>
+
+              <button type="submit" class="ff-as__submit" data-submit disabled>{t(locale, 'assessment.form.submit')}</button>
+              <div class="ff-as__softnets">
+                <a class="ff-as__soft" href={waHref} target="_blank" rel="noopener">{t(locale, 'assessment.form.soft_whatsapp')}</a>
+              </div>
+            </form>
+
+            <div class="ff-as__state ff-as__state--ok" data-state-ok hidden role="status">
+              <h3 class="ff-as__state-title">{t(locale, 'assessment.form.thanks_title')}</h3>
+              <p>{t(locale, 'assessment.form.thanks_body')}</p>
+            </div>
+            <div class="ff-as__state ff-as__state--err" data-state-err hidden role="alert">
+              <h3 class="ff-as__state-title">{t(locale, 'assessment.form.error_title')}</h3>
+              <p>{t(locale, 'assessment.form.error_body')}</p>
+              <a class="ff-as__wa-btn" href={waHref} target="_blank" rel="noopener">{t(locale, 'common.whatsapp_label')}</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wizard nav -->
+        <div class="ff-as__nav" data-nav>
+          <button type="button" class="ff-as__back" data-back hidden>{t(locale, 'assessment.common.back')}</button>
+          <button type="button" class="ff-as__next" data-next disabled>{t(locale, 'assessment.common.next')}</button>
+        </div>
+      </div>
+
+      <!-- ============ DOOR B — SITE VISIT ============ -->
+      <div class="ff-as__sitevisit" data-view="sitevisit" hidden>
+        <button type="button" class="ff-as__exit" data-exit-doorb>{t(locale, 'assessment.back_to_doors')}</button>
+        <SiteVisitLead locale={locale} />
+      </div>
+
+      <p class="ff-as__disclaimer">{t(locale, 'assessment.disclaimer')}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ff-as { background: var(--ff-green-tint); padding: var(--sp-7) var(--sp-3); }
+  .ff-as__inner { max-width: var(--container-tight); margin: 0 auto; }
+  .ff-as__head { text-align: center; margin-bottom: var(--sp-4); }
+  .ff-as__eyebrow {
+    text-transform: uppercase; letter-spacing: 0.12em; font-size: var(--fs-eyebrow);
+    font-weight: 700; color: var(--ff-accent-dk); margin: 0 0 var(--sp-2);
+  }
+  .ff-as__title { font-size: var(--fs-h1); line-height: var(--lh-snug); margin: 0 0 var(--sp-2); }
+  .ff-as__sub { font-size: var(--fs-lead); color: var(--ff-slate); margin: 0; }
+
+  .ff-as__card {
+    background: var(--ff-white); border: 1px solid var(--ff-line);
+    border-radius: var(--r-lg); box-shadow: var(--shadow-md);
+    padding: var(--sp-5) var(--sp-4); position: relative;
+  }
+
+  /* ---- Doors ---- */
+  .ff-as__door-grid { display: grid; gap: var(--sp-3); }
+  @media (min-width: 640px) { .ff-as__door-grid { grid-template-columns: 1fr 1fr; } }
+  .ff-as__door {
+    display: flex; flex-direction: column; gap: 0.4rem; text-align: left;
+    background: var(--ff-paper); border: 2px solid var(--ff-line);
+    border-radius: var(--r-md); padding: var(--sp-4); cursor: pointer;
+    font-family: var(--ff-sans);
+    transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  }
+  .ff-as__door:hover { transform: translateY(-3px); border-color: var(--ff-green); box-shadow: var(--shadow-md); }
+  .ff-as__door:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__door--a { border-color: var(--ff-accent); }
+  .ff-as__door-title { font-weight: 700; font-size: var(--fs-h3); color: var(--ff-ink); }
+  .ff-as__door-desc { color: var(--ff-slate); font-size: var(--fs-small); }
+  .ff-as__door-cta {
+    margin-top: var(--sp-2); align-self: flex-start; background: var(--ff-accent); color: var(--ff-white);
+    font-weight: 700; font-size: var(--fs-small); padding: 0.5rem 1.1rem; border-radius: var(--r-pill);
+  }
+  .ff-as__door--b .ff-as__door-cta { background: var(--ff-ink); }
+
+  /* ---- Wizard shell ---- */
+  .ff-as__exit {
+    background: transparent; border: 0; color: var(--ff-slate); font-family: var(--ff-sans);
+    font-weight: 700; font-size: var(--fs-small); cursor: pointer; padding: 0; margin: 0 0 var(--sp-3);
+    text-decoration: underline;
+  }
+  .ff-as__exit:hover { color: var(--ff-accent-dk); }
+  .ff-as__progress { list-style: none; display: flex; gap: var(--sp-1); justify-content: center; margin: 0 0 var(--sp-4); padding: 0; }
+  .ff-as__dot { width: 10px; height: 10px; border-radius: var(--r-pill); background: var(--ff-mist); transition: background var(--dur) var(--ease), width var(--dur) var(--ease); }
+  .ff-as__dot.is-active { background: var(--ff-accent); width: 26px; }
+  .ff-as__dot.is-done { background: var(--ff-green); }
+
+  .ff-as__step { margin: 0; padding: 0; }
+  .ff-as__legend { font-size: var(--fs-h3); font-weight: 700; color: var(--ff-ink); text-align: center; margin: 0 auto var(--sp-2); }
+  .ff-as__subhead { font-size: var(--fs-lead); font-weight: 700; color: var(--ff-ink); margin: var(--sp-4) 0 var(--sp-2); }
+  .ff-as__help { color: var(--ff-slate); font-size: var(--fs-small); text-align: center; margin: 0 0 var(--sp-3); }
+
+  /* ---- Consumption ---- */
+  .ff-as__consume { display: grid; gap: var(--sp-3); }
+  .ff-as__upload {
+    display: flex; flex-direction: column; gap: 0.4rem; background: var(--ff-paper);
+    border: 2px dashed var(--ff-line); border-radius: var(--r-md); padding: var(--sp-3); cursor: pointer;
+  }
+  .ff-as__upload:hover { border-color: var(--ff-green); }
+  .ff-as__upload-label { font-weight: 700; color: var(--ff-ink); }
+  .ff-as__upload-hint { color: var(--ff-slate); font-size: var(--fs-small); }
+  .ff-as__cfe-status { font-size: var(--fs-small); color: var(--ff-accent-dk); font-weight: 700; margin: 0; }
+  .ff-as__unknown {
+    background: transparent; border: 0; color: var(--ff-slate); font-family: var(--ff-sans);
+    font-size: var(--fs-small); text-decoration: underline; cursor: pointer; padding: 0; justify-self: center;
+  }
+  .ff-as__unknown:hover { color: var(--ff-accent-dk); }
+  .ff-as__or { display: flex; align-items: center; text-align: center; color: var(--ff-storm); font-size: var(--fs-small); margin: 0; gap: var(--sp-2); }
+  .ff-as__or::before, .ff-as__or::after { content: ''; flex: 1; height: 1px; background: var(--ff-line); }
+
+  /* ---- Fields ---- */
+  .ff-as__field { display: block; margin-bottom: var(--sp-2); }
+  .ff-as__field-label { display: block; font-weight: 700; font-size: var(--fs-small); color: var(--ff-ink); margin-bottom: 0.3rem; }
+  .ff-as__field input, .ff-as__field select {
+    width: 100%; box-sizing: border-box; padding: 0.7rem 0.9rem;
+    border: 2px solid var(--ff-line); border-radius: var(--r-md);
+    font-family: var(--ff-sans); font-size: var(--fs-body); background: var(--ff-paper);
+  }
+  .ff-as__field input:focus-visible, .ff-as__field select:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 1px; border-color: var(--ff-accent); }
+
+  /* ---- Yes / No ---- */
+  .ff-as__yesno { display: flex; gap: var(--sp-2); justify-content: center; }
+  .ff-as__yn {
+    background: var(--ff-paper); border: 2px solid var(--ff-line); border-radius: var(--r-pill);
+    padding: 0.6rem 1.6rem; font-weight: 700; font-family: var(--ff-sans); color: var(--ff-ink); cursor: pointer;
+  }
+  .ff-as__yn[aria-checked='true'] { border-color: var(--ff-accent); background: var(--ff-accent-tint); }
+  .ff-as__yn:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__solar-detail { margin-top: var(--sp-3); }
+  .ff-as__kwp { color: var(--ff-accent-dk); font-weight: 700; font-size: var(--fs-small); margin: 0; }
+
+  /* ---- Appliances ---- */
+  .ff-as__appliances { display: grid; gap: var(--sp-2); }
+  .ff-as__num-row, .ff-as__check-row {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
+    background: var(--ff-paper); border: 1px solid var(--ff-line); border-radius: var(--r-md); padding: 0.6rem 0.9rem;
+    font-size: var(--fs-body); color: var(--ff-ink);
+  }
+  .ff-as__check-row { justify-content: flex-start; gap: 0.6rem; cursor: pointer; }
+  .ff-as__num-row input { width: 88px; box-sizing: border-box; padding: 0.45rem 0.6rem; border: 2px solid var(--ff-line); border-radius: var(--r-md); font-family: var(--ff-sans); background: var(--ff-white); text-align: right; }
+  .ff-as__num-row select { padding: 0.45rem 0.6rem; border: 2px solid var(--ff-line); border-radius: var(--r-md); font-family: var(--ff-sans); background: var(--ff-white); }
+
+  /* ---- Choices ---- */
+  .ff-as__choices { display: grid; gap: var(--sp-2); }
+  @media (min-width: 560px) { .ff-as__choices { grid-template-columns: repeat(3, 1fr); } }
+  .ff-as__choice {
+    display: flex; flex-direction: column; gap: 0.2rem; text-align: left;
+    background: var(--ff-paper); border: 2px solid var(--ff-line); border-radius: var(--r-md);
+    padding: var(--sp-3); cursor: pointer; font-family: var(--ff-sans);
+    transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+  .ff-as__choice:hover { border-color: var(--ff-green); }
+  .ff-as__choice[aria-checked='true'] { border-color: var(--ff-accent); background: var(--ff-accent-tint); }
+  .ff-as__choice:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__choice-title { font-weight: 700; color: var(--ff-ink); font-size: var(--fs-body); }
+  .ff-as__choice-note { color: var(--ff-slate); font-size: var(--fs-small); }
+
+  /* ---- Pills ---- */
+  .ff-as__pills { display: flex; flex-wrap: wrap; gap: var(--sp-2); justify-content: center; }
+  .ff-as__pill {
+    background: var(--ff-paper); border: 2px solid var(--ff-line); border-radius: var(--r-pill);
+    padding: 0.55rem 1.3rem; font-weight: 700; font-family: var(--ff-sans); color: var(--ff-ink); cursor: pointer;
+  }
+  .ff-as__pill.is-active { border-color: var(--ff-accent); background: var(--ff-accent-tint); }
+  .ff-as__pill:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+
+  /* ---- Results (mirror Estimator look) ---- */
+  .ff-as__loading { text-align: center; color: var(--ff-slate); font-size: var(--fs-small); }
+  .ff-as__daily, .ff-as__offset { color: var(--ff-slate); font-size: var(--fs-small); margin: 0 0 0.25rem; }
+  .ff-as__result-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); flex-wrap: wrap; margin: 0 0 var(--sp-3); }
+  .ff-as__result-title { font-size: var(--fs-h3); margin: 0; color: var(--ff-ink); }
+  .ff-as__currency { display: inline-flex; border: 1px solid var(--ff-line); border-radius: var(--r-pill); overflow: hidden; }
+  .ff-as__cur { background: var(--ff-white); border: 0; padding: 0.35rem 0.9rem; font-weight: 700; font-size: var(--fs-small); color: var(--ff-slate); cursor: pointer; font-family: var(--ff-sans); }
+  .ff-as__cur.is-active { background: var(--ff-ink); color: var(--ff-white); }
+  .ff-as__cur:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: -3px; }
+
+  .ff-as__tiers { list-style: none; display: grid; gap: var(--sp-2); padding: 0; margin: 0 0 var(--sp-3); }
+  @media (min-width: 720px) { .ff-as__tiers { grid-template-columns: repeat(3, 1fr); align-items: stretch; } }
+  .ff-as__tier { display: flex; }
+  .ff-as__tier-btn {
+    position: relative; display: flex; flex-direction: column; gap: 0.35rem; width: 100%;
+    text-align: left; background: var(--ff-paper); border: 2px solid var(--ff-line);
+    border-radius: var(--r-md); padding: var(--sp-3); cursor: pointer; font-family: var(--ff-sans);
+    transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  }
+  .ff-as__tier-btn:hover { transform: translateY(-2px); border-color: var(--ff-green); }
+  .ff-as__tier-btn:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__tier.is-highlight .ff-as__tier-btn { border-color: var(--ff-accent); box-shadow: var(--shadow-md); }
+  .ff-as__tier-btn[aria-checked='true'] { border-color: var(--ff-accent); background: var(--ff-accent-tint); }
+  .ff-as__tier-badge {
+    position: absolute; top: -0.7rem; right: var(--sp-3); background: var(--ff-accent); color: var(--ff-white);
+    font-size: var(--fs-eyebrow); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 0.2rem 0.6rem; border-radius: var(--r-pill);
+  }
+  .ff-as__tier-name { font-weight: 700; font-size: var(--fs-body); color: var(--ff-ink); }
+  .ff-as__tier-cover { color: var(--ff-slate); font-size: var(--fs-small); }
+  .ff-as__tier-chips { color: var(--ff-ink); font-size: var(--fs-small); font-weight: 700; }
+  .ff-as__tier-price { margin-top: auto; padding-top: var(--sp-2); display: flex; flex-direction: column; }
+  .ff-as__tier-from { color: var(--ff-storm); font-size: var(--fs-eyebrow); text-transform: uppercase; letter-spacing: 0.08em; }
+  .ff-as__tier-amount { font-family: var(--ff-display); font-size: var(--fs-h3); color: var(--ff-accent-dk); line-height: var(--lh-snug); }
+  .ff-as__tier-iva { color: var(--ff-slate); font-size: var(--fs-small); }
+  .ff-as__tier-cta {
+    margin-top: var(--sp-2); display: inline-block; text-align: center; background: var(--ff-ink); color: var(--ff-white);
+    font-weight: 700; font-size: var(--fs-small); padding: 0.5rem 1rem; border-radius: var(--r-pill);
+  }
+  .ff-as__tier-btn[aria-checked='true'] .ff-as__tier-cta { background: var(--ff-accent); }
+  .ff-as__qualifier { color: var(--ff-storm); font-size: var(--fs-small); margin: 0 0 var(--sp-4); }
+
+  /* ---- Capture ---- */
+  .ff-as__capture-title { font-size: var(--fs-h3); margin: 0 0 0.25rem; color: var(--ff-ink); }
+  .ff-as__capture-sub { color: var(--ff-slate); font-size: var(--fs-small); margin: 0 0 var(--sp-3); }
+  .ff-as__hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .ff-as__submit, .ff-as__wa-btn {
+    display: inline-block; width: 100%; box-sizing: border-box; text-align: center;
+    background: var(--ff-accent); color: var(--ff-white); border: 0;
+    font-weight: 700; font-size: var(--fs-body); padding: 0.85rem 1.5rem;
+    border-radius: var(--r-pill); cursor: pointer; margin-top: var(--sp-2);
+    font-family: var(--ff-sans); text-decoration: none;
+    transition: background var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .ff-as__submit:hover:not(:disabled), .ff-as__wa-btn:hover { background: var(--ff-accent-dk); transform: translateY(-2px); }
+  .ff-as__submit:disabled { background: var(--ff-storm); cursor: not-allowed; }
+  .ff-as__submit:focus-visible, .ff-as__wa-btn:focus-visible { outline: 3px solid var(--ff-ink); outline-offset: 2px; }
+  .ff-as__softnets { display: flex; flex-direction: column; gap: 0.4rem; margin-top: var(--sp-3); text-align: center; }
+  .ff-as__soft { color: var(--ff-slate); font-size: var(--fs-small); text-decoration: underline; }
+  .ff-as__soft:hover { color: var(--ff-accent-dk); }
+  .ff-as__state { text-align: center; padding: var(--sp-3) 0; }
+  .ff-as__state-title { font-size: var(--fs-h3); margin: 0 0 0.5rem; color: var(--ff-ink); }
+  .ff-as__state--err .ff-as__state-title { color: var(--ff-accent-dk); }
+  .ff-as__wa-btn { max-width: 320px; margin: var(--sp-2) auto 0; }
+
+  /* ---- Nav / disclaimer ---- */
+  .ff-as__nav { display: flex; justify-content: space-between; margin-top: var(--sp-4); }
+  .ff-as__back, .ff-as__next {
+    border: 2px solid var(--ff-line); font-weight: 700; padding: 0.55rem 1.4rem; border-radius: var(--r-pill);
+    cursor: pointer; font-family: var(--ff-sans);
+  }
+  .ff-as__back { background: transparent; color: var(--ff-ink); }
+  .ff-as__back:hover { border-color: var(--ff-ink); }
+  .ff-as__next { background: var(--ff-accent); border-color: var(--ff-accent); color: var(--ff-white); margin-left: auto; }
+  .ff-as__next:hover:not(:disabled) { background: var(--ff-accent-dk); }
+  .ff-as__next:disabled { background: var(--ff-storm); border-color: var(--ff-storm); cursor: not-allowed; }
+  .ff-as__back:focus-visible, .ff-as__next:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__disclaimer { text-align: center; color: var(--ff-storm); font-size: var(--fs-small); margin: var(--sp-4) 0 0; }
+
+  @media (max-width: 560px) {
+    .ff-as__card { padding: var(--sp-4) var(--sp-3); }
+  }
+</style>
+
+<script>
+  import { initAssessment } from './Assessment.client';
+  const root = document.querySelector<HTMLElement>('[data-assessment]');
+  if (root) initAssessment(root);
+</script>

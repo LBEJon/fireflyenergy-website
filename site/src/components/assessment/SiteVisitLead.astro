@@ -1,0 +1,114 @@
+---
+import { t, type Locale } from '../../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+
+const waNumber = t(locale, 'common.whatsapp');
+const waHref = `https://wa.me/${waNumber}`;
+---
+<!--
+  Door B — site-visit lead capture. Used both as the standalone "have an
+  expert contact me" door and as the fail-safe destination when a price
+  cannot be produced (unknown consumption, estimate error, or needsSiteVisit).
+  No price is ever shown here.
+-->
+<div class="ff-sv" data-sitevisit data-wa-href={waHref}>
+  <p class="ff-sv__note" data-sitevisit-note hidden>{t(locale, 'assessment.sv.fallback_note')}</p>
+
+  <form class="ff-sv__form" data-sitevisit-form novalidate>
+    <h3 class="ff-sv__title">{t(locale, 'assessment.sv.title')}</h3>
+    <p class="ff-sv__sub">{t(locale, 'assessment.sv.sub')}</p>
+
+    <label class="ff-sv__field">
+      <span class="ff-sv__label">{t(locale, 'assessment.form.name_label')}</span>
+      <input type="text" name="name" autocomplete="name" required
+        placeholder={t(locale, 'assessment.form.name_placeholder')} data-sv-name />
+    </label>
+
+    <label class="ff-sv__field">
+      <span class="ff-sv__label">{t(locale, 'assessment.form.contact_label')}</span>
+      <input type="text" name="contact" autocomplete="off" required
+        placeholder={t(locale, 'assessment.form.contact_placeholder')} data-sv-contact />
+    </label>
+
+    <label class="ff-sv__field">
+      <span class="ff-sv__label">{t(locale, 'assessment.sv.location_label')}</span>
+      <input type="text" name="location" autocomplete="off"
+        placeholder={t(locale, 'assessment.sv.location_placeholder')} data-sv-location />
+    </label>
+
+    <label class="ff-sv__field">
+      <span class="ff-sv__label">{t(locale, 'assessment.sv.note_label')}</span>
+      <textarea name="note" rows="3"
+        placeholder={t(locale, 'assessment.sv.note_placeholder')} data-sv-message></textarea>
+    </label>
+
+    <!-- Honeypot: visually hidden, off the tab order, ignored by humans. -->
+    <div class="ff-sv__hp" aria-hidden="true">
+      <label>{t(locale, 'assessment.form.company_label')}
+        <input type="text" name="company_url" tabindex="-1" autocomplete="off" data-sv-hp />
+      </label>
+    </div>
+
+    <button type="submit" class="ff-sv__submit" data-sv-submit disabled>{t(locale, 'assessment.sv.submit')}</button>
+
+    <div class="ff-sv__softnets">
+      <a class="ff-sv__soft" href={waHref} target="_blank" rel="noopener" data-sv-soft-wa>{t(locale, 'assessment.form.soft_whatsapp')}</a>
+    </div>
+  </form>
+
+  <!-- Thank-you / error states (toggled by the client) -->
+  <div class="ff-sv__state ff-sv__state--ok" data-sv-state-ok hidden role="status">
+    <h3 class="ff-sv__state-title">{t(locale, 'assessment.form.thanks_title')}</h3>
+    <p>{t(locale, 'assessment.form.thanks_body')}</p>
+  </div>
+  <div class="ff-sv__state ff-sv__state--err" data-sv-state-err hidden role="alert">
+    <h3 class="ff-sv__state-title">{t(locale, 'assessment.form.error_title')}</h3>
+    <p>{t(locale, 'assessment.form.error_body')}</p>
+    <a class="ff-sv__wa-btn" href={waHref} target="_blank" rel="noopener">{t(locale, 'common.whatsapp_label')}</a>
+  </div>
+</div>
+
+<style>
+  .ff-sv { display: block; }
+  .ff-sv__note {
+    background: var(--ff-accent-tint); border: 1px solid var(--ff-accent);
+    border-radius: var(--r-md); padding: var(--sp-3); margin: 0 0 var(--sp-3);
+    color: var(--ff-ink); font-size: var(--fs-small);
+  }
+  .ff-sv__title { font-size: var(--fs-h3); margin: 0 0 0.25rem; color: var(--ff-ink); }
+  .ff-sv__sub { color: var(--ff-slate); font-size: var(--fs-small); margin: 0 0 var(--sp-3); }
+  .ff-sv__field { display: block; margin-bottom: var(--sp-2); }
+  .ff-sv__label { display: block; font-weight: 700; font-size: var(--fs-small); color: var(--ff-ink); margin-bottom: 0.3rem; }
+  .ff-sv__field input, .ff-sv__field textarea {
+    width: 100%; box-sizing: border-box; padding: 0.7rem 0.9rem;
+    border: 2px solid var(--ff-line); border-radius: var(--r-md);
+    font-family: var(--ff-sans); font-size: var(--fs-body); background: var(--ff-paper);
+    resize: vertical;
+  }
+  .ff-sv__field input:focus-visible, .ff-sv__field textarea:focus-visible {
+    outline: 3px solid var(--ff-accent); outline-offset: 1px; border-color: var(--ff-accent);
+  }
+  .ff-sv__hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .ff-sv__submit, .ff-sv__wa-btn {
+    display: inline-block; width: 100%; box-sizing: border-box; text-align: center;
+    background: var(--ff-accent); color: var(--ff-white); border: 0;
+    font-weight: 700; font-size: var(--fs-body); padding: 0.85rem 1.5rem;
+    border-radius: var(--r-pill); cursor: pointer; margin-top: var(--sp-2);
+    font-family: var(--ff-sans); text-decoration: none;
+    transition: background var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .ff-sv__submit:hover:not(:disabled), .ff-sv__wa-btn:hover { background: var(--ff-accent-dk); transform: translateY(-2px); }
+  .ff-sv__submit:disabled { background: var(--ff-storm); cursor: not-allowed; }
+  .ff-sv__submit:focus-visible, .ff-sv__wa-btn:focus-visible { outline: 3px solid var(--ff-ink); outline-offset: 2px; }
+  .ff-sv__softnets { display: flex; flex-direction: column; gap: 0.4rem; margin-top: var(--sp-3); text-align: center; }
+  .ff-sv__soft { color: var(--ff-slate); font-size: var(--fs-small); text-decoration: underline; }
+  .ff-sv__soft:hover { color: var(--ff-accent-dk); }
+  .ff-sv__state { text-align: center; padding: var(--sp-3) 0; }
+  .ff-sv__state-title { font-size: var(--fs-h3); margin: 0 0 0.5rem; color: var(--ff-ink); }
+  .ff-sv__state--err .ff-sv__state-title { color: var(--ff-accent-dk); }
+  .ff-sv__wa-btn { max-width: 320px; margin: var(--sp-2) auto 0; }
+</style>
