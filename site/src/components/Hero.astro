@@ -1,0 +1,135 @@
+---
+import { t, altUrl, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+
+const ctaHref = altUrl(locale, 'calculator');
+const chips = [
+  t(locale, 'hero.chip_switchover'),
+  t(locale, 'hero.chip_solar'),
+  t(locale, 'hero.chip_experience'),
+];
+---
+<section class="ff-hero">
+  <div class="ff-hero__inner">
+    <div class="ff-hero__copy">
+      <p class="ff-hero__eyebrow">{t(locale, 'hero.eyebrow')}</p>
+      <h1 class="ff-hero__h1 display">{t(locale, 'hero.h1')}</h1>
+      <p class="ff-hero__sub">{t(locale, 'hero.sub')}</p>
+      <div class="ff-hero__actions">
+        <a class="ff-btn ff-btn--coral" href={ctaHref}>{t(locale, 'hero.cta_primary')}</a>
+        <a class="ff-btn ff-btn--ghost" href="#how-it-works">{t(locale, 'hero.cta_secondary')}</a>
+      </div>
+      <ul class="ff-hero__chips">
+        {chips.map((c) => <li>{c}</li>)}
+      </ul>
+    </div>
+
+    <div class="ff-hero__media" id="hero-media">
+      <picture>
+        <!-- Phase 5 swaps in the real dusk photo. Until then, a warm golden-hour gradient holds the box. -->
+        <img
+          id="hero-image"
+          src="/assets/photos/hero-dusk.jpg"
+          alt={t(locale, 'hero.image_alt')}
+          width="720"
+          height="540"
+          loading="eager"
+          onerror="this.style.display='none';this.parentElement.parentElement.classList.add('ff-hero__media--placeholder');"
+        />
+      </picture>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ff-hero {
+    background: var(--ff-paper);
+    padding: var(--sp-6) var(--sp-3) var(--sp-7);
+  }
+  .ff-hero__inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: var(--sp-5);
+    align-items: center;
+  }
+  .ff-hero__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: var(--fs-eyebrow);
+    font-weight: 700;
+    color: var(--ff-accent-dk);
+    margin: 0 0 var(--sp-2);
+  }
+  .ff-hero__h1 {
+    font-size: var(--fs-display);
+    line-height: var(--lh-tight);
+    margin: 0 0 var(--sp-3);
+    max-width: 16ch;
+  }
+  .ff-hero__sub {
+    font-size: var(--fs-lead);
+    line-height: var(--lh-body);
+    color: var(--ff-slate);
+    max-width: 46ch;
+    margin: 0 0 var(--sp-4);
+  }
+  .ff-hero__actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+  .ff-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--r-pill);
+    font-weight: 700;
+    font-size: var(--fs-body);
+    text-decoration: none;
+    padding: 0.85rem 1.6rem;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+  .ff-btn--coral { background: var(--ff-accent); color: var(--ff-white); }
+  .ff-btn--coral:hover { background: var(--ff-accent-dk); transform: translateY(-1px); }
+  .ff-btn--ghost { background: transparent; color: var(--ff-ink); border-color: var(--ff-line); }
+  .ff-btn--ghost:hover { border-color: var(--ff-ink); }
+
+  .ff-hero__chips {
+    list-style: none;
+    padding: 0;
+    margin: var(--sp-4) 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1);
+  }
+  .ff-hero__chips li {
+    background: var(--ff-green-tint);
+    color: var(--ff-ink);
+    border: 1px solid var(--ff-line);
+    border-radius: var(--r-pill);
+    padding: 0.4rem 0.9rem;
+    font-size: var(--fs-small);
+    font-weight: 600;
+  }
+
+  .ff-hero__media {
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lift);
+    aspect-ratio: 4 / 3;
+    background:
+      radial-gradient(120% 90% at 80% 10%, var(--ff-glow) 0%, transparent 55%),
+      linear-gradient(150deg, #FFB81C 0%, var(--ff-accent) 48%, var(--ff-ink) 100%);
+  }
+  .ff-hero__media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .ff-hero__media--placeholder img { display: none; }
+
+  @media (max-width: 860px) {
+    .ff-hero__inner { grid-template-columns: 1fr; }
+    .ff-hero__media { order: -1; aspect-ratio: 16 / 10; }
+  }
+</style>
