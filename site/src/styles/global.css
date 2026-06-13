@@ -4,7 +4,7 @@
 body {
   font-family: var(--ff-sans);
   color: var(--ff-ink);
-  background: var(--ff-paper, #FDFBF7);
+  background: var(--ff-paper, #F8F9F4);
   line-height: 1.6;
   margin: 0;
 }

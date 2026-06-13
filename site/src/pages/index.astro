@@ -8,7 +8,7 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'Firefly Energy',
-  url: 'https://fireflyenergy.mx',
+  url: Astro.site?.href ?? 'https://fireflyenergy.mx/',
 };
 ---
 <Base
