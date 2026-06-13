@@ -1,5 +1,6 @@
 import { sizeSystem, type EstimatorAnswers, type SystemConfig } from '../lib/sizing';
 import { priceRange, type PricingData, type PriceRangeResult } from '../lib/pricing';
+import { buildTiers, type Tier } from '../lib/tiers';
 import type { LeadPayload } from '../lib/leadClient';
 
 export interface EstimatorDeps {
@@ -18,6 +19,8 @@ export interface SubmitInput {
   name: string;
   contact: string;
   locale: string;
+  /** Which tier the visitor is viewing/selected at submit time. */
+  selectedTier?: Tier['key'];
   /** Honeypot value — non-empty means a bot filled the hidden field. */
   hp?: string;
 }
@@ -33,6 +36,8 @@ export interface EstimatorStore {
   next(): void;
   back(): void;
   getResult(): EstimatorResult;
+  /** The three priced tiers (essentials / critical / recommended). */
+  getTiers(): Tier[];
   canSubmit(input: { name: string; contact: string }): boolean;
   submit(input: SubmitInput): Promise<{ ok: boolean }>;
 }
@@ -80,6 +85,13 @@ export function createEstimator(deps: EstimatorDeps): EstimatorStore {
       return { config, price };
     },
 
+    getTiers() {
+      if (!this.isComplete()) {
+        throw new Error('getTiers() requires all three answers to be set');
+      }
+      return buildTiers(this.answers as EstimatorAnswers);
+    },
+
     canSubmit(input) {
       return input.name.trim().length > 0 && input.contact.trim().length > 0;
     },
@@ -90,12 +102,17 @@ export function createEstimator(deps: EstimatorDeps): EstimatorStore {
       }
       const answers = this.answers as EstimatorAnswers;
       const config = sizeSystem(answers);
+      const tiers = buildTiers(answers);
+      const selectedKey = input.selectedTier ?? tiers.find((t) => t.highlighted)?.key ?? 'recommended';
+      const selected = tiers.find((t) => t.key === selectedKey) ?? tiers[tiers.length - 1];
       const payload: LeadPayload = {
         name: input.name.trim(),
         contact: input.contact.trim(),
         segment: 'residential',
         answers,
-        config,
+        // Whole-home sizing kept for back-compat; selected tier carries what the
+        // visitor was actually viewing (key + its concrete config).
+        config: { ...config, selectedTier: selected.key, tierConfig: selected.config },
         locale: input.locale,
         hp: input.hp,
       };

@@ -85,29 +85,39 @@ const steps = [
         </fieldset>
       ))}
 
-      <!-- Step 4: RESULTS FIRST, then capture -->
+      <!-- Step 4: RESULTS FIRST (three tiers), then capture -->
       <div class="ff-est__step ff-est__results" data-step="4" hidden>
         <div class="ff-est__result-block">
           <p class="ff-est__result-intro">{t(locale, 'estimator.result_intro')}</p>
-          <h3 class="ff-est__result-title">{t(locale, 'estimator.result_title')}</h3>
+          <div class="ff-est__result-head">
+            <h3 class="ff-est__result-title">{t(locale, 'estimator.tiers_heading')}</h3>
+            <div class="ff-est__currency" role="radiogroup" aria-label={t(locale, 'estimator.currency_aria')}>
+              <button type="button" class="ff-est__cur is-active" role="radio" aria-checked="true" data-currency="USD">{t(locale, 'estimator.currency_usd')}</button>
+              <button type="button" class="ff-est__cur" role="radio" aria-checked="false" data-currency="MXN">{t(locale, 'estimator.currency_mxn')}</button>
+            </div>
+          </div>
 
-          <ul class="ff-est__chips" data-chips aria-live="polite">
-            <li class="ff-est__chip" data-chip-inverter></li>
-            <li class="ff-est__chip" data-chip-battery></li>
-            <li class="ff-est__chip" data-chip-panels></li>
+          <!-- Three priced tiers, populated by the script (data-driven). -->
+          <ul class="ff-est__tiers" data-tiers role="radiogroup" aria-label={t(locale, 'estimator.tiers_heading')} aria-live="polite">
+            {['essentials', 'critical', 'recommended'].map((key) => (
+              <li class="ff-est__tier" data-tier={key}>
+                <button type="button" class="ff-est__tier-btn" role="radio" aria-checked="false" data-tier-select={key}>
+                  <span class="ff-est__tier-badge" data-tier-badge hidden>{t(locale, 'estimator.tier_badge')}</span>
+                  <span class="ff-est__tier-name" data-tier-name></span>
+                  <span class="ff-est__tier-cover" data-tier-cover></span>
+                  <span class="ff-est__tier-chips" data-tier-chips></span>
+                  <span class="ff-est__tier-price">
+                    <span class="ff-est__tier-from">{t(locale, 'estimator.price_from')}</span>
+                    <span class="ff-est__tier-amount" data-tier-amount></span>
+                    <span class="ff-est__tier-iva" data-tier-iva></span>
+                  </span>
+                  <span class="ff-est__tier-cta" data-tier-cta>{t(locale, 'estimator.tier_select')}</span>
+                </button>
+              </li>
+            ))}
           </ul>
 
-          <div class="ff-est__price">
-            <div class="ff-est__price-row">
-              <span class="ff-est__price-label">{t(locale, 'estimator.price_label')}</span>
-              <div class="ff-est__currency" role="radiogroup" aria-label={t(locale, 'estimator.currency_aria')}>
-                <button type="button" class="ff-est__cur is-active" role="radio" aria-checked="true" data-currency="USD">{t(locale, 'estimator.currency_usd')}</button>
-                <button type="button" class="ff-est__cur" role="radio" aria-checked="false" data-currency="MXN">{t(locale, 'estimator.currency_mxn')}</button>
-              </div>
-            </div>
-            <p class="ff-est__price-value" data-price aria-live="polite"></p>
-            <p class="ff-est__price-note" data-price-note hidden>{t(locale, 'estimator.price_placeholder_note')}</p>
-          </div>
+          <p class="ff-est__qualifier" data-qualifier>{t(locale, 'estimator.qualifier')}</p>
         </div>
 
         <!-- Capture form sits BELOW the result -->
@@ -209,20 +219,46 @@ const steps = [
 
   /* ---- Results ---- */
   .ff-est__result-intro { color: var(--ff-slate); margin: 0 0 0.25rem; font-size: var(--fs-small); }
-  .ff-est__result-title { font-size: var(--fs-h3); margin: 0 0 var(--sp-3); color: var(--ff-ink); }
-  .ff-est__chips { list-style: none; display: flex; flex-wrap: wrap; gap: var(--sp-1); padding: 0; margin: 0 0 var(--sp-4); }
-  .ff-est__chip { background: var(--ff-green); color: var(--ff-ink); font-weight: 700; font-size: var(--fs-body); padding: 0.4rem 1rem; border-radius: var(--r-pill); }
-  .ff-est__chip:empty { display: none; }
+  .ff-est__result-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); flex-wrap: wrap; margin: 0 0 var(--sp-3); }
+  .ff-est__result-title { font-size: var(--fs-h3); margin: 0; color: var(--ff-ink); }
 
-  .ff-est__price { background: var(--ff-paper); border: 1px solid var(--ff-line); border-radius: var(--r-md); padding: var(--sp-3); margin-bottom: var(--sp-4); }
-  .ff-est__price-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); flex-wrap: wrap; }
-  .ff-est__price-label { font-weight: 700; color: var(--ff-ink); }
   .ff-est__currency { display: inline-flex; border: 1px solid var(--ff-line); border-radius: var(--r-pill); overflow: hidden; }
   .ff-est__cur { background: var(--ff-white); border: 0; padding: 0.35rem 0.9rem; font-weight: 700; font-size: var(--fs-small); color: var(--ff-slate); cursor: pointer; font-family: var(--ff-sans); }
   .ff-est__cur.is-active { background: var(--ff-ink); color: var(--ff-white); }
   .ff-est__cur:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: -3px; }
-  .ff-est__price-value { font-family: var(--ff-display); font-size: var(--fs-h2); color: var(--ff-accent-dk); margin: var(--sp-2) 0 0; line-height: var(--lh-snug); }
-  .ff-est__price-note { color: var(--ff-slate); font-size: var(--fs-small); margin: 0.5rem 0 0; }
+
+  /* ---- Tier cards ---- */
+  .ff-est__tiers { list-style: none; display: grid; gap: var(--sp-2); padding: 0; margin: 0 0 var(--sp-3); }
+  @media (min-width: 720px) { .ff-est__tiers { grid-template-columns: repeat(3, 1fr); align-items: stretch; } }
+  .ff-est__tier { display: flex; }
+  .ff-est__tier-btn {
+    position: relative; display: flex; flex-direction: column; gap: 0.35rem; width: 100%;
+    text-align: left; background: var(--ff-paper); border: 2px solid var(--ff-line);
+    border-radius: var(--r-md); padding: var(--sp-3); cursor: pointer; font-family: var(--ff-sans);
+    transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  }
+  .ff-est__tier-btn:hover { transform: translateY(-2px); border-color: var(--ff-green); }
+  .ff-est__tier-btn:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-est__tier.is-highlight .ff-est__tier-btn { border-color: var(--ff-accent); box-shadow: var(--shadow-md); }
+  .ff-est__tier-btn[aria-checked='true'] { border-color: var(--ff-accent); background: var(--ff-accent-tint); }
+  .ff-est__tier-badge {
+    position: absolute; top: -0.7rem; right: var(--sp-3); background: var(--ff-accent); color: var(--ff-white);
+    font-size: var(--fs-eyebrow); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 0.2rem 0.6rem; border-radius: var(--r-pill);
+  }
+  .ff-est__tier-name { font-weight: 700; font-size: var(--fs-body); color: var(--ff-ink); }
+  .ff-est__tier-cover { color: var(--ff-slate); font-size: var(--fs-small); }
+  .ff-est__tier-chips { color: var(--ff-ink); font-size: var(--fs-small); font-weight: 700; }
+  .ff-est__tier-price { margin-top: auto; padding-top: var(--sp-2); display: flex; flex-direction: column; }
+  .ff-est__tier-from { color: var(--ff-storm); font-size: var(--fs-eyebrow); text-transform: uppercase; letter-spacing: 0.08em; }
+  .ff-est__tier-amount { font-family: var(--ff-display); font-size: var(--fs-h3); color: var(--ff-accent-dk); line-height: var(--lh-snug); }
+  .ff-est__tier-iva { color: var(--ff-slate); font-size: var(--fs-small); }
+  .ff-est__tier-cta {
+    margin-top: var(--sp-2); display: inline-block; text-align: center; background: var(--ff-ink); color: var(--ff-white);
+    font-weight: 700; font-size: var(--fs-small); padding: 0.5rem 1rem; border-radius: var(--r-pill);
+  }
+  .ff-est__tier-btn[aria-checked='true'] .ff-est__tier-cta { background: var(--ff-accent); }
+  .ff-est__qualifier { color: var(--ff-storm); font-size: var(--fs-small); margin: 0 0 var(--sp-4); }
 
   /* ---- Capture ---- */
   .ff-est__capture-title { font-size: var(--fs-h3); margin: 0 0 0.25rem; color: var(--ff-ink); }
@@ -280,9 +316,13 @@ const steps = [
   import { createEstimator } from './Estimator.client';
   import { fetchPricing } from '../lib/pricingClient';
   import { submitLead, type LeadPayload } from '../lib/leadClient';
+  import { t, type Locale } from '../lib/i18n';
+  import { PRICING } from '../lib/pricing.config';
+  import type { Tier } from '../lib/tiers';
 
-  // Fixed display FX rate — PLACEHOLDER. Refine / wire to a live rate later.
-  const MXN_PER_USD = 18;
+  // Display FX rate (USD → MXN). Sourced from the pricing snapshot today; this
+  // will later come from a CRM daily-rate endpoint (Phase 6b).
+  const MXN_PER_USD = PRICING.fxUsdMxn;
 
   const root = document.querySelector<HTMLElement>('[data-estimator]');
   if (root) {
@@ -299,11 +339,7 @@ const steps = [
     const restartBtn = root.querySelector<HTMLButtonElement>('[data-restart]');
     const choices = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-answer-key]'));
 
-    const chipInv = root.querySelector<HTMLElement>('[data-chip-inverter]');
-    const chipBat = root.querySelector<HTMLElement>('[data-chip-battery]');
-    const chipPan = root.querySelector<HTMLElement>('[data-chip-panels]');
-    const priceEl = root.querySelector<HTMLElement>('[data-price]');
-    const priceNote = root.querySelector<HTMLElement>('[data-price-note]');
+    const tierEls = Array.from(root.querySelectorAll<HTMLElement>('[data-tier]'));
     const curBtns = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-currency]'));
 
     const form = root.querySelector<HTMLFormElement>('[data-capture]');
@@ -314,18 +350,31 @@ const steps = [
     const okState = root.querySelector<HTMLElement>('[data-state-ok]');
     const errState = root.querySelector<HTMLElement>('[data-state-err]');
 
-    // i18n templates pulled from existing rendered chips' siblings: read from data.
-    const locale = document.documentElement.lang === 'es' ? 'es' : 'en';
-    const T = {
-      chipInverter: (kw: number) => `${kw} kW`,
-      chipBattery: (kwh: number) => `${kwh} kWh`,
-      chipPanels: (n: number) =>
-        n > 0
-          ? (locale === 'es' ? `${n} paneles` : `${n} panels`)
-          : (locale === 'es' ? 'Solo batería' : 'Battery only'),
+    const locale: Locale = document.documentElement.lang === 'es' ? 'es' : 'en';
+    const tr = (k: string) => t(locale, k);
+    const panelsLabel = (n: number) =>
+      n > 0 ? (locale === 'es' ? `${n} paneles` : `${n} panels`) : '';
+    // One-line config summary chips per tier, e.g. "6.5 kW · 5 kWh + Essential Loads Panel".
+    function tierChips(cfg: Tier['config']): string {
+      const parts = [`${cfg.inverterKw} kW`, `${cfg.batteryKwh} kWh`];
+      if (cfg.panels > 0) parts.push(panelsLabel(cfg.panels));
+      let s = parts.join(' · ');
+      if (cfg.includeSubpanel) s += ` + ${tr('estimator.tier_subpanel_chip')}`;
+      return s;
+    }
+    const TIER_NAME: Record<Tier['key'], string> = {
+      essentials: 'estimator.tier_essentials_name',
+      critical: 'estimator.tier_critical_name',
+      recommended: 'estimator.tier_recommended_name',
+    };
+    const TIER_COVER: Record<Tier['key'], string> = {
+      essentials: 'estimator.tier_essentials_cover',
+      critical: 'estimator.tier_critical_cover',
+      recommended: 'estimator.tier_recommended_cover',
     };
 
     let currency: 'USD' | 'MXN' = 'USD';
+    let selectedTier: Tier['key'] | null = null;
     // Mirror answers locally so a rebuilt store can be re-synced.
     const answers: Record<string, string> = {};
     let uiStep = 1;
@@ -407,19 +456,53 @@ const steps = [
 
     function renderResult() {
       if (!store.isComplete()) return;
-      const { config, price } = store.getResult();
-      if (chipInv) chipInv.textContent = T.chipInverter(config.inverterKw);
-      if (chipBat) chipBat.textContent = T.chipBattery(config.batteryKwh);
-      if (chipPan) chipPan.textContent = T.chipPanels(config.panels);
-      if (priceEl) {
-        priceEl.textContent = `${fmt(price.low, currency)} – ${fmt(price.high, currency)}`;
+      const tiers = store.getTiers();
+      // Default selection to the highlighted tier the first time we render.
+      if (selectedTier === null) {
+        selectedTier = tiers.find((t) => t.highlighted)?.key ?? 'recommended';
       }
-      if (priceNote) priceNote.hidden = !price.placeholder;
+      for (const tier of tiers) {
+        const el = tierEls.find((e) => e.dataset.tier === tier.key);
+        if (!el) continue;
+        const isHighlight = tier.highlighted;
+        const isSelected = tier.key === selectedTier;
+        el.classList.toggle('is-highlight', isHighlight);
+
+        const badge = el.querySelector<HTMLElement>('[data-tier-badge]');
+        const nameEl = el.querySelector<HTMLElement>('[data-tier-name]');
+        const coverEl = el.querySelector<HTMLElement>('[data-tier-cover]');
+        const chipsEl = el.querySelector<HTMLElement>('[data-tier-chips]');
+        const amountEl = el.querySelector<HTMLElement>('[data-tier-amount]');
+        const ivaEl = el.querySelector<HTMLElement>('[data-tier-iva]');
+        const ctaEl = el.querySelector<HTMLElement>('[data-tier-cta]');
+        const btn = el.querySelector<HTMLButtonElement>('[data-tier-select]');
+
+        if (badge) badge.hidden = !isHighlight;
+        if (nameEl) nameEl.textContent = tr(TIER_NAME[tier.key]);
+        if (coverEl) coverEl.textContent = tr(TIER_COVER[tier.key]);
+        if (chipsEl) chipsEl.textContent = tierChips(tier.config);
+        // Pre-IVA headline + a SEPARATE "+ 16% IVA (amount)" line.
+        if (amountEl) amountEl.textContent = fmt(tier.price.preIvaUsd, currency);
+        if (ivaEl) {
+          ivaEl.textContent = tr('estimator.price_iva_line').replace('{iva}', fmt(tier.price.ivaUsd, currency));
+        }
+        if (ctaEl) ctaEl.textContent = isSelected ? tr('estimator.tier_selected') : tr('estimator.tier_select');
+        if (btn) btn.setAttribute('aria-checked', String(isSelected));
+      }
     }
 
     // ---- Wire up choices ----
     for (const btn of choices) {
       btn.addEventListener('click', () => selectAnswer(btn));
+    }
+
+    // ---- Tier selection ----
+    for (const el of tierEls) {
+      const btn = el.querySelector<HTMLButtonElement>('[data-tier-select]');
+      btn?.addEventListener('click', () => {
+        selectedTier = (btn.dataset.tierSelect as Tier['key']) ?? selectedTier;
+        renderResult();
+      });
     }
 
     backBtn?.addEventListener('click', () => {
@@ -435,6 +518,7 @@ const steps = [
         leadClient: (p: LeadPayload) => submitLead(baseUrl, p),
       });
       for (const k of Object.keys(answers)) delete answers[k];
+      selectedTier = null;
       root.querySelectorAll('[data-answer-key]').forEach((b) => b.setAttribute('aria-checked', 'false'));
       if (form) form.hidden = false;
       if (okState) okState.hidden = true;
@@ -479,6 +563,7 @@ const steps = [
         name: nameInput?.value ?? '',
         contact: contactInput?.value ?? '',
         locale,
+        selectedTier: selectedTier ?? undefined,
         hp: hpInput?.value ?? '',
       });
       if (res.ok) {

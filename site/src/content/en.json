@@ -175,46 +175,38 @@
   "industrial.title": "Keep your operation running.",
   "industrial.sub": "Backup power and solar sized for shops, offices and facilities across Mexico.",
   "industrial.cta": "Talk to our team",
-
   "industrial.meta_title": "Industrial & commercial energy storage (BESS) — Firefly Energy",
   "industrial.meta_desc": "Battery energy storage and solar self-supply for businesses and facilities across Mexico. Reduce demand charges, ride through outages, and book an energy assessment.",
-
   "industrial.hero.eyebrow": "Industrial & Commercial · México",
   "industrial.hero.h1": "Energy storage that pays for itself — and protects everything.",
   "industrial.hero.sub": "Battery energy storage and solar self-supply, engineered for your facility. Lower your demand charges, keep production running through outages, and take control of what energy costs your business.",
   "industrial.hero.cta_primary": "Book an energy assessment",
   "industrial.hero.cta_secondary": "See capabilities",
   "industrial.hero.image_alt": "Battery energy storage cabinets installed at an industrial facility at dusk.",
-
   "industrial.props.eyebrow": "Why storage",
   "industrial.props.title": "Four ways storage works for your operation.",
   "industrial.props.sub": "Every facility is different. Most see two or three of these compound at once.",
   "industrial.props.expand": "How it works",
-
   "industrial.props.p1.title": "Peak shaving",
   "industrial.props.p1.summary": "Cut the demand charges that drive your bill.",
   "industrial.props.p1.problem": "Under GDMTH tariffs, a large share of your bill comes from your highest 15-minute demand peak — not just total energy used. A few short spikes each month can set the rate you pay across the whole period.",
   "industrial.props.p1.solves": "The battery discharges precisely during those load peaks, shaving the spikes your meter records. Your facility draws less from the grid at exactly the moments that cost the most, so your billed demand comes down.",
   "industrial.props.p1.deliver": "We profile your load, size storage to your peak shape, and configure automatic discharge so demand-charge reduction happens without anyone on your team lifting a finger.",
-
   "industrial.props.p2.title": "Backup at scale",
   "industrial.props.p2.summary": "Production lines, cold chains and operations ride through outages.",
   "industrial.props.p2.problem": "An outage on a production line, a cold-storage room, or a critical process is lost product, lost hours, and restart costs — sometimes far more than the power itself was ever worth.",
   "industrial.props.p2.solves": "Storage carries your critical loads through grid interruptions, switching over fast enough that sensitive equipment keeps running. Operations continue while the grid sorts itself out.",
   "industrial.props.p2.deliver": "We map your critical loads, size capacity for the runtime you need, and engineer the transfer so the right circuits stay live — cold chain, process control, safety systems first.",
-
   "industrial.props.p3.title": "Solar + storage self-supply",
   "industrial.props.p3.summary": "Generate and store your own energy, hedge tariff increases.",
   "industrial.props.p3.problem": "Energy costs rise and your facility has little control over the rate. Daytime consumption tracks the most expensive hours, and there's no buffer when tariffs move.",
   "industrial.props.p3.solves": "Generate your own power on-site and store what you don't use immediately. You draw on stored energy during costly periods, shifting more of your consumption off the grid and locking in a predictable cost for years.",
   "industrial.props.p3.deliver": "We design generation and storage to your consumption profile, with monitoring that shows exactly how much of your load you're self-supplying day to day.",
-
   "industrial.props.p4.title": "Power quality",
   "industrial.props.p4.summary": "Stable, clean power for sensitive equipment.",
   "industrial.props.p4.problem": "Voltage sags, surges and instability shorten the life of motors, drives and electronics, and can trip sensitive process equipment mid-run.",
   "industrial.props.p4.solves": "Storage and its power-conversion stage sit between the grid and your loads, smoothing disturbances and holding voltage steady so your equipment sees clean, consistent power.",
   "industrial.props.p4.deliver": "We assess your power-quality issues, specify conversion sized to your loads, and verify stable delivery to the circuits that matter most.",
-
   "industrial.scale.eyebrow": "Built for your scale",
   "industrial.scale.title": "From a single shop to a full plant.",
   "industrial.scale.sub": "We engineer systems across three orders of magnitude. Whatever your load, there's a configuration that fits.",
@@ -227,7 +219,6 @@
   "industrial.scale.t3.range": "1 MWh+",
   "industrial.scale.t3.label": "Industrial",
   "industrial.scale.t3.desc": "Plants and facilities — containerized, MWh-class storage for demand management and self-supply at scale.",
-
   "industrial.equip.eyebrow": "Equipment",
   "industrial.equip.title": "Engineered components, specified to your loads.",
   "industrial.equip.sub": "We design with the right tool for the job — sized in kW and kWh, not by brand.",
@@ -243,7 +234,6 @@
   "industrial.equip.e4.title": "Monitoring & EMS",
   "industrial.equip.e4.specs": "Remote telemetry · alerts",
   "industrial.equip.e4.body": "An energy-management layer that meters loads, schedules discharge, and reports performance with remote telemetry and proactive alerts — so the system earns its keep and you always know its state.",
-
   "industrial.path.eyebrow": "How we engage",
   "industrial.path.title": "A clear path from question to running system.",
   "industrial.path.s1.title": "Assess",
@@ -254,7 +244,6 @@
   "industrial.path.s3.body": "Our team installs and commissions the system, integrating it cleanly with your existing electrical infrastructure.",
   "industrial.path.s4.title": "Operate",
   "industrial.path.s4.body": "We monitor performance remotely and support you so the system keeps delivering savings and protection.",
-
   "industrial.form.eyebrow": "Let's talk numbers",
   "industrial.form.title": "Book an energy assessment.",
   "industrial.form.sub": "Tell us a little about your facility and we'll come back with a clear next step. No obligation.",
@@ -303,5 +292,20 @@
   "calc.faq_q2": "Do I need solar?",
   "calc.faq_a2": "No. Many homes start with battery backup alone and add panels later. If you already have solar, we simply add backup to your existing panels.",
   "calc.faq_q3": "What happens after I submit?",
-  "calc.faq_a3": "We'll reach out by WhatsApp or email to confirm a few details and prepare a tailored design. There's no obligation and no pressure."
+  "calc.faq_a3": "We'll reach out by WhatsApp or email to confirm a few details and prepare a tailored design. There's no obligation and no pressure.",
+  "estimator.tiers_heading": "Three ways to size it",
+  "estimator.tier_essentials_name": "Essentials",
+  "estimator.tier_essentials_cover": "Keeps your critical loads running through an outage.",
+  "estimator.tier_critical_name": "Essentials, isolated",
+  "estimator.tier_critical_cover": "Same coverage, cleanly separated with a dedicated loads panel.",
+  "estimator.tier_recommended_name": "Recommended",
+  "estimator.tier_recommended_cover": "Right-sized for your whole home from your answers.",
+  "estimator.tier_badge": "Best fit",
+  "estimator.tier_subpanel_chip": "Essential Loads Panel",
+  "estimator.tier_select": "Choose this",
+  "estimator.tier_selected": "Selected",
+  "estimator.price_plus_iva": "+ IVA",
+  "estimator.price_iva_line": "+ 16% IVA ({iva})",
+  "estimator.price_from": "from",
+  "estimator.qualifier": "Estimated from current pricing — your exact quote follows a quick site visit."
 }

@@ -175,46 +175,38 @@
   "industrial.title": "Mantén tu operación funcionando.",
   "industrial.sub": "Respaldo de energía y solar dimensionados para comercios, oficinas e instalaciones en todo México.",
   "industrial.cta": "Habla con nuestro equipo",
-
   "industrial.meta_title": "Almacenamiento de energía industrial y comercial (BESS) — Firefly Energy",
   "industrial.meta_desc": "Almacenamiento de energía en baterías y autoabasto solar para empresas e instalaciones en todo México. Reduce cargos por demanda, opera durante apagones y agenda una evaluación energética.",
-
   "industrial.hero.eyebrow": "Industrial y Comercial · México",
   "industrial.hero.h1": "Almacenamiento de energía que se paga solo — y lo protege todo.",
   "industrial.hero.sub": "Almacenamiento de energía en baterías y autoabasto solar, diseñados para tu instalación. Reduce tus cargos por demanda, mantén la producción durante apagones y toma el control de lo que la energía le cuesta a tu negocio.",
   "industrial.hero.cta_primary": "Agenda una evaluación energética",
   "industrial.hero.cta_secondary": "Ver capacidades",
   "industrial.hero.image_alt": "Gabinetes de almacenamiento de energía en baterías instalados en una instalación industrial al anochecer.",
-
   "industrial.props.eyebrow": "Por qué almacenar",
   "industrial.props.title": "Cuatro formas en que el almacenamiento trabaja para tu operación.",
   "industrial.props.sub": "Cada instalación es distinta. La mayoría aprovecha dos o tres de estas a la vez.",
   "industrial.props.expand": "Cómo funciona",
-
   "industrial.props.p1.title": "Reducción de picos",
   "industrial.props.p1.summary": "Reduce los cargos por demanda que dominan tu recibo.",
   "industrial.props.p1.problem": "En tarifas GDMTH, buena parte de tu recibo proviene de tu pico de demanda más alto en 15 minutos — no solo de la energía total consumida. Unos pocos picos breves al mes pueden fijar la tarifa que pagas durante todo el periodo.",
   "industrial.props.p1.solves": "La batería se descarga justo durante esos picos de carga, recortando los máximos que registra tu medidor. Tu instalación toma menos de la red precisamente en los momentos que más cuestan, y tu demanda facturada baja.",
   "industrial.props.p1.deliver": "Perfilamos tu carga, dimensionamos el almacenamiento a la forma de tu pico y configuramos la descarga automática para que la reducción de cargos por demanda suceda sin que tu equipo tenga que intervenir.",
-
   "industrial.props.p2.title": "Respaldo a gran escala",
   "industrial.props.p2.summary": "Líneas de producción, cadena de frío y operaciones siguen funcionando durante apagones.",
   "industrial.props.p2.problem": "Un apagón en una línea de producción, una cámara de refrigeración o un proceso crítico significa producto perdido, horas perdidas y costos de reinicio — a veces mucho más de lo que valía la energía en sí.",
   "industrial.props.p2.solves": "El almacenamiento sostiene tus cargas críticas durante las interrupciones de la red, con un cambio lo bastante rápido para que el equipo sensible siga operando. La operación continúa mientras la red se restablece.",
   "industrial.props.p2.deliver": "Mapeamos tus cargas críticas, dimensionamos la capacidad para el tiempo de respaldo que necesitas y diseñamos la transferencia para que los circuitos correctos permanezcan activos — cadena de frío, control de proceso y sistemas de seguridad primero.",
-
   "industrial.props.p3.title": "Autoabasto con solar + almacenamiento",
   "industrial.props.p3.summary": "Genera y almacena tu propia energía, protégete de los aumentos de tarifa.",
   "industrial.props.p3.problem": "Los costos de energía suben y tu instalación tiene poco control sobre la tarifa. El consumo diurno coincide con las horas más caras y no hay margen cuando las tarifas se mueven.",
   "industrial.props.p3.solves": "Genera tu propia energía en sitio y almacena la que no usas de inmediato. Aprovechas la energía almacenada en los periodos costosos, desplazando más de tu consumo fuera de la red y fijando un costo predecible por años.",
   "industrial.props.p3.deliver": "Diseñamos generación y almacenamiento según tu perfil de consumo, con monitoreo que muestra exactamente cuánto de tu carga estás autoabasteciendo día con día.",
-
   "industrial.props.p4.title": "Calidad de la energía",
   "industrial.props.p4.summary": "Energía estable y limpia para equipo sensible.",
   "industrial.props.p4.problem": "Las caídas de voltaje, sobretensiones e inestabilidad acortan la vida de motores, variadores y electrónica, y pueden detener equipo de proceso sensible a media operación.",
   "industrial.props.p4.solves": "El almacenamiento y su etapa de conversión de potencia se ubican entre la red y tus cargas, suavizando las perturbaciones y manteniendo el voltaje estable para que tu equipo reciba energía limpia y consistente.",
   "industrial.props.p4.deliver": "Evaluamos tus problemas de calidad de energía, especificamos la conversión dimensionada a tus cargas y verificamos una entrega estable a los circuitos que más importan.",
-
   "industrial.scale.eyebrow": "Hecho a tu escala",
   "industrial.scale.title": "Desde un solo comercio hasta una planta completa.",
   "industrial.scale.sub": "Diseñamos sistemas en tres órdenes de magnitud. Sea cual sea tu carga, hay una configuración que encaja.",
@@ -227,7 +219,6 @@
   "industrial.scale.t3.range": "1 MWh+",
   "industrial.scale.t3.label": "Industrial",
   "industrial.scale.t3.desc": "Plantas e instalaciones — almacenamiento en contenedor, clase MWh, para gestión de demanda y autoabasto a gran escala.",
-
   "industrial.equip.eyebrow": "Equipo",
   "industrial.equip.title": "Componentes de ingeniería, especificados a tus cargas.",
   "industrial.equip.sub": "Diseñamos con la herramienta adecuada para cada caso — dimensionada en kW y kWh, no por marca.",
@@ -243,7 +234,6 @@
   "industrial.equip.e4.title": "Monitoreo y EMS",
   "industrial.equip.e4.specs": "Telemetría remota · alertas",
   "industrial.equip.e4.body": "Una capa de gestión de energía que mide cargas, programa la descarga y reporta el desempeño con telemetría remota y alertas proactivas — para que el sistema rinda y siempre conozcas su estado.",
-
   "industrial.path.eyebrow": "Cómo trabajamos",
   "industrial.path.title": "Un camino claro de la pregunta al sistema en marcha.",
   "industrial.path.s1.title": "Evaluamos",
@@ -254,7 +244,6 @@
   "industrial.path.s3.body": "Nuestro equipo instala y pone en marcha el sistema, integrándolo de forma limpia con tu infraestructura eléctrica existente.",
   "industrial.path.s4.title": "Operamos",
   "industrial.path.s4.body": "Monitoreamos el desempeño de forma remota y te damos soporte para que el sistema siga entregando ahorro y protección.",
-
   "industrial.form.eyebrow": "Hablemos de números",
   "industrial.form.title": "Agenda una evaluación energética.",
   "industrial.form.sub": "Cuéntanos un poco sobre tu instalación y te responderemos con un siguiente paso claro. Sin compromiso.",
@@ -303,5 +292,20 @@
   "calc.faq_q2": "¿Necesito solar?",
   "calc.faq_a2": "No. Muchos hogares empiezan solo con respaldo de batería y agregan paneles después. Si ya tienes solar, simplemente añadimos respaldo a tus paneles existentes.",
   "calc.faq_q3": "¿Qué pasa después de enviar?",
-  "calc.faq_a3": "Te contactamos por WhatsApp o correo para confirmar algunos detalles y preparar un diseño a tu medida. Sin compromiso y sin presión."
+  "calc.faq_a3": "Te contactamos por WhatsApp o correo para confirmar algunos detalles y preparar un diseño a tu medida. Sin compromiso y sin presión.",
+  "estimator.tiers_heading": "Tres formas de dimensionarlo",
+  "estimator.tier_essentials_name": "Lo esencial",
+  "estimator.tier_essentials_cover": "Mantiene tus cargas críticas durante un apagón.",
+  "estimator.tier_critical_name": "Lo esencial, aislado",
+  "estimator.tier_critical_cover": "La misma cobertura, separada con un tablero de cargas dedicado.",
+  "estimator.tier_recommended_name": "Recomendado",
+  "estimator.tier_recommended_cover": "Dimensionado para toda tu casa según tus respuestas.",
+  "estimator.tier_badge": "Mejor opción",
+  "estimator.tier_subpanel_chip": "Tablero de cargas esenciales",
+  "estimator.tier_select": "Elegir esta",
+  "estimator.tier_selected": "Seleccionada",
+  "estimator.price_plus_iva": "+ IVA",
+  "estimator.price_iva_line": "+ 16% de IVA ({iva})",
+  "estimator.price_from": "desde",
+  "estimator.qualifier": "Estimado con precios actuales — tu cotización exacta sigue tras una visita rápida al sitio."
 }

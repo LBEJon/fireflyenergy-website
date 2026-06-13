@@ -48,6 +48,28 @@ describe('createEstimator', () => {
     expect(payload.answers.home).toBe('family');
   });
 
+  it('getTiers() returns three priced tiers with one highlighted', () => {
+    const e = createEstimator(baseDeps());
+    e.setAnswer('home', 'family');
+    e.setAnswer('backup', 'usual');
+    e.setAnswer('solar', 'add');
+    const tiers = e.getTiers();
+    expect(tiers.map((t) => t.key)).toEqual(['essentials', 'critical', 'recommended']);
+    expect(tiers.every((t) => t.price.totalUsd > 0)).toBe(true);
+    expect(tiers.filter((t) => t.highlighted).length).toBe(1);
+  });
+
+  it('submit() records the selected tier in the lead config', async () => {
+    const deps = baseDeps();
+    const e = createEstimator(deps);
+    e.setAnswer('home', 'family');
+    e.setAnswer('backup', 'usual');
+    e.setAnswer('solar', 'add');
+    await e.submit({ name: 'Ana', contact: 'a@b.com', locale: 'en', selectedTier: 'critical' });
+    const payload = deps.leadClient.mock.calls[0][0] as { config: { selectedTier: string } };
+    expect(payload.config.selectedTier).toBe('critical');
+  });
+
   it('canSubmit() false until name+contact', () => {
     const e = createEstimator(baseDeps());
     expect(e.canSubmit({ name: '', contact: '' })).toBe(false);
