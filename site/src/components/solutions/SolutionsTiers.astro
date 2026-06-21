@@ -1,0 +1,171 @@
+---
+import { t, altUrl, type Locale } from '../../lib/i18n';
+import { SOLUTION_TIERS, priceFor, formatPrice } from '../../lib/solutionsPricing';
+
+interface Props {
+  locale: Locale;
+  /** Build-baked USD→MXN rate (falls back to FX_FALLBACK locally). */
+  fxUsdMxn: number;
+}
+const { locale, fxUsdMxn } = Astro.props;
+
+const calcHref = altUrl(locale, 'calculator');
+const wa = t(locale, 'common.whatsapp');
+const waHref = `https://wa.me/${wa}`;
+
+// Server-render the DEFAULT price (MXN, without solar) so it's correct with JS
+// off; the client re-renders on toggle. Keeps the table as one source of truth.
+const chip = (key: string, kw: number | string) => t(locale, key).replace('{kw}', String(kw));
+const chipKwh = (key: string, kwh: number) => t(locale, key).replace('{kwh}', String(kwh));
+---
+<section class="ff-sol" aria-labelledby="ff-sol-title" data-solutions data-fx={fxUsdMxn}>
+  <div class="ff-sol__inner">
+    <header class="ff-sol__head">
+      <p class="ff-sol__eyebrow">{t(locale, 'solutions.tiers_eyebrow')}</p>
+      <h2 id="ff-sol-title" class="ff-sol__title display">{t(locale, 'solutions.tiers_title')}</h2>
+      <p class="ff-sol__sub">{t(locale, 'solutions.tiers_sub')}</p>
+    </header>
+
+    <!-- Toggles: MXN + Without-solar selected by default -->
+    <div class="ff-sol__toggles">
+      <div class="ff-sol__toggle" role="radiogroup" aria-label={t(locale, 'solutions.toggle_solar_aria')}>
+        <button type="button" class="ff-sol__tog is-active" role="radio" aria-checked="true" data-solar="off">{t(locale, 'solutions.toggle_without_solar')}</button>
+        <button type="button" class="ff-sol__tog" role="radio" aria-checked="false" data-solar="on">{t(locale, 'solutions.toggle_with_solar')}</button>
+      </div>
+      <div class="ff-sol__toggle" role="radiogroup" aria-label={t(locale, 'solutions.toggle_currency_aria')}>
+        <button type="button" class="ff-sol__tog is-active" role="radio" aria-checked="true" data-currency="MXN">{t(locale, 'solutions.toggle_mxn')}</button>
+        <button type="button" class="ff-sol__tog" role="radio" aria-checked="false" data-currency="USD">{t(locale, 'solutions.toggle_usd')}</button>
+      </div>
+    </div>
+
+    <ul class="ff-sol__grid">
+      {SOLUTION_TIERS.map((tier) => (
+        <li class={`ff-sol__tier${tier.recommended ? ' is-recommended' : ''}`}>
+          <article class="ff-sol__card">
+            {tier.recommended && (
+              <span class="ff-sol__badge">{t(locale, 'solutions.recommended_badge')}</span>
+            )}
+            <h3 class="ff-sol__name">{t(locale, `solutions.tier_${tier.key}_name`)}</h3>
+            <p class="ff-sol__covers">{t(locale, `solutions.tier_${tier.key}_covers`)}</p>
+
+            <ul class="ff-sol__chips" aria-hidden="false">
+              <li class="ff-sol__chip">{chip('solutions.chip_inverter', tier.inverterKw)}</li>
+              <li class="ff-sol__chip">{chipKwh('solutions.chip_battery', tier.batteryKwh)}</li>
+              <li class="ff-sol__chip ff-sol__chip--ghost">{chip('solutions.chip_solar_cap', tier.solarCapKw)}</li>
+            </ul>
+
+            {tier.key === 'essentials' && (
+              <p class="ff-sol__caveat">{t(locale, 'solutions.essentials_caveat')}</p>
+            )}
+
+            <div class="ff-sol__price">
+              <span class="ff-sol__from">{t(locale, 'solutions.starting_at')}</span>
+              <span class="ff-sol__amount" data-price data-tier={tier.key}>
+                {formatPrice(priceFor(tier.key, false), 'MXN', fxUsdMxn)}
+              </span>
+              <span class="ff-sol__iva">{t(locale, 'solutions.iva_note')}</span>
+              <span class="ff-sol__solar-note" data-solar-note hidden>{t(locale, 'solutions.with_solar_note')}</span>
+            </div>
+
+            <div class="ff-sol__ctas">
+              <a class="ff-sol__cta ff-sol__cta--primary" href={calcHref}>{t(locale, 'solutions.cta_estimate')}</a>
+              <a class="ff-sol__cta ff-sol__cta--ghost" href={waHref} target="_blank" rel="noopener">{t(locale, 'solutions.cta_whatsapp')}</a>
+            </div>
+          </article>
+        </li>
+      ))}
+    </ul>
+
+    <p class="ff-sol__microcopy">{t(locale, 'solutions.microcopy')}</p>
+  </div>
+</section>
+
+<style>
+  .ff-sol { background: var(--ff-green-tint); padding: var(--sp-7) var(--sp-3); }
+  .ff-sol__inner { max-width: var(--container); margin: 0 auto; }
+  .ff-sol__head { max-width: var(--container-tight); margin: 0 auto var(--sp-4); text-align: center; }
+  .ff-sol__eyebrow {
+    text-transform: uppercase; letter-spacing: 0.12em; font-size: var(--fs-eyebrow);
+    font-weight: 700; color: var(--ff-accent-dk); margin: 0 0 var(--sp-2);
+  }
+  .ff-sol__title { font-size: var(--fs-h1); line-height: var(--lh-snug); margin: 0 0 var(--sp-2); }
+  .ff-sol__sub { font-size: var(--fs-lead); color: var(--ff-slate); margin: 0; }
+
+  /* ---- Toggles ---- */
+  .ff-sol__toggles { display: flex; flex-wrap: wrap; gap: var(--sp-2); justify-content: center; margin: 0 0 var(--sp-5); }
+  .ff-sol__toggle { display: inline-flex; border: 1px solid var(--ff-line); border-radius: var(--r-pill); overflow: hidden; background: var(--ff-white); }
+  .ff-sol__tog {
+    background: var(--ff-white); border: 0; padding: 0.5rem 1.1rem; font-weight: 700; font-size: var(--fs-small);
+    color: var(--ff-slate); cursor: pointer; font-family: var(--ff-sans);
+    transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+  }
+  .ff-sol__tog.is-active { background: var(--ff-ink); color: var(--ff-white); }
+  .ff-sol__tog:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: -3px; }
+
+  /* ---- Tier grid ---- */
+  .ff-sol__grid { list-style: none; display: grid; gap: var(--sp-3); padding: 0; margin: 0 0 var(--sp-4); }
+  @media (min-width: 720px) { .ff-sol__grid { grid-template-columns: repeat(3, 1fr); align-items: stretch; } }
+  .ff-sol__tier { display: flex; }
+  .ff-sol__card {
+    position: relative; display: flex; flex-direction: column; gap: 0.45rem; width: 100%;
+    background: var(--ff-white); border: 2px solid var(--ff-line); border-radius: var(--r-lg);
+    padding: var(--sp-4); box-shadow: var(--shadow-sm);
+    transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  }
+  .ff-sol__card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+  .ff-sol__tier.is-recommended .ff-sol__card {
+    border-color: var(--ff-accent); box-shadow: var(--shadow-md);
+  }
+  .ff-sol__badge {
+    position: absolute; top: -0.8rem; right: var(--sp-3); background: var(--ff-accent); color: var(--ff-white);
+    font-size: var(--fs-eyebrow); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 0.25rem 0.7rem; border-radius: var(--r-pill);
+  }
+  .ff-sol__name { font-size: var(--fs-h3); font-weight: 800; color: var(--ff-ink); margin: 0; }
+  .ff-sol__covers { color: var(--ff-slate); font-size: var(--fs-small); margin: 0; line-height: var(--lh-body); }
+
+  .ff-sol__chips { list-style: none; display: flex; flex-wrap: wrap; gap: var(--sp-1); padding: 0; margin: var(--sp-1) 0 0; }
+  .ff-sol__chip {
+    background: var(--ff-green); color: var(--ff-ink); font-weight: 700; font-size: var(--fs-small);
+    padding: 0.3rem 0.75rem; border-radius: var(--r-pill);
+  }
+  .ff-sol__chip--ghost { background: var(--ff-green-tint); color: var(--ff-ink); border: 1px solid var(--ff-line); }
+
+  .ff-sol__caveat {
+    color: var(--ff-accent-dk); font-size: var(--fs-small); font-weight: 700; margin: var(--sp-1) 0 0;
+    line-height: var(--lh-body);
+  }
+
+  .ff-sol__price { margin-top: auto; padding-top: var(--sp-2); display: flex; flex-direction: column; gap: 0.15rem; }
+  .ff-sol__from {
+    color: var(--ff-storm); font-size: var(--fs-eyebrow); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
+  }
+  .ff-sol__amount { font-family: var(--ff-display); font-size: var(--fs-h1); color: var(--ff-accent-dk); line-height: var(--lh-snug); }
+  .ff-sol__iva { color: var(--ff-slate); font-size: var(--fs-small); }
+  .ff-sol__solar-note { color: var(--ff-storm); font-size: var(--fs-small); margin-top: 0.25rem; line-height: var(--lh-body); }
+
+  .ff-sol__ctas { display: flex; flex-direction: column; gap: var(--sp-1); margin-top: var(--sp-3); }
+  .ff-sol__cta {
+    display: inline-flex; align-items: center; justify-content: center; text-align: center;
+    border-radius: var(--r-pill); font-weight: 700; font-size: var(--fs-small); text-decoration: none;
+    padding: 0.7rem 1.2rem; border: 2px solid transparent;
+    transition: background var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .ff-sol__cta--primary { background: var(--ff-accent); color: var(--ff-white); }
+  .ff-sol__cta--primary:hover { background: var(--ff-accent-dk); transform: translateY(-1px); }
+  .ff-sol__cta--ghost { background: transparent; color: var(--ff-ink); border-color: var(--ff-line); }
+  .ff-sol__cta--ghost:hover { border-color: var(--ff-ink); }
+  .ff-sol__cta:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+
+  .ff-sol__microcopy { text-align: center; color: var(--ff-storm); font-size: var(--fs-small); margin: 0; max-width: 54ch; margin-inline: auto; }
+
+  @media (max-width: 600px) {
+    .ff-sol__card { padding: var(--sp-3); }
+  }
+</style>
+
+<script>
+  import { initSolutionsTiers } from './solutions.client';
+  const root = document.querySelector<HTMLElement>('[data-solutions]');
+  if (root) initSolutionsTiers(root);
+</script>

@@ -1,0 +1,147 @@
+---
+import type { Locale } from '../lib/i18n';
+import { faqData } from '../lib/faqData';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const data = faqData[locale];
+
+const count = (n: number) => `${n} ${data.countUnit[n === 1 ? 0 : 1]}`;
+---
+<section class="ff-faq">
+  <div class="ff-faq__inner">
+    <header class="ff-faq__head">
+      <p class="ff-faq__eyebrow">{data.eyebrow}</p>
+      <h1 class="ff-faq__title display">{data.title}</h1>
+      <p class="ff-faq__sub">{data.sub}</p>
+    </header>
+
+    <nav class="ff-faq__nav" aria-label={data.title}>
+      {data.categories.map((c) => (
+        <a class="ff-faq__chip" href={`#faq-${c.id}`}>
+          <span class="ff-faq__chip-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" set:html={c.icon} />
+          </span>
+          {c.label}
+        </a>
+      ))}
+    </nav>
+
+    {data.categories.map((c) => (
+      <section class="ff-faq__cat" id={`faq-${c.id}`}>
+        <div class="ff-faq__cat-head">
+          <span class="ff-faq__cat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" set:html={c.icon} />
+          </span>
+          <h2 class="ff-faq__cat-title">{c.label}</h2>
+          <span class="ff-faq__cat-count">{count(c.items.length)}</span>
+        </div>
+        <div class="ff-faq__list">
+          {c.items.map((it) => (
+            <details class="ff-faq__item">
+              <summary class="ff-faq__q">
+                <span>{it.q}</span>
+                <svg class="ff-faq__caret" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              </summary>
+              <div class="ff-faq__a" set:html={it.a} />
+            </details>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+</section>
+
+<style>
+  .ff-faq { background: var(--ff-paper); padding: var(--sp-7) var(--sp-3); }
+  .ff-faq__inner { max-width: var(--container-tight); margin: 0 auto; }
+
+  .ff-faq__head { text-align: center; margin-bottom: var(--sp-5); }
+  .ff-faq__eyebrow {
+    text-transform: uppercase; letter-spacing: 0.12em; font-size: var(--fs-eyebrow);
+    font-weight: 700; color: var(--ff-accent-dk); margin: 0 0 var(--sp-2);
+  }
+  .ff-faq__title { font-size: var(--fs-h1); line-height: var(--lh-snug); margin: 0 0 var(--sp-2); }
+  .ff-faq__sub { font-size: var(--fs-lead); color: var(--ff-slate); margin: 0 auto; max-width: 56ch; }
+
+  /* Category jump nav */
+  .ff-faq__nav {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: var(--sp-2);
+    margin-bottom: var(--sp-6);
+  }
+  .ff-faq__chip {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.5rem 0.9rem;
+    background: var(--ff-white); border: 1px solid var(--ff-line); border-radius: var(--r-pill);
+    font-size: var(--fs-small); font-weight: 600; color: var(--ff-ink); text-decoration: none;
+    box-shadow: var(--shadow-sm);
+    transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .ff-faq__chip:hover { border-color: var(--ff-accent); transform: translateY(-1px); }
+  .ff-faq__chip-icon { display: inline-flex; color: var(--ff-accent-dk); }
+
+  /* Category block */
+  .ff-faq__cat { scroll-margin-top: var(--sp-6); margin-top: var(--sp-6); }
+  .ff-faq__cat:first-of-type { margin-top: 0; }
+  .ff-faq__cat-head { display: flex; align-items: center; gap: 0.7rem; margin-bottom: var(--sp-3); }
+  .ff-faq__cat-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 42px; height: 42px; flex: none;
+    border-radius: var(--r-sm); background: var(--ff-green-tint); color: var(--ff-ink);
+  }
+  .ff-faq__cat-title { font-size: var(--fs-h3); margin: 0; }
+  .ff-faq__cat-count {
+    margin-left: auto; font-size: var(--fs-small); font-weight: 600; color: var(--ff-slate);
+    white-space: nowrap;
+  }
+
+  /* Accordion items */
+  .ff-faq__list { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .ff-faq__item {
+    background: var(--ff-white); border: 1px solid var(--ff-line); border-radius: var(--r-md);
+    box-shadow: var(--shadow-sm); overflow: hidden;
+  }
+  .ff-faq__q {
+    display: flex; align-items: center; gap: var(--sp-2); cursor: pointer;
+    list-style: none; padding: var(--sp-3);
+    font-size: var(--fs-h4, 1.05rem); font-weight: 700; color: var(--ff-ink);
+    line-height: var(--lh-snug);
+  }
+  .ff-faq__q::-webkit-details-marker { display: none; }
+  .ff-faq__q > span { flex: 1; }
+  .ff-faq__caret { flex: none; color: var(--ff-slate); transition: transform var(--dur) var(--ease); }
+  .ff-faq__item[open] .ff-faq__caret { transform: rotate(180deg); }
+  .ff-faq__item[open] .ff-faq__q { color: var(--ff-accent-dk); }
+
+  .ff-faq__a {
+    padding: 0 var(--sp-3) var(--sp-3);
+    color: var(--ff-slate); line-height: var(--lh-body);
+  }
+  .ff-faq__a :global(p) { margin: 0 0 var(--sp-2); }
+  .ff-faq__a :global(p:last-child) { margin-bottom: 0; }
+  .ff-faq__a :global(strong) { color: var(--ff-ink); font-weight: 700; }
+  .ff-faq__a :global(ul) { margin: 0 0 var(--sp-2); padding-left: 1.2rem; }
+  .ff-faq__a :global(li) { margin: 0 0 0.4rem; }
+  .ff-faq__a :global(li::marker) { color: var(--ff-accent); }
+
+  /* Spec / warranty tables */
+  .ff-faq__a :global(.ff-faq__tablewrap) { overflow-x: auto; margin: 0 0 var(--sp-2); }
+  .ff-faq__a :global(table) {
+    width: 100%; border-collapse: collapse; font-size: var(--fs-small); min-width: 460px;
+  }
+  .ff-faq__a :global(th), .ff-faq__a :global(td) {
+    text-align: left; padding: 0.6rem 0.7rem; border-bottom: 1px solid var(--ff-line);
+    vertical-align: top;
+  }
+  .ff-faq__a :global(thead th) {
+    background: var(--ff-green-tint); color: var(--ff-ink); font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.04em; font-size: var(--fs-eyebrow);
+  }
+  .ff-faq__a :global(tbody td:first-child) { color: var(--ff-ink); font-weight: 600; white-space: nowrap; }
+
+  @media (max-width: 600px) {
+    .ff-faq__cat-count { display: none; }
+  }
+</style>
