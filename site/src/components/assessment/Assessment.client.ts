@@ -319,6 +319,8 @@ export function initAssessment(root: HTMLElement): void {
   const recLine = root.querySelector<HTMLElement>('[data-rec-line]');
   const recBtn = root.querySelector<HTMLButtonElement>('[data-panel-rec]');
   const noneBtn = root.querySelector<HTMLButtonElement>('[data-panel-none]');
+  const addSolarHeading = root.querySelector<HTMLElement>('[data-addsolar-heading]');
+  const addSolarHelp = root.querySelector<HTMLElement>('[data-addsolar-help]');
   const panelVal = root.querySelector<HTMLInputElement>('[data-panel-val]');
   const offsetLine = root.querySelector<HTMLElement>('[data-offset-line]');
   let solarTouched = false; // once the user adjusts, stop auto-resetting to rec
@@ -380,6 +382,15 @@ export function initAssessment(root: HTMLElement): void {
   function prepareSolarStep() {
     const cfe = currentCfeKwhPerDay();
     if (solarRec) solarRec.hidden = false;
+    // If they already have solar (entered existing panels), this step is about
+    // *additional* panels — and "none" means keep the panels they already have.
+    const hasExisting = currentExistingKw() > 0;
+    if (addSolarHeading)
+      addSolarHeading.textContent = tr(hasExisting ? 'assessment.addsolar.heading_existing' : 'assessment.addsolar.heading');
+    if (addSolarHelp)
+      addSolarHelp.textContent = tr(hasExisting ? 'assessment.addsolar.help_existing' : 'assessment.addsolar.help');
+    if (noneBtn)
+      noneBtn.textContent = tr(hasExisting ? 'assessment.solar.none_existing' : 'assessment.solar.none');
     // No recommendation without consumption (shouldn't happen in Door A): keep the
     // stepper for free entry, hide the rec line + "Use recommended" button.
     lastRec = cfe > 0 ? recommendPanels(cfe, currentExistingKw()) : 0;
