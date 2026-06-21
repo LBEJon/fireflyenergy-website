@@ -537,14 +537,14 @@ const backupOpts = ['4', '8', '12', '24'];
     font-size: var(--fs-small); color: var(--ff-ink); cursor: pointer;
   }
   .ff-as__capture-check input { width: 1.1rem; height: 1.1rem; accent-color: var(--ff-green); }
-  .ff-as__phone-row { display: flex; gap: 0.5rem; }
+  .ff-as__phone-row { display: flex; gap: 0.5rem; align-items: stretch; }
   .ff-as__cc {
-    flex: 0 0 auto; width: auto; box-sizing: border-box; padding: 0.7rem 0.6rem;
+    flex: 0 0 auto; width: auto; max-width: 6.5rem; box-sizing: border-box; padding: 0.7rem 0.6rem;
     border: 2px solid var(--ff-line); border-radius: var(--r-md);
     font-family: var(--ff-sans); font-size: var(--fs-body); background: var(--ff-paper); cursor: pointer;
   }
   .ff-as__cc:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 1px; border-color: var(--ff-accent); }
-  .ff-as__phone-row input { flex: 1 1 auto; }
+  .ff-as__phone-row input { flex: 1 1 0; min-width: 0; }
   .ff-as__hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
   .ff-as__submit, .ff-as__wa-btn {
     display: inline-block; width: 100%; box-sizing: border-box; text-align: center;

@@ -49,11 +49,16 @@ export async function fetchEstimate(
   baseUrl: string,
   body: EstimateBody,
 ): Promise<EstimateResult | { error: true }> {
+  // Bound the wait: the estimate is best-effort (no price is shown), so never let
+  // a slow/unreachable endpoint stall the capture form. Abort after 5s.
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5000);
   try {
     const res = await fetch(`${baseUrl}/functions/v1/site-estimate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
+      signal: controller.signal,
     });
     if (!res.ok) return { error: true };
     const data = (await res.json()) as EstimateResult;
@@ -61,5 +66,7 @@ export async function fetchEstimate(
     return data;
   } catch {
     return { error: true };
+  } finally {
+    clearTimeout(timer);
   }
 }

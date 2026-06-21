@@ -426,10 +426,7 @@ export function initAssessment(root: HTMLElement): void {
   const loadingEl = root.querySelector<HTMLElement>('[data-result-loading]');
   const resultBlock = root.querySelector<HTMLElement>('[data-result-block]');
 
-  async function runResult() {
-    if (loadingEl) loadingEl.hidden = false;
-    if (resultBlock) resultBlock.hidden = true;
-
+  function runResult() {
     // No known consumption → we can't size a proposal from inputs alone; route to
     // the site-visit door so an expert can gather what's needed.
     if (!consumptionKnown(answers)) {
@@ -437,22 +434,18 @@ export function initAssessment(root: HTMLElement): void {
       return;
     }
 
-    // We no longer show a price here — the customized proposal is delivered within
-    // 24h. The estimate is best-effort: a needsSiteVisit verdict still routes to the
-    // site-visit door, and a successful estimate enriches the CRM payload with a
-    // suggested config — but an estimate error must NOT block the capture form.
-    const res = await fetchEstimate(baseUrl, toEstimateBody(answers));
-    if (!('error' in res) && res.needsSiteVisit) {
-      routeToDoorB(true);
-      return;
-    }
-    if (!('error' in res) && res.tiers && res.tiers.length > 0) {
-      lastResult = res;
-      selectedTier = res.tiers.find((t) => t.highlighted)?.key ?? res.tiers[0].key;
-    }
-
+    // Show the capture form immediately — there's no price to wait for. The estimate
+    // is best-effort enrichment for the CRM: run it in the background and, if it
+    // returns before the lead is submitted, attach the suggested config. A slow or
+    // unreachable endpoint never makes the customer wait.
     if (loadingEl) loadingEl.hidden = true;
     if (resultBlock) resultBlock.hidden = false;
+    void fetchEstimate(baseUrl, toEstimateBody(answers)).then((res) => {
+      if (!('error' in res) && res.tiers && res.tiers.length > 0) {
+        lastResult = res;
+        selectedTier = res.tiers.find((t) => t.highlighted)?.key ?? res.tiers[0].key;
+      }
+    });
   }
 
   // Compose the contact fields into a lead payload's contact parts. The phone is
