@@ -1,0 +1,149 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Firefly — Assessment Flow Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Narrow:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--lime:#9ED500;--ink:#2A2D34;--coral:#FF6A3D;--slate:#5B606B;--paper:#FDFBF7;--line:#E7E2D6;--tint:#F2F8E0;--mist:#F3EFE5}
+*{box-sizing:border-box}
+body{font-family:Archivo,system-ui,sans-serif;color:var(--ink);background:#EFEBE2;margin:0;line-height:1.55}
+.wrap{max-width:1040px;margin:0 auto;padding:40px 24px 90px}
+h1{font-family:'Archivo Narrow',sans-serif;font-size:2.5rem;margin:.1em 0;border-bottom:5px solid var(--lime);padding-bottom:12px}
+.lead{color:var(--slate);font-size:1.05rem;margin:.3em 0 0}
+.badge{display:inline-block;background:var(--coral);color:#fff;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 12px;border-radius:999px;margin-bottom:10px}
+.sec-label{font-family:'Archivo Narrow',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin:38px 0 4px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:22px;margin:10px 0;box-shadow:0 8px 24px rgba(42,45,52,.06)}
+h2{font-family:'Archivo Narrow',sans-serif;font-size:1.45rem;margin:.1em 0 .5em}
+h3{font-size:1.05rem;margin:0 0 4px}
+.muted{color:var(--slate);font-size:.92rem}
+.pill{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;font-weight:700;font-size:.92rem;padding:.7rem 1.4rem}
+.coral{background:var(--coral);color:#fff}.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.dots{display:flex;gap:5px;margin:0 0 12px}.dots span{width:26px;height:5px;border-radius:3px;background:var(--line)}.dots span.on{background:var(--lime)}
+.doors{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.door{border:1.5px solid var(--line);border-radius:14px;padding:20px;background:#fff}
+.door.a{border-color:var(--lime);background:#FBFFF0}
+.choice{display:flex;gap:11px;align-items:flex-start;border:1.5px solid var(--line);border-radius:11px;padding:12px 14px;margin:8px 0;background:#fff;font-size:.95rem}
+.choice.sel{border-color:var(--lime);background:#F8FCEB;box-shadow:0 0 0 3px rgba(158,213,0,.14)}
+.choice .em{font-size:1.2rem}.choice small{display:block;color:var(--slate);font-weight:400;font-size:.82rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.fld{background:#fff;border:1px solid var(--line);border-radius:9px;padding:10px 12px;color:var(--slate);font-size:.9rem}
+.upload{border:2px dashed #C9C3B4;border-radius:12px;padding:22px;text-align:center;color:var(--slate);background:#fff}
+.note{background:var(--tint);border-left:4px solid var(--lime);border-radius:0 8px 8px 0;padding:9px 13px;font-size:.88rem;color:#3d4147;margin:8px 0}
+.warn{background:#FFF8EC;border-left:4px solid var(--coral)}
+/* result tiers */
+.tiers{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.tier{border:1.5px solid var(--line);border-radius:14px;padding:16px;background:#fff;position:relative}
+.tier.hi{border-color:var(--ink);background:#2A2D34;color:#fff;box-shadow:0 12px 30px rgba(42,45,52,.25)}
+.tier.hi .muted{color:rgba(255,255,255,.7)}
+.tier .tn{font-family:'Archivo Narrow',sans-serif;font-size:1.1rem;font-weight:700}
+.tbadge{position:absolute;top:-10px;right:12px;background:var(--coral);color:#fff;font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:999px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin:10px 0}
+.chip{background:var(--mist);border-radius:7px;padding:5px 8px;font-size:.74rem;font-weight:600}
+.tier.hi .chip{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(158,213,0,.35)}
+.price{font-family:'Archivo Narrow',sans-serif;font-size:1.7rem;font-weight:700;line-height:1.05;margin-top:8px}
+.tier.hi .price{color:#fff}.iva{font-size:.78rem;color:var(--slate)}.tier.hi .iva{color:rgba(255,255,255,.7)}
+.cur{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;font-size:.72rem;vertical-align:middle;margin-left:6px}
+.cur span{padding:3px 10px}.cur .on{background:var(--lime);color:var(--ink);font-weight:700}
+.cap{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-top:14px;align-items:center}
+.flag{background:#FFF8EC;border:1px solid #F4D9C0;border-radius:12px;padding:14px 16px;margin:10px 0}
+.flag b{color:var(--coral)}
+.arrow{text-align:center;color:#B9B3A4;font-size:1.4rem;margin:2px 0}
+code{background:var(--tint);padding:.1em .4em;border-radius:5px;font-size:.85em}
+@media(max-width:760px){.doors,.tiers,.grid2,.grid3{grid-template-columns:1fr}}
+</style></head><body><div class="wrap">
+<span class="badge">Firefly · Calculator review · real engine numbers</span>
+<h1>The accurate-estimate assessment</h1>
+<p class="lead">A full walkthrough of the new two-door calculator. Prices below are the <b>real output of your proposal engine</b> for a sample home (family, 25 kWh/day from CFE bill, 12 h backup, 8 new panels, comfort coverage, 2 mini-splits + fridge + 110V pump + pool). Live at <code>localhost:4321/calculator/</code>.</p>
+
+<div class="sec-label">Entry — two doors</div>
+<div class="card"><div class="doors">
+  <div class="door a">
+    <h3>⚡ Get my accurate estimate</h3>
+    <p class="muted">Answer a few questions about your home and power use. We size your system with the same engine our proposals use — and show you a real price range.</p>
+    <span class="pill coral" style="margin-top:6px">Start the assessment →</span>
+  </div>
+  <div class="door">
+    <h3>📅 Have an expert contact me</h3>
+    <p class="muted">Prefer to skip the questions? Leave your details and we'll reach out to schedule a quick site visit.</p>
+    <span class="pill ghost" style="margin-top:6px">Request a visit →</span>
+  </div>
+</div>
+<div class="note">The whole funnel honors one rule: <b>no price is ever shown without real consumption.</b> Door B — and any incomplete answer — never sees a number.</div>
+</div>
+
+<div class="sec-label">Door A · Step 1 — your consumption</div>
+<div class="card"><div class="dots"><span class="on"></span><span></span><span></span><span></span><span></span></div>
+<h2>How much power do you use?</h2>
+<div class="grid2">
+  <div><div class="upload">📄 <b>Upload your CFE bill</b><br><span class="muted">jpg, png or pdf · we read your kWh automatically</span></div>
+  <div class="note" style="margin-top:8px">✓ Parsed: <b>25 kWh/day</b> from your last bill (600 kWh / 24 days).</div></div>
+  <div><p class="muted">Or enter it manually:</p><div class="fld">Average monthly kWh — e.g. 750</div>
+  <p class="muted" style="margin-top:10px"><a style="color:var(--coral)">I don't know my usage →</a> <small>routes to "have an expert contact me"</small></p></div>
+</div></div>
+
+<div class="sec-label">Door A · Step 2 — existing solar</div>
+<div class="card"><div class="dots"><span class="on"></span><span class="on"></span><span></span><span></span><span></span></div>
+<h2>Do you already have solar panels?</h2>
+<div class="grid3"><div class="choice sel"><span class="em">☀️</span><div>Yes</div></div><div class="choice"><span class="em">🔋</span><div>No</div></div><div class="fld">Panels: <b>8</b> &nbsp;·&nbsp; Watts each: <b>645</b></div></div>
+<div class="note">That's about <b>5.16 kWp</b> of existing production — we factor it into your offset.</div></div>
+
+<div class="sec-label">Door A · Step 3 — appliances & critical loads</div>
+<div class="card"><div class="dots"><span class="on"></span><span class="on"></span><span class="on"></span><span></span><span></span></div>
+<h2>What's running in your home?</h2>
+<div class="grid3">
+<div class="fld">Mini-splits: <b>2</b></div><div class="fld">Refrigerators: <b>1</b></div><div class="fld">Water pump: <b>110V</b></div>
+<div class="choice sel"><span class="em">🏊</span><div>Pool pump</div></div><div class="choice"><span class="em">🍳</span><div>Electric oven</div></div><div class="choice"><span class="em">🛗</span><div>Elevator</div></div>
+</div>
+<h3 style="margin-top:14px">➕ Add an appliance that's not listed <span class="muted" style="font-weight:400">(NEW)</span></h3>
+<div class="grid3" style="grid-template-columns:1.4fr 1fr auto">
+  <div class="fld">Name — e.g. "Workshop"</div><div class="fld">Estimated watts — 1200</div><div class="choice" style="margin:0"><span class="em">⚡</span><div>Runs in an outage?</div></div>
+</div>
+<div class="note">Added: <b>Workshop — 1,200 W · runs in an outage</b> &nbsp;✕ &nbsp;<span class="muted">— folds into your load sizing so you see its real impact.</span></div>
+<h3 style="margin-top:14px">What must stay on in an outage?</h3>
+<div class="grid3"><div class="choice"><span class="em">💡</span><div>Essentials</div></div><div class="choice sel"><span class="em">🛋️</span><div>Life as usual</div></div><div class="choice"><span class="em">✨</span><div>Everything</div></div></div>
+</div>
+
+<div class="sec-label">Door A · Step 3b — add solar (NEW: recommended to offset your bill)</div>
+<div class="card">
+<h2>Add solar panels to your new system?</h2>
+<p class="muted">Panels lower your bill and recharge your battery. We recommend enough to offset your usage — adjust from there.</p>
+<div class="note"><b>☀️ We recommend 9 panels</b> to offset ~100% of your 25 kWh/day usage (645 W panels · San Miguel sun).</div>
+<div style="display:flex;align-items:center;gap:14px;margin:12px 0">
+  <span class="pill ghost">– </span>
+  <div style="text-align:center"><div style="font-family:'Archivo Narrow',sans-serif;font-size:1.9rem;font-weight:700">9 panels</div><div class="muted" style="font-size:.82rem">Offsets about <b>100%</b> of your usage</div></div>
+  <span class="pill ghost">+</span>
+  <span class="choice" style="margin:0 0 0 10px"><span class="em">🔋</span><div>None — battery only</div></span>
+</div>
+<div class="note">As you step up or down, the offset readout updates live (e.g. 8 panels → ~91%). The 4-panel string minimum is respected automatically.</div>
+</div>
+
+<div class="sec-label">Door A · Step 4 — backup goal</div>
+<div class="card"><div class="dots"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span></span></div>
+<h2>How long should your essentials run in an outage?</h2>
+<div class="grid3" style="grid-template-columns:repeat(4,1fr)"><div class="choice"><div>4 hrs</div></div><div class="choice"><div>8 hrs</div></div><div class="choice sel"><div>12 hrs</div></div><div class="choice"><div>24 hrs</div></div></div></div>
+
+<div class="sec-label">Door A · Step 5 — your result (engine-computed)</div>
+<div class="card"><div class="dots"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span></div>
+<h2>Your Firefly system <span class="cur"><span class="on">USD</span><span>MXN</span></span></h2>
+<p class="muted">Based on 25 kWh/day · 12 h backup · 8 panels · comfort coverage. Choose the option that fits.</p>
+<div class="tiers" style="grid-template-columns:1fr 1.3fr">
+  <div class="tier"><div class="tn">Essentials</div><div class="muted" style="font-size:.82rem">Critical loads only — the dependable floor</div>
+    <div class="chips"><span class="chip">6.5 kW</span><span class="chip">5 kWh</span><span class="chip">Essential Loads Panel</span></div>
+    <div class="muted" style="font-size:.74rem;margin-top:6px">Starting at</div><div class="price">$5,075</div><div class="iva">+ 16% IVA ($812)</div></div>
+  <div class="tier hi"><span class="tbadge">Recommended</span><div class="tn">Recommended</div><div class="muted" style="font-size:.82rem">Right-sized for your home, with solar</div>
+    <div class="chips"><span class="chip">6.5 kW</span><span class="chip">16 kWh</span><span class="chip">8 panels</span></div>
+    <div class="muted" style="font-size:.74rem;margin-top:6px">Estimated installed range</div><div class="price">$13,629 – $16,354</div><div class="iva">+ 16% IVA · Final price quoted after a site visit and inspection.</div></div>
+</div>
+<div class="note">Two options only. Essentials is a fixed minimal package (single "from" price); Recommended carries a <b>20% range</b> anchored at the estimate — your real price lands at the bottom-to-middle, with room for site specifics. Prices USD; toggle shows MXN at the daily rate.</div>
+<div class="cap"><div class="fld">Name</div><div class="fld">WhatsApp or email</div><span class="pill coral">Get my exact quote →</span></div>
+<p class="muted" style="margin-top:8px">Not ready? <a style="color:var(--coral)">Email me this estimate</a> · 💬 WhatsApp us</p>
+</div>
+
+<div class="sec-label">Door B — have an expert contact me</div>
+<div class="card"><h2>Let's schedule your site visit</h2>
+<div class="grid2"><div class="fld">Name</div><div class="fld">WhatsApp or email</div><div class="fld">Where's your home? (optional)</div><div class="fld">Anything we should know? (optional)</div></div>
+<span class="pill coral" style="margin-top:12px">Request my visit →</span>
+<div class="note">No price shown — this door is for people who'd rather talk first. Lands in the CRM flagged <code>site_visit_requested</code>.</div></div>
+
+<div class="sec-label">✓ Tier model — locked to your spec</div>
+<div class="note"><b>Two options only.</b> <b>Essentials</b> is fixed: lowest-capacity 6.5 kW inverter (hard cap, never exceeds 6,500 W) + lowest 5 kWh battery + Essential Loads Panel, critical-loads-only, battery-only → a single "from $5,075" price. <b>Recommended</b> is engine-sized for the home + their solar, shown as a 20% range ($13,629 – $16,354) anchored at the estimate so the true price lands bottom-to-middle with room to spare; "final price quoted after a site visit and inspection." IVA shown separately. The old middle "Critical Circuits" tier is gone — its subpanel folded into Essentials. Adjustable: the 20% width is a single constant (`RANGE_PCT`).</div>
+
+</div></body></html>

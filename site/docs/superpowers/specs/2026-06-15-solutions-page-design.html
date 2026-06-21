@@ -1,0 +1,93 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>Solutions Page Spec</title><style>:root{--ink:#2A2D34;--mut:#5b6168;--line:#e7e3dc;--paper:#fbfaf7;--green:#9ED500;--accent:#FF6A3D;--gold:#FFB81C;--code:#f3f0ea}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}.wrap{max-width:860px;margin:0 auto;padding:2.5rem 1.5rem 5rem}h1{font-size:2rem;line-height:1.15;border-bottom:4px solid var(--green);padding-bottom:.5rem}h2{font-size:1.3rem;margin-top:2rem;color:#2A2D34;border-left:4px solid var(--accent);padding-left:.6rem}h3{font-size:1.05rem;margin-top:1.3rem}table{border-collapse:collapse;width:100%;font-size:.93em;margin:1rem 0}th,td{border:1px solid var(--line);padding:.5rem .7rem;text-align:left;vertical-align:top}th{background:#f3f6ea}code{background:var(--code);padding:.12em .4em;border-radius:5px;font-size:.86em;font-family:ui-monospace,Menlo,monospace}strong{color:#1a1a1a}a{color:var(--accent)}em{color:var(--mut)}ul,ol{padding-left:1.3rem}li{margin:.25rem 0}</style></head><body><div class=wrap><h1 id="fireflyenergymx-solutions-page-design-spec">FireflyEnergy.mx — Solutions Page Design Spec</h1>
+<p><em>Brainstormed with Jon, 2026-06-15</em></p>
+<h2 id="goal">Goal</h2>
+<p>A bilingual <code>/solutions/</code> page that highlights Firefly's equipment and three recommended systems, gives customers a real sense of <strong>what it costs to start</strong> — without becoming a cost-first pricing table. Price <em>informs</em>; the right-sized system and Firefly's quality lead. Funnels to the personalized calculator and the (now-live) lead capture.</p>
+<p>Replaces the current 404 at <code>/solutions/</code> (the nav already links it).</p>
+<h2 id="direction-chosen">Direction (chosen)</h2>
+<p><strong>Recommended-led spectrum</strong> (Approach B). Lead with the recommended system + value; present three rungs where <strong>Essentials is the honest floor</strong> ("starting at"), <strong>Whole-home is the recommended hero</strong>, and price never dominates the layout.</p>
+<h2 id="the-three-tiers">The three tiers</h2>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Inverter</th>
+<th>Battery</th>
+<th>Solar cap</th>
+<th>Covers</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Essentials</strong> (floor)</td>
+<td>6.5 kW</td>
+<td>5 kWh</td>
+<td>up to 6.5 kW</td>
+<td>Keep critical things on</td>
+<td><strong>Critical loads only — includes a dedicated sub-panel</strong> (must be explicit)</td>
+</tr>
+<tr>
+<td><strong>Comfort</strong></td>
+<td>10 kW</td>
+<td>10 kWh</td>
+<td>up to 10 kW</td>
+<td>Everyday life, incl. some A/C</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Whole-home</strong> (recommended hero)</td>
+<td>12 kW</td>
+<td>16 kWh</td>
+<td>up to 12 kW</td>
+<td>Run the whole house</td>
+<td>Emphasized/badged; your most common install</td>
+</tr>
+</tbody>
+</table>
+<h2 id="pricing-model">Pricing model</h2>
+<ul>
+<li>Each tier shows <strong>"starting at"</strong> with two toggles: <strong>Without solar / With solar</strong> and <strong>MXN / USD</strong>.</li>
+<li><em>Without solar</em> = inverter + battery only (Jon's floor logic). <em>With solar</em> = + panels up to the tier's cap.</li>
+<li>Basis: <strong>installed, pre-IVA, with a "+ IVA" note</strong> (matches the calculator convention) + microcopy "exact system &amp; price after a free site visit."</li>
+<li><strong>Currency: MXN is the DEFAULT</strong> (selling in Mexico); USD available via toggle. Both supported.</li>
+<li><strong>Numbers:</strong> Jon provides the <strong>6 USD figures</strong> (3 tiers × with/without solar) — see "Inputs needed." MXN is <strong>derived live from the Supabase daily FX rate</strong> (the existing <code>fx_rate</code> / <code>fetch-fx-rate</code> mechanism the calculator already uses), not hardcoded.</li>
+<li>Pure client-side: a small static <code>solutionsPricing</code> data module holds the USD figures; MXN computed from the fetched rate. No pricing engine/backend call.</li>
+</ul>
+<h3 id="fx-wiring">FX wiring</h3>
+<p>Reuse the existing Supabase FX rate (migration <code>0004 fx_rate</code>; <code>fetch-fx-rate</code> edge fn; calculator already receives <code>fxUsdMxn</code>). Site is static (<code>output:'static'</code>). Approach: <strong>fetch the latest USD→MXN rate at runtime</strong> on page load via a lightweight read (public function or read-only <code>fx_rate</code> select with the publishable key), with a <strong>baked fallback rate</strong> (~18) if the fetch fails so the page never shows a blank price. (Exact read mechanism finalized in the plan.)</p>
+<h2 id="page-structure-top-bottom">Page structure (top → bottom)</h2>
+<ol>
+<li><strong>Hero</strong> — value-led headline (not a price), e.g. "Backup power, sized to your home." Sub + CTA → calculator. Reuse <code>Hero.astro</code> pattern.</li>
+<li><strong>Tier spectrum</strong> (core) — the 3 cards above, Whole-home emphasized; the two toggles above the row; Essentials caveat inline; "starting prices" microcopy below; each card CTA → calculator (primary) + WhatsApp (secondary). New component <code>SolutionsTiers.astro</code> + a client module for toggle/FX behavior, mirroring the calculator's tier-card visual language (<code>Assessment.client.ts</code>) and brand tokens.</li>
+<li><strong>Equipment showcase</strong> — reuse <code>EquipmentShowcase.astro</code>, framed "the equipment behind every system." Uses the <strong>per-tier renders</strong> (see inputs).</li>
+<li><strong>Why Firefly</strong> — trimmed value band (reuse <code>DefenseCards</code>/<code>TrustStrip</code> style) so the page sells quality, not just price.</li>
+<li><strong>Closing CTA</strong> — "Not sure which fits? Get a personalized estimate in 2 minutes" → calculator + WhatsApp. Reuse <code>CTASection.astro</code>.</li>
+</ol>
+<h2 id="components-files-astro-static">Components &amp; files (Astro static)</h2>
+<ul>
+<li>Create: <code>src/pages/solutions.astro</code> + <code>src/pages/es/solutions.astro</code> (Base + Nav + sections + Footer + WhatsAppBubble; <code>path="solutions"</code>).</li>
+<li>Create: <code>src/components/solutions/SolutionsTiers.astro</code> (the tier row + toggles markup).</li>
+<li>Create: <code>src/components/solutions/solutions.client.ts</code> (toggle state, FX fetch, currency/solar price rendering, USD/MXN formatting — mirrors the calculator's <code>fmt</code>).</li>
+<li>Create: <code>src/lib/solutionsPricing.ts</code> (typed tier definitions + the USD figures; one source of truth).</li>
+<li>Create: <code>src/lib/fxClient.ts</code> (fetch latest USD→MXN from Supabase with baked fallback) — or extend an existing client.</li>
+<li>Reuse: <code>Hero</code>, <code>EquipmentShowcase</code>, <code>DefenseCards</code>/<code>TrustStrip</code>, <code>CTASection</code>, <code>Base</code>, <code>Nav</code>, <code>Footer</code>, <code>WhatsAppBubble</code>, <code>tokens.css</code>.</li>
+<li>i18n: add a <code>solutions.*</code> namespace to <code>src/content/en.json</code> + <code>es.json</code> (tier names, covers lines, caveat, toggle labels, microcopy, hero/CTA copy).</li>
+</ul>
+<h2 id="anti-cost-first-guardrails">Anti-"cost-first" guardrails</h2>
+<p>Value-led hero; "starting at"/"from" language; recommended system emphasized over price; "final price after free site visit"; explicit Essentials critical-loads + sub-panel caveat; funnel to the personalized calculator for the real number.</p>
+<h2 id="inputs-needed-from-jon-asset-task">Inputs needed (from Jon / asset task)</h2>
+<ol>
+<li><strong>6 USD starting figures</strong>: Essentials without/with solar; Comfort without/with solar; Whole-home without/with solar.</li>
+<li><strong>Per-tier equipment renders</strong> to generate: 6.5 kW + 5 kWh; 10 kW + 10 kWh; 12 kW + 16 kWh (asset task — generate before launch; reuse the existing 12/16 render meanwhile).</li>
+</ol>
+<h2 id="out-of-scope">Out of scope</h2>
+<ul>
+<li>The personalized calculator / <code>site-estimate</code> engine (separate; the page links to it).</li>
+<li>Any pricing-engine/backend work — the page is static with a small price table + live FX read.</li>
+<li>Deploy/launch — folds into the broader site launch (site is not yet live).</li>
+</ul>
+<h2 id="testing">Testing</h2>
+<ul>
+<li>Unit: the price/format logic (USD + MXN-from-rate, with/without-solar selection, rounding) in <code>solutions.client.ts</code> / <code>fxClient.ts</code> via <code>vitest</code>.</li>
+<li>Visual/E2E: Playwright MCP on localhost — toggles flip price + currency (MXN default), Essentials caveat present, EN/ES copy correct, 0 console errors.</li>
+</ul></div></body></html>
