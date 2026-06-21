@@ -101,6 +101,9 @@ const tariffOpts = ['o1', 'o2', 'o3', 'o4', 'o5'] as const;
     <div class="ind-form__result ind-form__result--ok" data-result-ok hidden>
       <h3>{t(locale, 'industrial.form.success_title')}</h3>
       <p>{t(locale, 'industrial.form.success_body')}</p>
+      <a class="ff-btn ff-btn--green" href={`https://wa.me/${wa}`} target="_blank" rel="noopener" data-wa-success>
+        {t(locale, 'industrial.form.wa_cta')}
+      </a>
     </div>
 
     <!-- Error / WhatsApp fallback -->
@@ -116,11 +119,13 @@ const tariffOpts = ['o1', 'o2', 'o3', 'o4', 'o5'] as const;
 
 <script>
   import { submitLead, type LeadPayload } from '../../lib/leadClient';
+  import { buildWaSuccessHref } from '../../lib/waLink';
 
   const form = document.querySelector<HTMLFormElement>('[data-assessment-form]');
   if (form) {
     const okBox = document.querySelector<HTMLElement>('[data-result-ok]');
     const errBox = document.querySelector<HTMLElement>('[data-result-err]');
+    const waSuccessBtn = document.querySelector<HTMLAnchorElement>('[data-result-ok] [data-wa-success]');
     const submitBtn = form.querySelector<HTMLButtonElement>('[data-submit]');
     const submitLabel = form.querySelector<HTMLElement>('[data-submit-label]');
 
@@ -173,6 +178,10 @@ const tariffOpts = ['o1', 'o2', 'o3', 'o4', 'o5'] as const;
       if (submitLabel) submitLabel.textContent = idleLabel;
 
       if (ok) {
+        if (waSuccessBtn) {
+          const loc = locale === 'es' ? 'es' : 'en';
+          waSuccessBtn.href = buildWaSuccessHref(loc, 'industrial.form.wa_message', payload.name);
+        }
         form.hidden = true;
         if (errBox) errBox.hidden = true;
         if (okBox) {

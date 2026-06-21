@@ -38,6 +38,22 @@ export function initMotion(): void {
 
   // Recompute trigger positions once images/fonts settle.
   ScrollTrigger.refresh();
+
+  // Lazy-loaded images that sit ABOVE a reveal trigger (e.g. the equipment
+  // photo above DefenseCards on /solutions/) shift later sections down after
+  // the initial refresh, leaving ScrollTrigger start points stale — which can
+  // strand a `gsap.from(..., {opacity:0})` reveal in its hidden state. Re-refresh
+  // once the window fully loads and whenever a lazy image finishes decoding so
+  // trigger positions always reflect final layout. No-op on the homepage where
+  // no lazy image precedes a reveal.
+  const refresh = () => ScrollTrigger.refresh();
+  if (document.readyState === 'complete') refresh();
+  else window.addEventListener('load', refresh, { once: true });
+
+  for (const img of document.querySelectorAll<HTMLImageElement>('img[loading="lazy"]')) {
+    if (img.complete) continue;
+    img.addEventListener('load', refresh, { once: true });
+  }
 }
 
 /* ------------------------------------------------------------------ */

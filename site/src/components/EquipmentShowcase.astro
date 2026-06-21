@@ -5,9 +5,6 @@ interface Props {
   locale: Locale;
 }
 const { locale } = Astro.props;
-
-// Spec chips — specs only, no brand/model names.
-const chips = ['12 kW', '16 kWh', t(locale, 'equipment.chip_panels')];
 ---
 <section id="equipment" class="ff-eq" aria-labelledby="ff-eq-title">
   <div class="ff-eq__inner">
@@ -15,47 +12,21 @@ const chips = ['12 kW', '16 kWh', t(locale, 'equipment.chip_panels')];
       <p class="ff-eq__eyebrow">{t(locale, 'equipment.eyebrow')}</p>
       <h2 id="ff-eq-title" class="ff-eq__title display">{t(locale, 'equipment.title')}</h2>
       <p class="ff-eq__sub">{t(locale, 'equipment.sub')}</p>
-
-      <ul class="ff-eq__chips" aria-label={t(locale, 'equipment.chips_aria')}>
-        {chips.map((c) => <li class="ff-eq__chip">{c}</li>)}
-      </ul>
     </header>
 
-    <figure class="ff-eq__stage" data-eq-stage>
-      <canvas
-        class="ff-eq__canvas"
-        data-eq-canvas
-        role="img"
-        aria-label={t(locale, 'equipment.canvas_aria')}
-      ></canvas>
-
-      <!-- Shown until WebGL initialises, and the permanent no-JS / no-WebGL fallback. -->
-      <div class="ff-eq__fallback" data-eq-fallback>
+    <figure class="ff-eq__stage">
+      <picture>
+        <source type="image/webp" srcset="/assets/equipment/system-installed.webp" />
         <img
-          class="ff-eq__img"
-          src="/assets/equipment/inverter-12kw.png"
-          alt={t(locale, 'equipment.inverter_alt')}
-          width="520"
-          height="640"
+          class="ff-eq__photo"
+          src="/assets/equipment/system-installed.jpg"
+          alt={t(locale, 'equipment.installed_alt')}
+          width="1600"
+          height="1067"
           loading="lazy"
           decoding="async"
         />
-        <img
-          class="ff-eq__img ff-eq__img--battery"
-          src="/assets/equipment/battery-16kwh.png"
-          alt={t(locale, 'equipment.battery_alt')}
-          width="360"
-          height="640"
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
-
-      <noscript>
-        <style>[data-eq-canvas]{display:none}</style>
-      </noscript>
-
-      <figcaption class="ff-eq__hint" data-eq-hint hidden>{t(locale, 'equipment.drag_hint')}</figcaption>
+      </picture>
     </figure>
   </div>
 </section>
@@ -71,98 +42,26 @@ const chips = ['12 kW', '16 kWh', t(locale, 'equipment.chip_panels')];
   .ff-eq__title { font-size: var(--fs-h1); line-height: var(--lh-snug); margin: 0 0 var(--sp-2); }
   .ff-eq__sub { font-size: var(--fs-lead); color: var(--ff-slate); margin: 0; }
 
-  .ff-eq__chips {
-    list-style: none; margin: var(--sp-3) 0 0; padding: 0;
-    display: flex; flex-wrap: wrap; gap: var(--sp-1); justify-content: center;
-  }
-  .ff-eq__chip {
-    background: var(--ff-green); color: var(--ff-ink);
-    font-weight: 700; font-size: var(--fs-small); letter-spacing: 0.01em;
-    padding: 0.35rem 0.9rem; border-radius: var(--r-pill);
-  }
-
-  /* ---- Stage: the WebGL canvas sits over a paper-toned card ---- */
+  /* ---- Stage: a photoreal in-home install shot ---- */
   .ff-eq__stage {
     position: relative;
     margin: 0;
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 3 / 2;
     width: 100%;
-    background: radial-gradient(120% 90% at 50% 30%, var(--ff-white), var(--ff-mist));
     border: 1px solid var(--ff-line);
     border-radius: var(--r-lg, 22px);
     box-shadow: var(--shadow-md, 0 18px 40px rgba(42, 45, 52, 0.1));
     overflow: hidden;
+    background: var(--ff-mist);
   }
-  .ff-eq__canvas {
-    position: absolute; inset: 0;
-    width: 100%; height: 100%;
+  .ff-eq__photo {
     display: block;
-    cursor: grab;
-    touch-action: pan-y; /* let the page scroll vertically; horizontal drag rotates */
-  }
-  .ff-eq__canvas:active { cursor: grabbing; }
-
-  /* Static fallback — centred renders, hidden once WebGL takes over. */
-  .ff-eq__fallback {
-    position: absolute; inset: 0;
-    display: flex; align-items: flex-end; justify-content: center;
-    gap: var(--sp-3); padding: var(--sp-4);
-  }
-  .ff-eq__img { height: 80%; width: auto; object-fit: contain; filter: drop-shadow(0 12px 18px rgba(42, 45, 52, 0.18)); }
-  .ff-eq__img--battery { height: 66%; }
-  .ff-eq__stage.is-live .ff-eq__fallback { display: none; }
-
-  .ff-eq__hint {
-    position: absolute; left: 50%; bottom: var(--sp-2); transform: translateX(-50%);
-    font-size: var(--fs-small); color: var(--ff-slate);
-    background: rgba(248, 249, 244, 0.82); backdrop-filter: blur(4px);
-    padding: 0.3rem 0.8rem; border-radius: var(--r-pill);
-    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   @media (max-width: 600px) {
-    .ff-eq__stage { aspect-ratio: 4 / 5; border-radius: 16px; }
-    .ff-eq__fallback { gap: var(--sp-2); padding: var(--sp-3); }
+    .ff-eq__stage { aspect-ratio: 4 / 3; border-radius: 16px; }
   }
 </style>
-
-<script>
-  import { initShowcase } from './EquipmentShowcase.client';
-
-  const stage = document.querySelector<HTMLElement>('[data-eq-stage]');
-  const canvas = document.querySelector<HTMLCanvasElement>('[data-eq-canvas]');
-  const hint = document.querySelector<HTMLElement>('[data-eq-hint]');
-
-  function hasWebGL(): boolean {
-    try {
-      const c = document.createElement('canvas');
-      return !!(
-        window.WebGLRenderingContext &&
-        (c.getContext('webgl') || c.getContext('experimental-webgl'))
-      );
-    } catch {
-      return false;
-    }
-  }
-
-  if (stage && canvas && hasWebGL()) {
-    let dispose: (() => void) | null = null;
-
-    const io = new IntersectionObserver(
-      (entries, observer) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          observer.disconnect(); // init once, then stop observing
-          dispose = initShowcase(canvas);
-          stage.classList.add('is-live');
-          if (hint) hint.hidden = false;
-        }
-      },
-      { rootMargin: '200px 0px', threshold: 0.01 }
-    );
-    io.observe(stage);
-
-    // Best-effort teardown if the page is torn down (SPA-style navigations).
-    window.addEventListener('pagehide', () => dispose?.(), { once: true });
-  }
-</script>

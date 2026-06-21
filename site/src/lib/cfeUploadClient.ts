@@ -1,8 +1,18 @@
+export interface CfeAddress {
+  address_line?: string;
+  address2?: string;
+  colonia?: string;
+  city?: string;
+  state?: string;
+  postal_code?: string;
+}
+
 export interface CfeParseResult {
   kwhPerDay: number;
   kwhTotal?: number;
   periodDays?: number;
   tariff?: string | null;
+  address?: CfeAddress | null;
 }
 
 const MAX_FILE_BYTES = 8 * 1024 * 1024; // 8 MB
@@ -54,6 +64,7 @@ export async function parseCfe(
       kwhTotal: data.kwhTotal,
       periodDays: data.periodDays,
       tariff: data.tariff ?? null,
+      address: data.address ?? null,
     };
   } catch {
     return { fallback: 'manual' };

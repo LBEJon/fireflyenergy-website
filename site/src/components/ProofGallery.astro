@@ -6,18 +6,9 @@ interface Props {
 }
 const { locale } = Astro.props;
 
-// Phase 5 swaps these gradient placeholders for Higgsfield home photos.
-const homes = [
-  { label: t(locale, 'proof.home1'), grad: 'linear-gradient(150deg, #FFB81C 0%, var(--ff-accent) 70%)' },
-  { label: t(locale, 'proof.home2'), grad: 'linear-gradient(150deg, var(--ff-green-soft) 0%, var(--ff-ink) 90%)' },
-  { label: t(locale, 'proof.home3'), grad: 'linear-gradient(150deg, var(--ff-accent) 0%, var(--ff-ink) 90%)' },
-];
-
-// PLACEHOLDER testimonials — copy is illustrative until real customer quotes land.
-const testimonials = [
-  { quote: t(locale, 'proof.t1_quote'), author: t(locale, 'proof.t1_author') },
-  { quote: t(locale, 'proof.t2_quote'), author: t(locale, 'proof.t2_author') },
-];
+// Real Firefly installs (retouched: decluttered + Firefly-branded). 5 photos.
+const installs = [1, 2, 3, 4, 5];
+const alt = t(locale, 'proof.install_alt');
 ---
 <section class="ff-proof">
   <div class="ff-proof__inner">
@@ -27,22 +18,18 @@ const testimonials = [
       <p class="ff-proof__sub">{t(locale, 'proof.sub')}</p>
     </header>
 
-    <div class="ff-proof__rail" data-draggable>
-      {homes.map((h) => (
-        <figure class="ff-proof__home">
-          <div class="ff-proof__photo" style={`background:${h.grad}`}></div>
-          <figcaption>{h.label}</figcaption>
-        </figure>
-      ))}
-    </div>
-
-    <div class="ff-proof__quotes">
-      {testimonials.map((t2) => (
-        <blockquote class="ff-proof__quote">
-          <p>“{t2.quote}”</p>
-          <cite>{t2.author}</cite>
-        </blockquote>
-      ))}
+    <div class="ff-proof__carousel">
+      <ul class="ff-proof__rail" data-rail>
+        {installs.map((n) => (
+          <li class="ff-proof__card">
+            <img class="ff-proof__img" src={`/assets/equipment/installs/install-${n}.jpg`} alt={alt} width="1200" height="1600" loading="lazy" decoding="async" />
+          </li>
+        ))}
+      </ul>
+      <div class="ff-proof__nav">
+        <button type="button" class="ff-proof__arrow" data-prev aria-label={t(locale, 'proof.prev')}>‹</button>
+        <button type="button" class="ff-proof__arrow" data-next aria-label={t(locale, 'proof.next')}>›</button>
+      </div>
     </div>
   </div>
 </section>
@@ -58,43 +45,36 @@ const testimonials = [
   .ff-proof__title { font-size: var(--fs-h1); line-height: var(--lh-snug); margin: 0 0 var(--sp-2); }
   .ff-proof__sub { font-size: var(--fs-lead); color: var(--ff-slate); margin: 0; }
 
+  .ff-proof__carousel { position: relative; }
   .ff-proof__rail {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--sp-3);
+    list-style: none; margin: 0; padding: 0 0 var(--sp-2);
+    display: flex; gap: var(--sp-3); align-items: flex-start;
+    overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
   }
-  .ff-proof__home { margin: 0; }
-  .ff-proof__photo {
-    aspect-ratio: 4 / 3;
-    border-radius: var(--r-lg);
-    box-shadow: var(--shadow-md);
+  .ff-proof__rail::-webkit-scrollbar { display: none; }
+  .ff-proof__card { flex: 0 0 auto; width: clamp(220px, 60vw, 300px); scroll-snap-align: center; margin: 0; }
+  .ff-proof__img {
+    /* images are exactly 3:4 — size to the file, no crop, no stretch */
+    display: block; width: 100%; height: auto;
+    border-radius: var(--r-lg); box-shadow: var(--shadow-md); background: var(--ff-mist);
   }
-  .ff-proof__home figcaption {
-    margin-top: var(--sp-1);
-    font-weight: 600;
-    font-size: var(--fs-small);
-    color: var(--ff-slate);
+  .ff-proof__nav { display: flex; justify-content: center; gap: var(--sp-2); margin-top: var(--sp-3); }
+  .ff-proof__arrow {
+    width: 44px; height: 44px; border-radius: var(--r-pill);
+    border: 1px solid var(--ff-line); background: var(--ff-white); color: var(--ff-ink);
+    font-size: 1.5rem; line-height: 1; cursor: pointer;
+    transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
   }
-
-  .ff-proof__quotes {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--sp-3);
-    margin-top: var(--sp-5);
-  }
-  .ff-proof__quote {
-    margin: 0;
-    background: var(--ff-white);
-    border: 1px solid var(--ff-line);
-    border-radius: var(--r-md);
-    padding: var(--sp-3);
-    box-shadow: var(--shadow-sm);
-  }
-  .ff-proof__quote p { font-size: var(--fs-lead); line-height: var(--lh-body); margin: 0 0 var(--sp-2); }
-  .ff-proof__quote cite { font-style: normal; font-weight: 700; color: var(--ff-ink); font-size: var(--fs-small); }
-
-  @media (max-width: 860px) {
-    .ff-proof__rail { grid-template-columns: 1fr; }
-    .ff-proof__quotes { grid-template-columns: 1fr; }
-  }
+  .ff-proof__arrow:hover { border-color: var(--ff-ink); transform: translateY(-1px); }
 </style>
+
+<script>
+  for (const root of document.querySelectorAll('.ff-proof__carousel')) {
+    const rail = root.querySelector<HTMLElement>('[data-rail]');
+    if (!rail) continue;
+    const step = () => (rail.querySelector<HTMLElement>('.ff-proof__card')?.offsetWidth ?? 300) + 16;
+    root.querySelector('[data-prev]')?.addEventListener('click', () => rail.scrollBy({ left: -step(), behavior: 'smooth' }));
+    root.querySelector('[data-next]')?.addEventListener('click', () => rail.scrollBy({ left: step(), behavior: 'smooth' }));
+  }
+</script>

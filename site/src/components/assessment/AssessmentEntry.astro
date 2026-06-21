@@ -24,7 +24,6 @@ const coverageOpts = [
   { value: 'comfort', title: 'assessment.coverage.comfort', note: 'assessment.coverage.comfort_note' },
   { value: 'full', title: 'assessment.coverage.full', note: 'assessment.coverage.full_note' },
 ];
-const addSolarOpts = ['0', '4', '8', '12'];
 const backupOpts = ['4', '8', '12', '24'];
 ---
 <section
@@ -90,7 +89,7 @@ const backupOpts = ['4', '8', '12', '24'];
               <label class="ff-as__field">
                 <span class="ff-as__field-label">{t(locale, 'assessment.consumption.manual_label')}</span>
                 <input type="number" inputmode="numeric" min="0" step="1"
-                  placeholder={t(locale, 'assessment.consumption.manual_placeholder')} data-monthly-kwh />
+                  placeholder={t(locale, 'assessment.consumption.manual_placeholder')} data-daily-kwh />
               </label>
             </div>
 
@@ -185,25 +184,23 @@ const backupOpts = ['4', '8', '12', '24'];
           <h4 class="ff-as__subhead">{t(locale, 'assessment.addsolar.heading')}</h4>
           <p class="ff-as__help">{t(locale, 'assessment.addsolar.help')}</p>
 
-          <!-- Recommendation-anchored stepper (shown when consumption is known) -->
+          <!-- Recommendation (text only) + choose: use it / oversize / battery only -->
           <div class="ff-as__solar-rec" data-solar-rec hidden>
             <p class="ff-as__rec-line" data-rec-line></p>
-            <div class="ff-as__stepper" role="group" aria-label={t(locale, 'assessment.addsolar.heading')}>
-              <button type="button" class="ff-as__step-btn" data-panel-dec aria-label={t(locale, 'assessment.solar.fewer')}>−</button>
-              <span class="ff-as__step-val" data-panel-val aria-live="polite">0</span>
-              <button type="button" class="ff-as__step-btn" data-panel-inc aria-label={t(locale, 'assessment.solar.more')}>+</button>
-            </div>
             <p class="ff-as__offset-line" data-offset-line aria-live="polite"></p>
-            <button type="button" class="ff-as__none-btn" data-panel-none>{t(locale, 'assessment.solar.none')}</button>
-          </div>
-
-          <!-- Fallback fixed chips (only if consumption is somehow unknown here) -->
-          <div class="ff-as__pills" role="radiogroup" aria-label={t(locale, 'assessment.addsolar.heading')} data-add-solar-fallback hidden>
-            {addSolarOpts.map((v, i) => (
-              <button type="button" class={`ff-as__pill${i === 0 ? ' is-active' : ''}`} role="radio" aria-checked={i === 0 ? 'true' : 'false'} data-add-solar={v}>
-                {v === '0' ? t(locale, 'assessment.addsolar.none') : t(locale, 'assessment.addsolar.count').replace('{n}', v)}
-              </button>
-            ))}
+            <div class="ff-as__solar-actions">
+              <button type="button" class="ff-as__rec-btn" data-panel-rec hidden>{t(locale, 'assessment.solar.use_recommended')}</button>
+              <label class="ff-as__oversize">
+                <span class="ff-as__oversize-label">{t(locale, 'assessment.solar.oversize_label')}</span>
+                <span class="ff-as__oversize-input">
+                  <input type="number" inputmode="numeric" min="0" step="1" class="ff-as__step-input"
+                    data-panel-val aria-label={t(locale, 'assessment.solar.panel_count')}
+                    placeholder={t(locale, 'assessment.solar.oversize_ph')} />
+                  <span class="ff-as__step-unit">{t(locale, 'assessment.solar.panels_unit')}</span>
+                </span>
+              </label>
+              <button type="button" class="ff-as__none-btn" data-panel-none>{t(locale, 'assessment.solar.none')}</button>
+            </div>
           </div>
         </div>
 
@@ -226,22 +223,7 @@ const backupOpts = ['4', '8', '12', '24'];
           <p class="ff-as__loading" data-result-loading role="status">{t(locale, 'assessment.result.loading')}</p>
 
           <div class="ff-as__result-block" data-result-block hidden>
-            <p class="ff-as__daily" data-daily-note hidden></p>
-            <p class="ff-as__offset" data-offset-note hidden></p>
-
-            <div class="ff-as__result-head">
-              <h3 class="ff-as__result-title">{t(locale, 'assessment.result.tiers_heading')}</h3>
-              <div class="ff-as__currency" role="radiogroup" aria-label={t(locale, 'assessment.result.currency_aria')}>
-                <button type="button" class="ff-as__cur is-active" role="radio" aria-checked="true" data-currency="USD">{t(locale, 'assessment.result.currency_usd')}</button>
-                <button type="button" class="ff-as__cur" role="radio" aria-checked="false" data-currency="MXN">{t(locale, 'assessment.result.currency_mxn')}</button>
-              </div>
-            </div>
-
-            <ul class="ff-as__tiers" data-tiers aria-live="polite"></ul>
-
-            <p class="ff-as__qualifier">{t(locale, 'assessment.result.qualifier')}</p>
-
-            <!-- Capture form -->
+            <!-- Capture form (no on-the-spot quote — answers feed a proposal we deliver within 24h) -->
             <form class="ff-as__capture" data-capture novalidate>
               <h3 class="ff-as__capture-title">{t(locale, 'assessment.form.capture_title')}</h3>
               <p class="ff-as__capture-sub">{t(locale, 'assessment.form.capture_sub')}</p>
@@ -252,9 +234,24 @@ const backupOpts = ['4', '8', '12', '24'];
                   placeholder={t(locale, 'assessment.form.name_placeholder')} data-name />
               </label>
               <label class="ff-as__field">
-                <span class="ff-as__field-label">{t(locale, 'assessment.form.contact_label')}</span>
-                <input type="text" name="contact" autocomplete="off" required
-                  placeholder={t(locale, 'assessment.form.contact_placeholder')} data-contact />
+                <span class="ff-as__field-label">{t(locale, 'assessment.form.phone_label')}</span>
+                <span class="ff-as__phone-row">
+                  <select class="ff-as__cc" data-phone-cc aria-label={t(locale, 'assessment.form.country_code')}>
+                    <option value="+52">🇲🇽 +52</option>
+                    <option value="+1">🇺🇸 +1</option>
+                  </select>
+                  <input type="tel" name="phone" autocomplete="tel" inputmode="tel"
+                    placeholder={t(locale, 'assessment.form.phone_placeholder')} data-phone />
+                </span>
+              </label>
+              <label class="ff-as__capture-check">
+                <input type="checkbox" checked data-whatsapp />
+                <span>{t(locale, 'assessment.form.whatsapp_same')}</span>
+              </label>
+              <label class="ff-as__field">
+                <span class="ff-as__field-label">{t(locale, 'assessment.form.email_label')}</span>
+                <input type="email" name="email" autocomplete="email"
+                  placeholder={t(locale, 'assessment.form.email_placeholder')} data-email />
               </label>
 
               <div class="ff-as__hp" aria-hidden="true">
@@ -265,13 +262,14 @@ const backupOpts = ['4', '8', '12', '24'];
 
               <button type="submit" class="ff-as__submit" data-submit disabled>{t(locale, 'assessment.form.submit')}</button>
               <div class="ff-as__softnets">
-                <a class="ff-as__soft" href={waHref} target="_blank" rel="noopener">{t(locale, 'assessment.form.soft_whatsapp')}</a>
+                <a class="ff-as__soft" href={waHref} target="_blank" rel="noopener" data-soft-wa>{t(locale, 'assessment.form.soft_whatsapp')}</a>
               </div>
             </form>
 
             <div class="ff-as__state ff-as__state--ok" data-state-ok hidden role="status">
               <h3 class="ff-as__state-title">{t(locale, 'assessment.form.thanks_title')}</h3>
               <p>{t(locale, 'assessment.form.thanks_body')}</p>
+              <a class="ff-as__wa-btn" href={waHref} target="_blank" rel="noopener" data-wa-success>{t(locale, 'assessment.result.wa_cta')}</a>
             </div>
             <div class="ff-as__state ff-as__state--err" data-state-err hidden role="alert">
               <h3 class="ff-as__state-title">{t(locale, 'assessment.form.error_title')}</h3>
@@ -439,17 +437,36 @@ const backupOpts = ['4', '8', '12', '24'];
   }
   .ff-as__step-btn:hover { border-color: var(--ff-green); }
   .ff-as__step-btn:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
-  .ff-as__step-val { min-width: 6rem; text-align: center; font-weight: 700; color: var(--ff-ink); }
-  .ff-as__offset-line { margin: 0; color: var(--ff-slate); font-size: var(--fs-small); }
-  .ff-as__none-btn {
-    background: none; border: none; padding: 0; color: var(--ff-accent-dk);
-    font-family: var(--ff-sans); font-weight: 600; text-decoration: underline; cursor: pointer;
+  .ff-as__step-input {
+    width: 4rem; text-align: center; font-weight: 700; color: var(--ff-ink); font-size: var(--fs-body);
+    border: 2px solid var(--ff-line); border-radius: var(--r-md); padding: 0.45rem 0.3rem;
+    font-family: var(--ff-sans); background: var(--ff-paper);
   }
-  .ff-as__none-btn:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__step-input:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 1px; border-color: var(--ff-accent); }
+  .ff-as__step-input:not(:placeholder-shown) { border-color: var(--ff-accent); background: var(--ff-accent-tint); }
+  .ff-as__step-unit { font-weight: 700; color: var(--ff-ink); }
+  .ff-as__offset-line { margin: 0 0 var(--sp-1); color: var(--ff-slate); font-size: var(--fs-small); }
+  /* Choose how many panels: use recommended / oversize (type a number) / battery only. */
+  .ff-as__solar-actions { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-2); }
+  .ff-as__oversize { display: flex; flex-direction: column; gap: 0.3rem; }
+  .ff-as__oversize-label { font-size: var(--fs-small); font-weight: 700; color: var(--ff-ink); }
+  .ff-as__oversize-input { display: inline-flex; align-items: baseline; gap: 0.4rem; }
+  /* Both quick-set actions are pills; the one matching the current count is active. */
+  .ff-as__rec-btn, .ff-as__none-btn {
+    background: var(--ff-paper); border: 2px solid var(--ff-line); border-radius: var(--r-pill);
+    padding: 0.5rem 1.2rem; font-weight: 700; font-family: var(--ff-sans); color: var(--ff-ink);
+    cursor: pointer; text-decoration: none;
+  }
+  .ff-as__rec-btn:hover, .ff-as__none-btn:hover { border-color: var(--ff-green); }
+  .ff-as__rec-btn:focus-visible, .ff-as__none-btn:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__rec-btn.is-active, .ff-as__none-btn.is-active { border-color: var(--ff-accent); background: var(--ff-accent-tint); }
 
   /* ---- Custom appliance add ---- */
   .ff-as__add-appliance { margin-top: var(--sp-3); }
   .ff-as__add-row { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: flex-end; }
+  /* Streamlined inline add row: name + watts flex, toggle + button inline beside them. */
+  .ff-as__add-row .ff-as__field { flex: 1 1 140px; margin-bottom: 0; }
+  .ff-as__add-row .ff-as__check-row { flex: 0 0 auto; }
   .ff-as__add-btn {
     background: var(--ff-accent); border: none; border-radius: var(--r-pill); color: var(--ff-white);
     padding: 0.55rem 1.2rem; font-weight: 700; font-family: var(--ff-sans); cursor: pointer;
@@ -515,6 +532,19 @@ const backupOpts = ['4', '8', '12', '24'];
   /* ---- Capture ---- */
   .ff-as__capture-title { font-size: var(--fs-h3); margin: 0 0 0.25rem; color: var(--ff-ink); }
   .ff-as__capture-sub { color: var(--ff-slate); font-size: var(--fs-small); margin: 0 0 var(--sp-3); }
+  .ff-as__capture-check {
+    display: flex; align-items: center; gap: 0.5rem; margin: -0.25rem 0 var(--sp-2);
+    font-size: var(--fs-small); color: var(--ff-ink); cursor: pointer;
+  }
+  .ff-as__capture-check input { width: 1.1rem; height: 1.1rem; accent-color: var(--ff-green); }
+  .ff-as__phone-row { display: flex; gap: 0.5rem; }
+  .ff-as__cc {
+    flex: 0 0 auto; width: auto; box-sizing: border-box; padding: 0.7rem 0.6rem;
+    border: 2px solid var(--ff-line); border-radius: var(--r-md);
+    font-family: var(--ff-sans); font-size: var(--fs-body); background: var(--ff-paper); cursor: pointer;
+  }
+  .ff-as__cc:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 1px; border-color: var(--ff-accent); }
+  .ff-as__phone-row input { flex: 1 1 auto; }
   .ff-as__hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
   .ff-as__submit, .ff-as__wa-btn {
     display: inline-block; width: 100%; box-sizing: border-box; text-align: center;

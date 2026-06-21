@@ -17,9 +17,19 @@ export interface ApplianceAnswers {
   otherLoads?: OtherLoad[];
 }
 
+export interface CfeAddress {
+  address_line?: string;
+  address2?: string;
+  colonia?: string;
+  city?: string;
+  state?: string;
+  postal_code?: string;
+}
+
 export interface AssessmentAnswers {
   billKwhPerDay?: number; // from CFE parse
-  monthlyKwh?: number; // manual entry
+  billAddress?: CfeAddress; // service address read from the CFE bill
+  dailyKwh?: number; // manual entry (kWh/day)
   backupHours?: number;
   hasExistingSolar?: boolean;
   panelCount?: number;
@@ -109,7 +119,7 @@ export function existingSolarKw(count: number, watts: number): number {
 export function consumptionKnown(a: AssessmentAnswers): boolean {
   return (
     (typeof a.billKwhPerDay === 'number' && a.billKwhPerDay > 0) ||
-    (typeof a.monthlyKwh === 'number' && a.monthlyKwh > 0)
+    (typeof a.dailyKwh === 'number' && a.dailyKwh > 0)
   );
 }
 
@@ -122,8 +132,8 @@ export function toEstimateBody(a: AssessmentAnswers): EstimateBody {
   let cfeKwhPerDay: number | undefined;
   if (typeof a.billKwhPerDay === 'number' && a.billKwhPerDay > 0) {
     cfeKwhPerDay = a.billKwhPerDay;
-  } else if (typeof a.monthlyKwh === 'number' && a.monthlyKwh > 0) {
-    cfeKwhPerDay = a.monthlyKwh / 30;
+  } else if (typeof a.dailyKwh === 'number' && a.dailyKwh > 0) {
+    cfeKwhPerDay = a.dailyKwh;
   } else {
     cfeKwhPerDay = undefined;
   }

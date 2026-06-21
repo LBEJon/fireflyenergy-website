@@ -13,14 +13,14 @@ describe('assessment mapping', () => {
     expect(existingSolarKw(8, 645)).toBeCloseTo(5.16);
     expect(existingSolarKw(0, 645)).toBe(0);
   });
-  it('manual monthly kWh -> kwhPerDay (÷30)', () => {
-    const b = toEstimateBody({ monthlyKwh: 600, backupHours: 12, appliances: { miniSplits: 2 }, coverageTier: 'comfort', addSolarPanels: 0 });
+  it('manual daily kWh -> kwhPerDay (used directly)', () => {
+    const b = toEstimateBody({ dailyKwh: 20, backupHours: 12, appliances: { miniSplits: 2 }, coverageTier: 'comfort', addSolarPanels: 0 });
     expect(b.cfeKwhPerDay).toBeCloseTo(20);
     expect(b.backupHours).toBe(12);
     expect(b.appliances.miniSplits).toBe(2);
   });
   it('bill kwhPerDay wins over manual', () => {
-    const b = toEstimateBody({ billKwhPerDay: 25, monthlyKwh: 600, backupHours: 12, appliances: {}, coverageTier: 'comfort' });
+    const b = toEstimateBody({ billKwhPerDay: 25, dailyKwh: 20, backupHours: 12, appliances: {}, coverageTier: 'comfort' });
     expect(b.cfeKwhPerDay).toBe(25);
   });
   it('no consumption => cfeKwhPerDay undefined + consumptionKnown false', () => {
@@ -30,19 +30,19 @@ describe('assessment mapping', () => {
   });
   it('consumptionKnown true with bill or manual', () => {
     expect(consumptionKnown({ billKwhPerDay: 25 })).toBe(true);
-    expect(consumptionKnown({ monthlyKwh: 600 })).toBe(true);
+    expect(consumptionKnown({ dailyKwh: 20 })).toBe(true);
   });
   it('existing panels feed existingSolarKw + hasExistingSolar', () => {
-    const b = toEstimateBody({ monthlyKwh: 600, hasExistingSolar: true, panelCount: 8, panelWatts: 645, appliances: {}, coverageTier: 'comfort' });
+    const b = toEstimateBody({ dailyKwh: 20, hasExistingSolar: true, panelCount: 8, panelWatts: 645, appliances: {}, coverageTier: 'comfort' });
     expect(b.existingSolarKw).toBeCloseTo(5.16);
     expect(b.hasExistingSolar).toBe(true);
   });
   it('passes custom otherLoads through to the estimate body', () => {
-    const b = toEstimateBody({ monthlyKwh: 600, appliances: { otherLoads: [{ name: 'Workshop', watts: 1200, critical: false }] }, coverageTier: 'comfort' });
+    const b = toEstimateBody({ dailyKwh: 20, appliances: { otherLoads: [{ name: 'Workshop', watts: 1200, critical: false }] }, coverageTier: 'comfort' });
     expect(b.appliances.otherLoads).toEqual([{ name: 'Workshop', watts: 1200, critical: false }]);
   });
   it('defaults otherLoads to [] when not provided', () => {
-    const b = toEstimateBody({ monthlyKwh: 600, appliances: {}, coverageTier: 'comfort' });
+    const b = toEstimateBody({ dailyKwh: 20, appliances: {}, coverageTier: 'comfort' });
     expect(b.appliances.otherLoads).toEqual([]);
   });
 });

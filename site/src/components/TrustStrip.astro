@@ -40,12 +40,15 @@ const stats = [
     gap: var(--sp-3);
     text-align: center;
   }
-  .ff-trust__stat { display: flex; flex-direction: column; gap: 0.3rem; }
+  /* min-width:0 lets grid items shrink to their 1fr column instead of being
+     forced wider by their content (which caused a mobile horizontal-scroll). */
+  .ff-trust__stat { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
   .stat-num {
     font-size: clamp(2rem, 4vw, 3rem);
     line-height: 1;
     font-weight: 700;
     color: var(--ff-ink);
+    overflow-wrap: anywhere;
   }
   .ff-trust__label {
     font-size: var(--fs-small);

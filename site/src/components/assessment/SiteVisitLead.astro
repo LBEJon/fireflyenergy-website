@@ -29,9 +29,24 @@ const waHref = `https://wa.me/${waNumber}`;
     </label>
 
     <label class="ff-sv__field">
-      <span class="ff-sv__label">{t(locale, 'assessment.form.contact_label')}</span>
-      <input type="text" name="contact" autocomplete="off" required
-        placeholder={t(locale, 'assessment.form.contact_placeholder')} data-sv-contact />
+      <span class="ff-sv__label">{t(locale, 'assessment.form.phone_label')}</span>
+      <span class="ff-sv__phone-row">
+        <select class="ff-sv__cc" data-sv-phone-cc aria-label={t(locale, 'assessment.form.country_code')}>
+          <option value="+52">🇲🇽 +52</option>
+          <option value="+1">🇺🇸 +1</option>
+        </select>
+        <input type="tel" name="phone" autocomplete="tel" inputmode="tel"
+          placeholder={t(locale, 'assessment.form.phone_placeholder')} data-sv-phone />
+      </span>
+    </label>
+    <label class="ff-sv__check">
+      <input type="checkbox" checked data-sv-whatsapp />
+      <span>{t(locale, 'assessment.form.whatsapp_same')}</span>
+    </label>
+    <label class="ff-sv__field">
+      <span class="ff-sv__label">{t(locale, 'assessment.form.email_label')}</span>
+      <input type="email" name="email" autocomplete="email"
+        placeholder={t(locale, 'assessment.form.email_placeholder')} data-sv-email />
     </label>
 
     <label class="ff-sv__field">
@@ -64,6 +79,7 @@ const waHref = `https://wa.me/${waNumber}`;
   <div class="ff-sv__state ff-sv__state--ok" data-sv-state-ok hidden role="status">
     <h3 class="ff-sv__state-title">{t(locale, 'assessment.form.thanks_title')}</h3>
     <p>{t(locale, 'assessment.form.thanks_body')}</p>
+    <a class="ff-sv__wa-btn" href={waHref} target="_blank" rel="noopener" data-sv-wa-success>{t(locale, 'assessment.result.wa_cta')}</a>
   </div>
   <div class="ff-sv__state ff-sv__state--err" data-sv-state-err hidden role="alert">
     <h3 class="ff-sv__state-title">{t(locale, 'assessment.form.error_title')}</h3>
@@ -92,6 +108,19 @@ const waHref = `https://wa.me/${waNumber}`;
   .ff-sv__field input:focus-visible, .ff-sv__field textarea:focus-visible {
     outline: 3px solid var(--ff-accent); outline-offset: 1px; border-color: var(--ff-accent);
   }
+  .ff-sv__phone-row { display: flex; gap: 0.5rem; }
+  .ff-sv__cc {
+    flex: 0 0 auto; width: auto; box-sizing: border-box; padding: 0.7rem 0.6rem;
+    border: 2px solid var(--ff-line); border-radius: var(--r-md);
+    font-family: var(--ff-sans); font-size: var(--fs-body); background: var(--ff-paper); cursor: pointer;
+  }
+  .ff-sv__cc:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 1px; border-color: var(--ff-accent); }
+  .ff-sv__phone-row input { flex: 1 1 auto; }
+  .ff-sv__check {
+    display: flex; align-items: center; gap: 0.5rem; margin: -0.25rem 0 var(--sp-2);
+    font-size: var(--fs-small); color: var(--ff-ink); cursor: pointer;
+  }
+  .ff-sv__check input { width: 1.1rem; height: 1.1rem; accent-color: var(--ff-green); }
   .ff-sv__hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
   .ff-sv__submit, .ff-sv__wa-btn {
     display: inline-block; width: 100%; box-sizing: border-box; text-align: center;

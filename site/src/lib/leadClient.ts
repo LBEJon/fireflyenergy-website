@@ -1,6 +1,11 @@
 export interface LeadPayload {
   name: string;
+  /** Composed fallback (phone || email) for back-compat with the older edge fn. */
   contact: string;
+  phone?: string;
+  email?: string;
+  /** Whether the phone is reachable on WhatsApp. */
+  whatsapp?: boolean;
   segment: 'residential' | 'industrial';
   answers: unknown;
   config: unknown;

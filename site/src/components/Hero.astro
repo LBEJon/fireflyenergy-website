@@ -14,6 +14,27 @@ const chips = [
 ];
 ---
 <section class="ff-hero">
+  <div class="ff-hero__media" id="hero-media">
+    <picture>
+      <!-- Real dusk hero: one lit San Miguel home in a blacked-out valley.
+           Mobile gets a tighter 5:4 banner crop; desktop the wide pan. WebP preferred. -->
+      <source media="(max-width: 860px)" type="image/webp" srcset="/assets/photos/hero-dusk-mobile.webp" />
+      <source media="(max-width: 860px)" srcset="/assets/photos/hero-dusk-mobile.jpg" />
+      <source type="image/webp" srcset="/assets/photos/hero-dusk.webp" />
+      <img
+        id="hero-image"
+        src="/assets/photos/hero-dusk.jpg"
+        alt={t(locale, 'hero.image_alt')}
+        width="1920"
+        height="1086"
+        loading="eager"
+        fetchpriority="high"
+        onerror="this.style.display='none';this.closest('.ff-hero__media').classList.add('ff-hero__media--placeholder');"
+      />
+    </picture>
+    <div class="ff-hero__scrim" aria-hidden="true"></div>
+  </div>
+
   <div class="ff-hero__inner">
     <div class="ff-hero__copy">
       <p class="ff-hero__eyebrow">{t(locale, 'hero.eyebrow')}</p>
@@ -21,63 +42,98 @@ const chips = [
       <p class="ff-hero__sub">{t(locale, 'hero.sub')}</p>
       <div class="ff-hero__actions">
         <a class="ff-btn ff-btn--coral" href={ctaHref}>{t(locale, 'hero.cta_primary')}</a>
-        <a class="ff-btn ff-btn--ghost" href="#how-it-works">{t(locale, 'hero.cta_secondary')}</a>
+        <a class="ff-btn ff-btn--ghost-light" href="#how-it-works">{t(locale, 'hero.cta_secondary')}</a>
       </div>
       <ul class="ff-hero__chips">
         {chips.map((c) => <li>{c}</li>)}
       </ul>
-    </div>
-
-    <div class="ff-hero__media" id="hero-media">
-      <picture>
-        <!-- Phase 5 swaps in the real dusk photo. Until then, a warm golden-hour gradient holds the box. -->
-        <img
-          id="hero-image"
-          src="/assets/photos/hero-dusk.jpg"
-          alt={t(locale, 'hero.image_alt')}
-          width="720"
-          height="540"
-          loading="eager"
-          onerror="this.style.display='none';this.parentElement.parentElement.classList.add('ff-hero__media--placeholder');"
-        />
-      </picture>
     </div>
   </div>
 </section>
 
 <style>
   .ff-hero {
-    background: var(--ff-paper);
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    min-height: clamp(560px, 84vh, 820px);
     padding: var(--sp-6) var(--sp-3) var(--sp-7);
+    overflow: hidden;
+    color: var(--ff-white);
+    /* Fallback wash behind the photo (also shows before load / on error). */
+    background:
+      radial-gradient(120% 90% at 62% 52%, var(--ff-glow) 0%, transparent 46%),
+      linear-gradient(150deg, #11131a 0%, #1a1d27 60%, #11131a 100%);
+  }
+  .ff-hero__media {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+  /* Zoom slightly to create horizontal slack, then pan the scene to the right so
+     the lit home + Parroquia clear the left-side copy. Transform lives on <picture>
+     so it doesn't fight the GSAP scale parallax applied to the <img>. */
+  .ff-hero__media picture {
+    position: absolute;
+    inset: 0;
+    display: block;
+    transform: scale(1.3) translateX(13%);
+    transform-origin: center center;
+    will-change: transform;
+  }
+  .ff-hero__media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 42%;
+  }
+  .ff-hero__media--placeholder img { display: none; }
+  /* Legibility scrim: dark on the left where the copy sits, clearing by the
+     center so the one lit home keeps glowing; gentle vignette top & bottom. */
+  .ff-hero__scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg,
+        rgba(12,14,19,0.86) 0%,
+        rgba(12,14,19,0.60) 34%,
+        rgba(12,14,19,0.18) 58%,
+        rgba(12,14,19,0.00) 82%),
+      linear-gradient(0deg, rgba(12,14,19,0.55) 0%, rgba(12,14,19,0.0) 38%);
   }
   .ff-hero__inner {
+    position: relative;
+    z-index: 1;
     max-width: var(--container);
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1.05fr 0.95fr;
-    gap: var(--sp-5);
-    align-items: center;
+    width: 100%;
   }
+  .ff-hero__copy { max-width: 38rem; }
   .ff-hero__eyebrow {
     text-transform: uppercase;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     font-size: var(--fs-eyebrow);
     font-weight: 700;
-    color: var(--ff-accent-dk);
+    color: var(--ff-green);
     margin: 0 0 var(--sp-2);
   }
   .ff-hero__h1 {
     font-size: var(--fs-display);
     line-height: var(--lh-tight);
     margin: 0 0 var(--sp-3);
-    max-width: 16ch;
+    max-width: 14ch;
+    color: var(--ff-white);
+    text-shadow: 0 2px 24px rgba(0,0,0,0.35);
   }
   .ff-hero__sub {
     font-size: var(--fs-lead);
     line-height: var(--lh-body);
-    color: var(--ff-slate);
-    max-width: 46ch;
+    color: rgba(255,255,255,0.88);
+    max-width: 44ch;
     margin: 0 0 var(--sp-4);
+    text-shadow: 0 1px 12px rgba(0,0,0,0.3);
   }
   .ff-hero__actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
   .ff-btn {
@@ -95,8 +151,18 @@ const chips = [
   }
   .ff-btn--coral { background: var(--ff-accent); color: var(--ff-white); }
   .ff-btn--coral:hover { background: var(--ff-accent-dk); transform: translateY(-1px); }
-  .ff-btn--ghost { background: transparent; color: var(--ff-ink); border-color: var(--ff-line); }
-  .ff-btn--ghost:hover { border-color: var(--ff-ink); }
+  /* Light ghost for use on the dark hero photo. */
+  .ff-btn--ghost-light {
+    background: rgba(255,255,255,0.06);
+    color: var(--ff-white);
+    border-color: rgba(255,255,255,0.55);
+    backdrop-filter: blur(2px);
+  }
+  .ff-btn--ghost-light:hover {
+    background: rgba(255,255,255,0.14);
+    border-color: var(--ff-white);
+    transform: translateY(-1px);
+  }
 
   .ff-hero__chips {
     list-style: none;
@@ -107,29 +173,66 @@ const chips = [
     gap: var(--sp-1);
   }
   .ff-hero__chips li {
-    background: var(--ff-green-tint);
-    color: var(--ff-ink);
-    border: 1px solid var(--ff-line);
+    background: rgba(255,255,255,0.10);
+    color: var(--ff-white);
+    border: 1px solid rgba(255,255,255,0.28);
     border-radius: var(--r-pill);
     padding: 0.4rem 0.9rem;
     font-size: var(--fs-small);
     font-weight: 600;
+    backdrop-filter: blur(2px);
   }
 
-  .ff-hero__media {
-    border-radius: var(--r-lg);
-    overflow: hidden;
-    box-shadow: var(--shadow-lift);
-    aspect-ratio: 4 / 3;
-    background:
-      radial-gradient(120% 90% at 80% 10%, var(--ff-glow) 0%, transparent 55%),
-      linear-gradient(150deg, #FFB81C 0%, var(--ff-accent) 48%, var(--ff-ink) 100%);
-  }
-  .ff-hero__media img { display: block; width: 100%; height: 100%; object-fit: cover; }
-  .ff-hero__media--placeholder img { display: none; }
-
+  /* On phones the text-over-photo overlay gets cramped and unreadable, so we
+     switch to a clean STACKED layout: a clear image banner up top, then the copy
+     on solid paper below with dark text. Both the photo and the message read. */
   @media (max-width: 860px) {
-    .ff-hero__inner { grid-template-columns: 1fr; }
-    .ff-hero__media { order: -1; aspect-ratio: 16 / 10; }
+    .ff-hero {
+      display: block;
+      min-height: 0;
+      padding: 0;
+      overflow: visible;
+      color: var(--ff-ink);
+      background: var(--ff-paper);
+    }
+    .ff-hero__media {
+      position: relative;
+      inset: auto;
+      z-index: 0;
+      width: 100%;
+      aspect-ratio: 5 / 4;
+      border-bottom: 1px solid var(--ff-line);
+    }
+    .ff-hero__media picture { transform: none; }      /* show the full banner, no pan/zoom */
+    .ff-hero__media img { object-position: center center; }
+    /* Soft bottom fade so the photo blends into the paper — no heavy darkening. */
+    .ff-hero__scrim {
+      background: linear-gradient(0deg, rgba(12,14,19,0.30) 0%, rgba(12,14,19,0) 34%);
+    }
+    .ff-hero__inner {
+      position: relative;
+      z-index: 1;
+      width: auto;            /* drop desktop width:100% so side padding stays inside the viewport */
+      box-sizing: border-box;
+      padding: var(--sp-4) var(--sp-3) var(--sp-6);
+    }
+    .ff-hero__copy { max-width: none; }
+    .ff-hero__eyebrow { color: var(--ff-accent-dk); }
+    .ff-hero__h1 { color: var(--ff-ink); text-shadow: none; max-width: 18ch; }
+    .ff-hero__sub { color: var(--ff-slate); text-shadow: none; }
+    /* Light-background variants for the dark-hero controls. */
+    .ff-btn--ghost-light {
+      background: transparent;
+      color: var(--ff-ink);
+      border-color: var(--ff-line);
+      backdrop-filter: none;
+    }
+    .ff-btn--ghost-light:hover { background: transparent; border-color: var(--ff-ink); }
+    .ff-hero__chips li {
+      background: var(--ff-green-tint);
+      color: var(--ff-ink);
+      border-color: var(--ff-line);
+      backdrop-filter: none;
+    }
   }
 </style>

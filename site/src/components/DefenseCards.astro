@@ -18,19 +18,26 @@ const icons: Record<string, string> = {
     '<path d="M3 12h3l3-7 4 14 3-7h5"/>',
   long:
     '<path d="M5 8h11v8H5z"/><path d="M16 11h3v2h-3z"/><path d="M8 8V6h5v2"/>',
-  lightning:
-    '<path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/><path d="M9 21h6"/>',
+  flicker:
+    '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4.5 12.6c.5.4.9 1 1 1.7l.2 1.2h6.6l.2-1.2c.1-.7.5-1.3 1-1.7A7 7 0 0 0 12 2z"/>',
 };
 
+// All six protections, shown together in a 3×2 grid (no expand/collapse).
 const cards = [
   { k: 'outage', title: t(locale, 'defense.c1_title'), body: t(locale, 'defense.c1_body') },
   { k: 'weak', title: t(locale, 'defense.c2_title'), body: t(locale, 'defense.c2_body') },
   { k: 'quality', title: t(locale, 'defense.c3_title'), body: t(locale, 'defense.c3_body') },
-];
-const more = [
   { k: 'spike', title: t(locale, 'defense.c4_title'), body: t(locale, 'defense.c4_body') },
   { k: 'long', title: t(locale, 'defense.c5_title'), body: t(locale, 'defense.c5_body') },
-  { k: 'lightning', title: t(locale, 'defense.c6_title'), body: t(locale, 'defense.c6_body') },
+  { k: 'flicker', title: t(locale, 'defense.c6_title'), body: t(locale, 'defense.c6_body') },
+];
+
+// System-level specs — presented as a confident stat band rather than a chip line.
+const stats = [
+  { num: t(locale, 'defense.stat_resp_num'), label: t(locale, 'defense.stat_resp_label') },
+  { num: t(locale, 'defense.stat_mon_num'), label: t(locale, 'defense.stat_mon_label') },
+  { num: t(locale, 'defense.stat_auto_num'), label: t(locale, 'defense.stat_auto_label') },
+  { num: t(locale, 'defense.stat_uptime_num'), label: t(locale, 'defense.stat_uptime_label') },
 ];
 ---
 <section class="ff-defense">
@@ -53,22 +60,17 @@ const more = [
       ))}
     </div>
 
-    <details class="ff-defense__more">
-      <summary>{t(locale, 'defense.see_all')}</summary>
-      <div class="ff-defense__grid ff-defense__grid--more">
-        {more.map((c) => (
-          <article class="ff-defense__card">
-            <span class="ff-defense__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" set:html={icons[c.k]} />
-            </span>
-            <h3>{c.title}</h3>
-            <p>{c.body}</p>
-          </article>
+    <div class="ff-defense__stats">
+      <p class="ff-defense__stats-lead">{t(locale, 'defense.stats_lead')}</p>
+      <dl class="ff-defense__stats-grid">
+        {stats.map((s) => (
+          <div class="ff-defense__stat">
+            <dt class="ff-defense__stat-num display">{s.num}</dt>
+            <dd class="ff-defense__stat-label">{s.label}</dd>
+          </div>
         ))}
-      </div>
-    </details>
-
-    <p class="ff-defense__chips">{t(locale, 'defense.chips')}</p>
+      </dl>
+    </div>
   </div>
 </section>
 
@@ -88,7 +90,6 @@ const more = [
     grid-template-columns: repeat(3, 1fr);
     gap: var(--sp-3);
   }
-  .ff-defense__grid--more { margin-top: var(--sp-3); }
   .ff-defense__card {
     background: var(--ff-white);
     border: 1px solid var(--ff-line);
@@ -109,30 +110,60 @@ const more = [
   .ff-defense__card h3 { font-size: var(--fs-h3); margin: 0 0 0.4rem; }
   .ff-defense__card p { margin: 0; color: var(--ff-slate); line-height: var(--lh-body); }
 
-  .ff-defense__more { margin-top: var(--sp-3); }
-  .ff-defense__more summary {
-    cursor: pointer;
-    list-style: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-weight: 700;
-    color: var(--ff-accent-dk);
-    padding: 0.6rem 0;
-  }
-  .ff-defense__more summary::-webkit-details-marker { display: none; }
-  .ff-defense__more summary::after { content: "＋"; font-weight: 700; }
-  .ff-defense__more[open] summary::after { content: "－"; }
-
-  .ff-defense__chips {
+  /* System-level specs as one confident band (replaces the old chip line). */
+  .ff-defense__stats {
+    margin: var(--sp-6) auto 0;
+    max-width: var(--container-tight);
+    background: var(--ff-white);
+    border: 1px solid var(--ff-line);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--sp-5) var(--sp-4);
     text-align: center;
-    margin: var(--sp-5) 0 0;
-    font-weight: 600;
+  }
+  .ff-defense__stats-lead {
+    max-width: 52ch;
+    margin: 0 auto var(--sp-4);
     color: var(--ff-slate);
+    font-size: var(--fs-lead);
+    line-height: var(--lh-body);
+  }
+  .ff-defense__stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--sp-3);
+    margin: 0;
+  }
+  .ff-defense__stat {
+    padding: 0 var(--sp-2);
+    border-left: 1px solid var(--ff-line);
+  }
+  .ff-defense__stat:first-child { border-left: 0; }
+  .ff-defense__stat-num {
+    font-size: clamp(1.7rem, 3.4vw, 2.4rem);
+    font-weight: 800;
+    line-height: 1;
+    color: var(--ff-accent-dk);
+    margin: 0;
+  }
+  .ff-defense__stat-label {
+    margin: 0.5rem 0 0;
     font-size: var(--fs-small);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ff-slate);
   }
 
   @media (max-width: 860px) {
     .ff-defense__grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .ff-defense__stats { padding: var(--sp-4) var(--sp-3); }
+    .ff-defense__stats-grid { grid-template-columns: 1fr 1fr; gap: var(--sp-3) var(--sp-2); }
+    /* Reset borders, then divide the 2×2 grid cleanly. */
+    .ff-defense__stat { border-left: 0; padding: var(--sp-2) var(--sp-1); }
+    .ff-defense__stat:nth-child(even) { border-left: 1px solid var(--ff-line); }
+    .ff-defense__stat:nth-child(n + 3) { border-top: 1px solid var(--ff-line); }
   }
 </style>

@@ -3,8 +3,9 @@ import Base from '../layouts/Base.astro';
 import Nav from '../components/Nav.astro';
 import Hero from '../components/Hero.astro';
 import TrustStrip from '../components/TrustStrip.astro';
-import FlowDiagram from '../components/FlowDiagram.astro';
+import FlowDiagram from '../components/PowerFlow.astro';
 import DefenseCards from '../components/DefenseCards.astro';
+import SolutionsTiers from '../components/solutions/SolutionsTiers.astro';
 import EquipmentShowcase from '../components/EquipmentShowcase.astro';
 import ProofGallery from '../components/ProofGallery.astro';
 import CTASection from '../components/CTASection.astro';
@@ -12,11 +13,15 @@ import Footer from '../components/Footer.astro';
 import WhatsAppBubble from '../components/WhatsAppBubble.astro';
 import { t, altUrl } from '../lib/i18n';
 import { homeGraph } from '../lib/jsonld';
+import { getBuildFxRate } from '../lib/fxBuild';
 
 const locale = 'en' as const;
 const title = `${t(locale, 'common.brand')} — ${t(locale, 'hero.h1')}`;
 const description = t(locale, 'hero.sub');
 const jsonLd = homeGraph(locale, Astro.site);
+
+// Bake the FX rate at build time; falls back to FX_FALLBACK locally.
+const fxUsdMxn = await getBuildFxRate();
 ---
 <Base title={title} description={description} locale={locale} path="" jsonLd={jsonLd}>
   <Nav locale={locale} />
@@ -25,7 +30,12 @@ const jsonLd = homeGraph(locale, Astro.site);
     <TrustStrip locale={locale} />
     <FlowDiagram locale={locale} />
     <DefenseCards locale={locale} />
+
     <EquipmentShowcase locale={locale} />
+
+    <div id="solutions">
+      <SolutionsTiers locale={locale} fxUsdMxn={fxUsdMxn} />
+    </div>
 
     <section class="ff-calc-teaser" aria-labelledby="ff-calc-teaser-title">
       <div class="ff-calc-teaser__inner">
@@ -57,7 +67,7 @@ const jsonLd = homeGraph(locale, Astro.site);
     text-decoration: none;
     padding: 0.85rem 1.6rem;
   }
-  .ff-btn--coral { background: var(--ff-coral); color: var(--ff-white); }
+  .ff-btn--coral { background: var(--ff-accent); color: var(--ff-white); }
   .ff-btn--coral:hover { filter: brightness(1.05); }
 </style>
 

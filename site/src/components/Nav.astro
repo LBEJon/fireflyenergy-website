@@ -9,10 +9,11 @@ const other: Locale = locale === 'es' ? 'en' : 'es';
 
 const home = altUrl(locale, '');
 const links = [
-  { href: altUrl(locale, 'solutions'), label: t(locale, 'nav.solutions') },
+  { href: `${altUrl(locale, '')}#solutions`, label: t(locale, 'nav.solutions') },
   { href: '#how-it-works', label: t(locale, 'nav.how_it_works') },
   { href: altUrl(locale, 'industrial'), label: t(locale, 'nav.industrial') },
   { href: altUrl(locale, 'calculator'), label: t(locale, 'nav.calculator') },
+  { href: altUrl(locale, 'faq'), label: t(locale, 'nav.faq') },
 ];
 const ctaHref = altUrl(locale, 'calculator');
 // Toggle to the same logical page in the other locale (home for now).

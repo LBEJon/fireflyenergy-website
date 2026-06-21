@@ -102,9 +102,15 @@ const capabilitiesHref = '#capabilities';
   .ind-hero__image {
     width: 100%;
     height: 100%;
-    background:
-      radial-gradient(90% 70% at 75% 15%, rgba(158, 213, 0, 0.28) 0%, transparent 60%),
-      linear-gradient(155deg, #3A4350 0%, #2A2D34 50%, #11141A 100%);
+    /* Real BESS photo (WebP preferred). Plain JPG is the fallback; dark color shows
+       only if the image fails to load. */
+    background: #20232A url("/assets/photos/industrial-hero.jpg") center / cover no-repeat;
+    background-image: -webkit-image-set(
+      url("/assets/photos/industrial-hero.webp") type("image/webp"),
+      url("/assets/photos/industrial-hero.jpg") type("image/jpeg"));
+    background-image: image-set(
+      url("/assets/photos/industrial-hero.webp") type("image/webp"),
+      url("/assets/photos/industrial-hero.jpg") type("image/jpeg"));
   }
 
   @media (max-width: 860px) {

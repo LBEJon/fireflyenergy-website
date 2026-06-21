@@ -8,10 +8,11 @@ import {
   type CoverageTier,
   type OtherLoad,
 } from '../../lib/assessment';
-import { fetchEstimate, type EstimateResult, type EstimateTier } from '../../lib/estimateClient';
+import { fetchEstimate, type EstimateResult } from '../../lib/estimateClient';
 import { parseCfe, fileToB64 } from '../../lib/cfeUploadClient';
 import { submitLead, type LeadPayload } from '../../lib/leadClient';
 import { t, type Locale } from '../../lib/i18n';
+import { buildWaSuccessHref } from '../../lib/waLink';
 
 const MAX_FILE_BYTES = 8 * 1024 * 1024; // 8 MB
 
@@ -49,8 +50,6 @@ export function initAssessment(root: HTMLElement): void {
   let uiStep = 1;
   let lastResult: EstimateResult | null = null;
   let selectedTier: string | null = null;
-  let currency: 'USD' | 'MXN' = 'USD';
-  let fxUsdMxn = 1;
 
   // ---- View elements ----
   const views = {
@@ -133,7 +132,7 @@ export function initAssessment(root: HTMLElement): void {
   const fileInput = root.querySelector<HTMLInputElement>('[data-cfe-file]');
   const cfeStatus = root.querySelector<HTMLElement>('[data-cfe-status]');
   const manualWrap = root.querySelector<HTMLElement>('[data-manual]');
-  const monthlyInput = root.querySelector<HTMLInputElement>('[data-monthly-kwh]');
+  const dailyInput = root.querySelector<HTMLInputElement>('[data-daily-kwh]');
 
   function setCfeStatus(msg: string, show = true) {
     if (!cfeStatus) return;
@@ -165,7 +164,8 @@ export function initAssessment(root: HTMLElement): void {
         return;
       }
       answers.billKwhPerDay = res.kwhPerDay;
-      answers.monthlyKwh = undefined;
+      answers.billAddress = res.address ?? undefined;
+      answers.dailyKwh = undefined;
       setCfeStatus(
         tr('assessment.consumption.parsed').replace('{kwh}', String(Math.round(res.kwhPerDay))),
       );
@@ -176,11 +176,11 @@ export function initAssessment(root: HTMLElement): void {
     syncNext();
   });
 
-  monthlyInput?.addEventListener('input', () => {
-    const v = Number(monthlyInput.value);
-    answers.monthlyKwh = v > 0 ? v : undefined;
+  dailyInput?.addEventListener('input', () => {
+    const v = Number(dailyInput.value);
+    answers.dailyKwh = v > 0 ? v : undefined;
     // Manual entry supersedes any prior (failed) bill parse.
-    if (answers.monthlyKwh) answers.billKwhPerDay = undefined;
+    if (answers.dailyKwh) answers.billKwhPerDay = undefined;
     syncNext();
   });
 
@@ -316,19 +316,21 @@ export function initAssessment(root: HTMLElement): void {
   });
   // ---- Add-solar: recommendation-anchored stepper ----
   const solarRec = root.querySelector<HTMLElement>('[data-solar-rec]');
-  const solarFallback = root.querySelector<HTMLElement>('[data-add-solar-fallback]');
   const recLine = root.querySelector<HTMLElement>('[data-rec-line]');
-  const panelVal = root.querySelector<HTMLElement>('[data-panel-val]');
+  const recBtn = root.querySelector<HTMLButtonElement>('[data-panel-rec]');
+  const noneBtn = root.querySelector<HTMLButtonElement>('[data-panel-none]');
+  const panelVal = root.querySelector<HTMLInputElement>('[data-panel-val]');
   const offsetLine = root.querySelector<HTMLElement>('[data-offset-line]');
   let solarTouched = false; // once the user adjusts, stop auto-resetting to rec
+  let lastRec = 0; // most recent recommendation, for the "Use recommended" button
 
   // Current consumption (kWh/day) from a parsed bill or manual monthly entry.
   function currentCfeKwhPerDay(): number {
     if (typeof answers.billKwhPerDay === 'number' && answers.billKwhPerDay > 0) {
       return answers.billKwhPerDay;
     }
-    if (typeof answers.monthlyKwh === 'number' && answers.monthlyKwh > 0) {
-      return answers.monthlyKwh / 30;
+    if (typeof answers.dailyKwh === 'number' && answers.dailyKwh > 0) {
+      return answers.dailyKwh;
     }
     return 0;
   }
@@ -342,15 +344,19 @@ export function initAssessment(root: HTMLElement): void {
     const cfe = currentCfeKwhPerDay();
     const existing = currentExistingKw();
     const n = answers.addSolarPanels ?? 0;
-    if (panelVal) {
-      panelVal.textContent = tr('assessment.addsolar.count').replace('{n}', String(n));
-    }
+    // The oversize field shows a number ONLY when oversizing (a custom count that
+    // isn't the recommendation or battery-only); otherwise it stays blank.
+    const isCustom = n > 0 && n !== lastRec;
+    if (panelVal && document.activeElement !== panelVal) panelVal.value = isCustom ? String(n) : '';
     if (offsetLine) {
       offsetLine.textContent = tr('assessment.solar.offset').replace(
         '{pct}',
         String(offsetPct(n, cfe, existing)),
       );
     }
+    // Highlight whichever quick-set action matches the current count.
+    noneBtn?.classList.toggle('is-active', n === 0);
+    recBtn?.classList.toggle('is-active', n > 0 && n === lastRec);
   }
 
   // Bounded panel change: 0 allowed; first positive snaps to the 4-panel min.
@@ -361,51 +367,33 @@ export function initAssessment(root: HTMLElement): void {
     solarTouched = true;
     renderSolarReadout();
   }
-  root.querySelector<HTMLButtonElement>('[data-panel-inc]')?.addEventListener('click', () => {
-    const cur = answers.addSolarPanels ?? 0;
-    setPanels(cur === 0 ? 4 : cur + 1);
+  noneBtn?.addEventListener('click', () => setPanels(0));
+  recBtn?.addEventListener('click', () => setPanels(lastRec));
+  // Oversize: typing a number sets the panel count directly. Clamp on commit
+  // (blur/Enter); an empty field falls back to the recommendation.
+  panelVal?.addEventListener('change', () => {
+    const v = panelVal.value.trim();
+    setPanels(v === '' ? lastRec : Number(v) || 0);
   });
-  root.querySelector<HTMLButtonElement>('[data-panel-dec]')?.addEventListener('click', () => {
-    const cur = answers.addSolarPanels ?? 0;
-    setPanels(cur <= 4 ? 0 : cur - 1);
-  });
-  root.querySelector<HTMLButtonElement>('[data-panel-none]')?.addEventListener('click', () => setPanels(0));
 
   // Recompute + default-select the recommendation when entering the solar step.
   function prepareSolarStep() {
     const cfe = currentCfeKwhPerDay();
-    if (cfe <= 0) {
-      // Consumption unknown here (shouldn't happen) → fixed-chip fallback.
-      if (solarRec) solarRec.hidden = true;
-      if (solarFallback) solarFallback.hidden = false;
-      return;
-    }
-    if (solarFallback) solarFallback.hidden = true;
     if (solarRec) solarRec.hidden = false;
-    const rec = recommendPanels(cfe, currentExistingKw());
+    // No recommendation without consumption (shouldn't happen in Door A): keep the
+    // stepper for free entry, hide the rec line + "Use recommended" button.
+    lastRec = cfe > 0 ? recommendPanels(cfe, currentExistingKw()) : 0;
     if (recLine) {
-      recLine.innerHTML = tr('assessment.solar.recommend').replace(
-        '{rec}',
-        `<strong>${rec}</strong>`,
-      );
+      recLine.hidden = lastRec <= 0;
+      if (lastRec > 0) {
+        recLine.innerHTML = tr('assessment.solar.recommend').replace('{rec}', `<strong>${lastRec}</strong>`);
+      }
     }
+    if (recBtn) recBtn.hidden = lastRec <= 0;
     // Default-select the recommendation until the user adjusts the stepper.
-    if (!solarTouched) answers.addSolarPanels = rec;
+    if (!solarTouched && lastRec > 0) answers.addSolarPanels = lastRec;
     renderSolarReadout();
   }
-
-  // Fallback fixed-chip selection (only used when consumption is unknown).
-  root.querySelectorAll<HTMLButtonElement>('[data-add-solar]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      answers.addSolarPanels = Number(btn.dataset.addSolar ?? 0);
-      solarTouched = true;
-      root.querySelectorAll<HTMLButtonElement>('[data-add-solar]').forEach((b) => {
-        const on = b === btn;
-        b.classList.toggle('is-active', on);
-        b.setAttribute('aria-checked', String(on));
-      });
-    });
-  });
 
   // ====================================================================
   // STEP 4 — BACKUP GOAL
@@ -426,172 +414,103 @@ export function initAssessment(root: HTMLElement): void {
   // ====================================================================
   const loadingEl = root.querySelector<HTMLElement>('[data-result-loading]');
   const resultBlock = root.querySelector<HTMLElement>('[data-result-block]');
-  const tiersEl = root.querySelector<HTMLElement>('[data-tiers]');
-  const dailyNote = root.querySelector<HTMLElement>('[data-daily-note]');
-  const offsetNote = root.querySelector<HTMLElement>('[data-offset-note]');
-  const curBtns = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-currency]'));
 
   async function runResult() {
     if (loadingEl) loadingEl.hidden = false;
     if (resultBlock) resultBlock.hidden = true;
 
-    // Hard gate: no known consumption → never price. Route to Door B.
+    // No known consumption → we can't size a proposal from inputs alone; route to
+    // the site-visit door so an expert can gather what's needed.
     if (!consumptionKnown(answers)) {
       routeToDoorB(true);
       return;
     }
 
+    // We no longer show a price here — the customized proposal is delivered within
+    // 24h. The estimate is best-effort: a needsSiteVisit verdict still routes to the
+    // site-visit door, and a successful estimate enriches the CRM payload with a
+    // suggested config — but an estimate error must NOT block the capture form.
     const res = await fetchEstimate(baseUrl, toEstimateBody(answers));
-    // Fail safe: any error or a needsSiteVisit verdict → Door B, friendly note.
-    if ('error' in res || res.needsSiteVisit || !res.tiers || res.tiers.length === 0) {
+    if (!('error' in res) && res.needsSiteVisit) {
       routeToDoorB(true);
       return;
     }
-
-    lastResult = res;
-    fxUsdMxn = typeof res.fxUsdMxn === 'number' && res.fxUsdMxn > 0 ? res.fxUsdMxn : 1;
-    selectedTier = res.tiers.find((t) => t.highlighted)?.key ?? res.tiers[0].key;
+    if (!('error' in res) && res.tiers && res.tiers.length > 0) {
+      lastResult = res;
+      selectedTier = res.tiers.find((t) => t.highlighted)?.key ?? res.tiers[0].key;
+    }
 
     if (loadingEl) loadingEl.hidden = true;
     if (resultBlock) resultBlock.hidden = false;
-
-    // Daily kWh + existing-solar offset notes.
-    if (dailyNote) {
-      if (typeof res.dailyKwh === 'number' && res.dailyKwh > 0) {
-        dailyNote.textContent = tr('assessment.result.daily_note').replace('{kwh}', String(Math.round(res.dailyKwh)));
-        dailyNote.hidden = false;
-      } else dailyNote.hidden = true;
-    }
-    if (offsetNote) {
-      const off = res.existingSolarKw ?? 0;
-      if (off > 0) {
-        offsetNote.textContent = tr('assessment.result.offset_note').replace('{kwp}', off.toFixed(2));
-        offsetNote.hidden = false;
-      } else offsetNote.hidden = true;
-    }
-
-    renderTiers();
   }
 
-  function fmt(usd: number): string {
-    const val = currency === 'MXN' ? usd * fxUsdMxn : usd;
-    const loc = locale === 'es' ? 'es-MX' : 'en-US';
-    return new Intl.NumberFormat(loc, { style: 'currency', currency, maximumFractionDigits: 0 }).format(val);
+  // Compose the contact fields into a lead payload's contact parts. The phone is
+  // prefixed with the selected country code (e.g. "+52 415 180 5030"). `contact`
+  // (phone || email) keeps back-compat with the older single-field edge fn.
+  function contactParts(cc: string, phone: string, email: string, whatsapp: boolean) {
+    const p = phone.trim();
+    const e = email.trim();
+    const full = p ? `${cc} ${p}`.trim() : '';
+    return { phone: full || undefined, email: e || undefined, whatsapp, contact: full || e };
   }
-
-  function tierChips(cfg: EstimateTier['config']): string {
-    const parts = [`${cfg.inverterKw} kW`, `${cfg.batteryKwh} kWh`];
-    if (cfg.panels > 0) {
-      parts.push(locale === 'es' ? `${cfg.panels} paneles` : `${cfg.panels} panels`);
-    }
-    let s = parts.join(' · ');
-    if (cfg.includeSubpanel) s += ` + ${tr('assessment.result.subpanel_chip')}`;
-    return s;
-  }
-
-  const TIER_NAME: Record<string, string> = {
-    essentials: 'assessment.result.tier_essentials_name',
-    recommended: 'assessment.result.tier_recommended_name',
-  };
-  const TIER_COVER: Record<string, string> = {
-    essentials: 'assessment.result.tier_essentials_cover',
-    recommended: 'assessment.result.tier_recommended_cover',
-  };
-
-  function renderTiers() {
-    if (!tiersEl || !lastResult?.tiers) return;
-    tiersEl.innerHTML = '';
-    for (const tier of lastResult.tiers) {
-      const li = document.createElement('li');
-      li.className = 'ff-as__tier' + (tier.highlighted ? ' is-highlight' : '');
-      const isSel = tier.key === selectedTier;
-      const nameKey = TIER_NAME[tier.key] ?? 'assessment.result.tier_recommended_name';
-      const coverKey = TIER_COVER[tier.key] ?? 'assessment.result.tier_recommended_cover';
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'ff-as__tier-btn';
-      btn.setAttribute('role', 'radio');
-      btn.setAttribute('aria-checked', String(isSel));
-      // Data-driven price: a tier carrying a `range` (e.g. Recommended) renders
-      // as a low–high band; a single-price tier (e.g. Essentials) renders the
-      // pre-IVA estimate alone, framed as a "from" floor.
-      const priceHtml = tier.range
-        ? `
-          <span class="ff-as__tier-amount">${esc(
-            tr('assessment.result.price_range')
-              .replace('{low}', fmt(tier.range.lowUsd))
-              .replace('{high}', fmt(tier.range.highUsd)),
-          )}</span>
-          <span class="ff-as__tier-iva">${esc(tr('assessment.result.price_iva_note'))}</span>
-          <span class="ff-as__tier-final">${esc(tr('assessment.result.price_after_visit'))}</span>
-        `
-        : `
-          <span class="ff-as__tier-from">${esc(tr('assessment.result.price_from'))}</span>
-          <span class="ff-as__tier-amount">${esc(fmt(tier.price.preIvaUsd))}</span>
-          <span class="ff-as__tier-iva">${esc(tr('assessment.result.price_iva_line').replace('{iva}', fmt(tier.price.ivaUsd)))}</span>
-        `;
-      btn.innerHTML = `
-        ${tier.highlighted ? `<span class="ff-as__tier-badge">${esc(tr('assessment.result.tier_badge'))}</span>` : ''}
-        <span class="ff-as__tier-name">${esc(tr(nameKey))}</span>
-        <span class="ff-as__tier-cover">${esc(tr(coverKey))}</span>
-        <span class="ff-as__tier-chips">${esc(tierChips(tier.config))}</span>
-        <span class="ff-as__tier-price">${priceHtml}</span>
-        <span class="ff-as__tier-cta">${esc(isSel ? tr('assessment.result.tier_selected') : tr('assessment.result.tier_select'))}</span>
-      `;
-      btn.addEventListener('click', () => {
-        selectedTier = tier.key;
-        renderTiers();
-      });
-      li.appendChild(btn);
-      tiersEl.appendChild(li);
-    }
-  }
-
-  curBtns.forEach((cb) => {
-    cb.addEventListener('click', () => {
-      currency = (cb.dataset.currency as 'USD' | 'MXN') ?? 'USD';
-      curBtns.forEach((b) => {
-        const on = b === cb;
-        b.classList.toggle('is-active', on);
-        b.setAttribute('aria-checked', String(on));
-      });
-      renderTiers();
-    });
-  });
+  // A lead is submittable once we have a name and at least one way to reach them.
+  const hasContact = (phone: string, email: string) => !!(phone.trim() || email.trim());
 
   // ---- Door A capture form ----
   const captureForm = root.querySelector<HTMLFormElement>('[data-capture]');
   const nameInput = root.querySelector<HTMLInputElement>('[data-name]');
-  const contactInput = root.querySelector<HTMLInputElement>('[data-contact]');
+  const ccInput = root.querySelector<HTMLSelectElement>('[data-phone-cc]');
+  const phoneInput = root.querySelector<HTMLInputElement>('[data-phone]');
+  const emailInput = root.querySelector<HTMLInputElement>('[data-email]');
+  const whatsappInput = root.querySelector<HTMLInputElement>('[data-whatsapp]');
   const hpInput = root.querySelector<HTMLInputElement>('[data-hp]');
   const submitBtn = root.querySelector<HTMLButtonElement>('[data-submit]');
   const okState = root.querySelector<HTMLElement>('[data-state-ok]');
   const errState = root.querySelector<HTMLElement>('[data-state-err]');
+  const waSuccessBtn = root.querySelector<HTMLAnchorElement>('[data-wa-success]');
+  const softWa = root.querySelector<HTMLAnchorElement>('[data-soft-wa]');
 
-  function syncSubmit() {
-    if (!submitBtn) return;
-    const ok = (nameInput?.value.trim().length ?? 0) > 0 && (contactInput?.value.trim().length ?? 0) > 0;
-    submitBtn.disabled = !ok;
-  }
-  nameInput?.addEventListener('input', syncSubmit);
-  contactInput?.addEventListener('input', syncSubmit);
-
-  captureForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    // Honeypot tripped → swallow without submitting (bot, not a person).
-    if (hpInput?.value) return;
-    if (submitBtn) submitBtn.disabled = true;
-    const payload: LeadPayload = {
+  function captureValues() {
+    return {
       name: nameInput?.value.trim() ?? '',
-      contact: contactInput?.value.trim() ?? '',
+      ...contactParts(ccInput?.value ?? '+52', phoneInput?.value ?? '', emailInput?.value ?? '', whatsappInput?.checked ?? false),
+    };
+  }
+  function buildCapturePayload(): LeadPayload {
+    const v = captureValues();
+    return {
+      name: v.name,
+      contact: v.contact,
+      phone: v.phone,
+      email: v.email,
+      whatsapp: v.whatsapp,
       segment: 'residential',
       locale,
       answers,
       config: { selectedTier, tiers: lastResult?.tiers ?? [] },
       hp: hpInput?.value ?? '',
     };
+  }
+  function syncSubmit() {
+    if (!submitBtn) return;
+    const v = captureValues();
+    submitBtn.disabled = !(v.name.length > 0 && hasContact(v.phone ?? '', v.email ?? ''));
+  }
+  nameInput?.addEventListener('input', syncSubmit);
+  phoneInput?.addEventListener('input', syncSubmit);
+  emailInput?.addEventListener('input', syncSubmit);
+
+  captureForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    // Honeypot tripped → swallow without submitting (bot, not a person).
+    if (hpInput?.value) return;
+    if (submitBtn) submitBtn.disabled = true;
+    const payload = buildCapturePayload();
     const res = await submitLead(baseUrl, payload);
     if (res.ok) {
+      if (waSuccessBtn) {
+        waSuccessBtn.href = buildWaSuccessHref(locale, 'assessment.result.wa_message', payload.name);
+      }
       if (captureForm) captureForm.hidden = true;
       if (okState) { okState.hidden = false; okState.focus?.(); }
     } else {
@@ -600,13 +519,27 @@ export function initAssessment(root: HTMLElement): void {
     }
   });
 
+  // Soft "message us on WhatsApp" link: don't lose a partially-filled form.
+  // Best-effort save (fire-and-forget) of whatever they've entered, then let the
+  // link open WhatsApp in its new tab. Only saves if there's a name + contact.
+  softWa?.addEventListener('click', () => {
+    if (hpInput?.value) return;
+    const payload = buildCapturePayload();
+    if (payload.name && hasContact(payload.phone ?? '', payload.email ?? '')) {
+      void submitLead(baseUrl, payload);
+    }
+  });
+
   // ====================================================================
   // DOOR B (site visit) — used as door + as fail-safe destination
   // ====================================================================
+  // Set by the Door B binding below; prefills the location from a parsed bill.
+  let prefillDoorBLocation: (() => void) | null = null;
   function routeToDoorB(withFallbackNote: boolean) {
     showView('sitevisit');
     const note = root.querySelector<HTMLElement>('[data-sitevisit-note]');
     if (note) note.hidden = !withFallbackNote;
+    prefillDoorBLocation?.();
   }
 
   // Bind the Door B form (lives inside SiteVisitLead.astro).
@@ -614,29 +547,33 @@ export function initAssessment(root: HTMLElement): void {
   if (svRoot) {
     const svForm = svRoot.querySelector<HTMLFormElement>('[data-sitevisit-form]');
     const svName = svRoot.querySelector<HTMLInputElement>('[data-sv-name]');
-    const svContact = svRoot.querySelector<HTMLInputElement>('[data-sv-contact]');
+    const svCc = svRoot.querySelector<HTMLSelectElement>('[data-sv-phone-cc]');
+    const svPhone = svRoot.querySelector<HTMLInputElement>('[data-sv-phone]');
+    const svEmail = svRoot.querySelector<HTMLInputElement>('[data-sv-email]');
+    const svWhatsapp = svRoot.querySelector<HTMLInputElement>('[data-sv-whatsapp]');
     const svLocation = svRoot.querySelector<HTMLInputElement>('[data-sv-location]');
     const svMessage = svRoot.querySelector<HTMLTextAreaElement>('[data-sv-message]');
     const svHp = svRoot.querySelector<HTMLInputElement>('[data-sv-hp]');
     const svSubmit = svRoot.querySelector<HTMLButtonElement>('[data-sv-submit]');
     const svOk = svRoot.querySelector<HTMLElement>('[data-sv-state-ok]');
     const svErr = svRoot.querySelector<HTMLElement>('[data-sv-state-err]');
+    const svWaSuccess = svRoot.querySelector<HTMLAnchorElement>('[data-sv-wa-success]');
+    const svSoftWa = svRoot.querySelector<HTMLAnchorElement>('[data-sv-soft-wa]');
 
-    const svSync = () => {
-      if (!svSubmit) return;
-      const ok = (svName?.value.trim().length ?? 0) > 0 && (svContact?.value.trim().length ?? 0) > 0;
-      svSubmit.disabled = !ok;
-    };
-    svName?.addEventListener('input', svSync);
-    svContact?.addEventListener('input', svSync);
-
-    svForm?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (svHp?.value) return; // honeypot
-      if (svSubmit) svSubmit.disabled = true;
-      const payload: LeadPayload = {
+    function svValues() {
+      return {
         name: svName?.value.trim() ?? '',
-        contact: svContact?.value.trim() ?? '',
+        ...contactParts(svCc?.value ?? '+52', svPhone?.value ?? '', svEmail?.value ?? '', svWhatsapp?.checked ?? false),
+      };
+    }
+    function buildSvPayload(): LeadPayload {
+      const v = svValues();
+      return {
+        name: v.name,
+        contact: v.contact,
+        phone: v.phone,
+        email: v.email,
+        whatsapp: v.whatsapp,
         segment: 'residential',
         locale,
         answers: {
@@ -647,13 +584,50 @@ export function initAssessment(root: HTMLElement): void {
         config: { siteVisitRequested: true },
         hp: svHp?.value ?? '',
       };
+    }
+    const svSync = () => {
+      if (!svSubmit) return;
+      const v = svValues();
+      svSubmit.disabled = !(v.name.length > 0 && hasContact(v.phone ?? '', v.email ?? ''));
+    };
+    svName?.addEventListener('input', svSync);
+    svPhone?.addEventListener('input', svSync);
+    svEmail?.addEventListener('input', svSync);
+
+    // Prefill the location from a parsed CFE bill address when Door B opens, so we
+    // don't ask for details we already have. Only fills an empty field (no clobber).
+    prefillDoorBLocation = () => {
+      const addr = answers.billAddress;
+      if (svLocation && !svLocation.value.trim() && addr) {
+        const where = [addr.colonia, addr.city].filter(Boolean).join(', ');
+        if (where) svLocation.value = where;
+      }
+    };
+
+    svForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (svHp?.value) return; // honeypot
+      if (svSubmit) svSubmit.disabled = true;
+      const payload = buildSvPayload();
       const res = await submitLead(baseUrl, payload);
       if (res.ok) {
+        if (svWaSuccess) {
+          svWaSuccess.href = buildWaSuccessHref(locale, 'assessment.result.wa_message', payload.name);
+        }
         if (svForm) svForm.hidden = true;
         if (svOk) { svOk.hidden = false; svOk.focus?.(); }
       } else {
         if (svErr) svErr.hidden = false; // never fake success → WhatsApp fallback
         if (svSubmit) svSubmit.disabled = false;
+      }
+    });
+
+    // Soft WhatsApp link: best-effort save of the partially-filled form first.
+    svSoftWa?.addEventListener('click', () => {
+      if (svHp?.value) return;
+      const payload = buildSvPayload();
+      if (payload.name && hasContact(payload.phone ?? '', payload.email ?? '')) {
+        void submitLead(baseUrl, payload);
       }
     });
   }
