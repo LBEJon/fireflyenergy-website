@@ -47,9 +47,6 @@ const toggleHref = altUrl(other, '');
       <a href={l.href}>{l.label}</a>
     ))}
     <a class="ff-btn ff-btn--coral" href={ctaHref}>{t(locale, 'nav.cta')}</a>
-    <a class="ff-nav__lang ff-nav__lang--block" href={toggleHref} aria-label={t(locale, 'common.locale_aria')}>
-      {t(locale, 'common.locale_label')}
-    </a>
   </div>
 </header>
 
@@ -149,12 +146,10 @@ const toggleHref = altUrl(other, '');
     padding: 0.6rem 0;
   }
   .ff-nav__mobile .ff-btn { margin-top: var(--sp-1); }
-  .ff-nav__lang--block { display: inline-block; width: fit-content; }
 
   @media (max-width: 860px) {
     .ff-nav__links { display: none; }
     .ff-nav__cta { display: none; }
-    .ff-nav__lang { display: none; }
     .ff-nav__burger { display: flex; }
     .ff-nav__mobile[data-open="true"] { display: flex; }
   }
