@@ -239,6 +239,30 @@ export function initAssessment(root: HTMLElement): void {
   };
   bindNum('[data-mini-splits]', 'miniSplits');
   bindNum('[data-refrigerators]', 'refrigerators');
+
+  // −/＋ steppers: adjust the sibling number input, clamp at 0, and fire `input`
+  // so the bindings above stay in sync. Delegated so it covers every stepper.
+  root.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const input = btn.parentElement?.querySelector<HTMLInputElement>('input[type="number"]');
+      if (!input) return;
+      const next = Math.max(0, (Number(input.value) || 0) + Number(btn.dataset.step));
+      input.value = String(next);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  });
+
+  // Number fields that default to "0": clear on focus so typing "2" gives 2, not
+  // 20; restore "0" on blur if left empty (and resync state).
+  root.querySelectorAll<HTMLInputElement>('input[data-zero]').forEach((input) => {
+    input.addEventListener('focus', () => { if (input.value === '0') input.value = ''; });
+    input.addEventListener('blur', () => {
+      if (input.value.trim() === '') {
+        input.value = '0';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    });
+  });
   const bindCheck = (sel: string, key: keyof typeof ap) => {
     root.querySelector<HTMLInputElement>(sel)?.addEventListener('change', (e) => {
       (ap as Record<string, unknown>)[key] = (e.target as HTMLInputElement).checked;

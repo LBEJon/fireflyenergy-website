@@ -107,11 +107,11 @@ const backupOpts = ['4', '8', '12', '24'];
           <div class="ff-as__solar-detail" data-solar-detail hidden>
             <label class="ff-as__field">
               <span class="ff-as__field-label">{t(locale, 'assessment.solar.panel_count')}</span>
-              <input type="number" inputmode="numeric" min="0" step="1" value="0" data-panel-count />
+              <input type="number" inputmode="numeric" min="0" step="1" value="0" data-panel-count data-zero />
             </label>
             <label class="ff-as__field">
               <span class="ff-as__field-label">{t(locale, 'assessment.solar.panel_watts')}</span>
-              <input type="number" inputmode="numeric" min="0" step="5" value="0" data-panel-watts />
+              <input type="number" inputmode="numeric" min="0" step="5" value="0" data-panel-watts data-zero />
             </label>
             <p class="ff-as__kwp" data-existing-kwp></p>
           </div>
@@ -123,14 +123,22 @@ const backupOpts = ['4', '8', '12', '24'];
           <p class="ff-as__help">{t(locale, 'assessment.step.appliances_help')}</p>
 
           <div class="ff-as__appliances">
-            <label class="ff-as__num-row">
+            <div class="ff-as__num-row">
               <span>{t(locale, 'assessment.appliances.mini_splits')}</span>
-              <input type="number" inputmode="numeric" min="0" step="1" value="0" data-mini-splits />
-            </label>
-            <label class="ff-as__num-row">
+              <span class="ff-as__stepper">
+                <button type="button" class="ff-as__step-btn" data-step="-1" aria-label={t(locale, 'assessment.common.decrease')}>−</button>
+                <input type="number" inputmode="numeric" min="0" step="1" value="0" data-mini-splits data-zero aria-label={t(locale, 'assessment.appliances.mini_splits')} />
+                <button type="button" class="ff-as__step-btn" data-step="1" aria-label={t(locale, 'assessment.common.increase')}>+</button>
+              </span>
+            </div>
+            <div class="ff-as__num-row">
               <span>{t(locale, 'assessment.appliances.refrigerators')}</span>
-              <input type="number" inputmode="numeric" min="0" step="1" value="0" data-refrigerators />
-            </label>
+              <span class="ff-as__stepper">
+                <button type="button" class="ff-as__step-btn" data-step="-1" aria-label={t(locale, 'assessment.common.decrease')}>−</button>
+                <input type="number" inputmode="numeric" min="0" step="1" value="0" data-refrigerators data-zero aria-label={t(locale, 'assessment.appliances.refrigerators')} />
+                <button type="button" class="ff-as__step-btn" data-step="1" aria-label={t(locale, 'assessment.common.increase')}>+</button>
+              </span>
+            </div>
             <label class="ff-as__num-row">
               <span>{t(locale, 'assessment.appliances.water_pump')}</span>
               <select data-water-pump>
@@ -400,6 +408,9 @@ const backupOpts = ['4', '8', '12', '24'];
   }
   .ff-as__check-row { justify-content: flex-start; gap: 0.6rem; cursor: pointer; }
   .ff-as__num-row input { width: 88px; box-sizing: border-box; padding: 0.45rem 0.6rem; border: 2px solid var(--ff-line); border-radius: var(--r-md); font-family: var(--ff-sans); background: var(--ff-white); text-align: right; }
+  /* Appliance counts use a −/＋ stepper: center the input, tighten the buttons. */
+  .ff-as__num-row .ff-as__stepper input { width: 3rem; text-align: center; padding: 0.45rem 0.3rem; }
+  .ff-as__num-row .ff-as__step-btn { width: 2.2rem; height: 2.2rem; font-size: 1.25rem; flex: 0 0 auto; }
   .ff-as__num-row select { padding: 0.45rem 0.6rem; border: 2px solid var(--ff-line); border-radius: var(--r-md); font-family: var(--ff-sans); background: var(--ff-white); }
 
   /* ---- Choices ---- */

@@ -340,6 +340,8 @@
   "assessment.common.no": "No",
   "assessment.common.back": "Back",
   "assessment.common.next": "Next",
+  "assessment.common.decrease": "Decrease",
+  "assessment.common.increase": "Increase",
   "assessment.step.consumption_heading": "How much power do you use?",
   "assessment.step.consumption_help": "We size everything around your real consumption — no usage, no price.",
   "assessment.step.solar_heading": "Do you already have solar panels?",

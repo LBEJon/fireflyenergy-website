@@ -340,6 +340,8 @@
   "assessment.common.no": "No",
   "assessment.common.back": "Atrás",
   "assessment.common.next": "Siguiente",
+  "assessment.common.decrease": "Disminuir",
+  "assessment.common.increase": "Aumentar",
   "assessment.step.consumption_heading": "¿Cuánta energía usas?",
   "assessment.step.consumption_help": "Dimensionamos todo según tu consumo real — sin consumo, no hay precio.",
   "assessment.step.solar_heading": "¿Ya tienes paneles solares?",
