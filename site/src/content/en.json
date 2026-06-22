@@ -481,7 +481,8 @@
   "solutions.with_solar_note": "Shown with 6 panels — additional solar capacity quoted to your power needs.",
   "solutions.iva_note": "+ IVA",
   "solutions.starting_at": "Starting at",
-  "solutions.microcopy": "Approximate backup time on battery alone, based on ~25 kWh/day of normal use. With solar, the system recharges through the day and rides out most outages — actual runtime depends on your home's loads.",
+  "solutions.micro_solar": "☀ With solar, the system recharges through the day — riding out most outages indefinitely.",
+  "solutions.micro_note": "Backup times are approximate, on battery alone, based on ~25 kWh/day of normal use. Actual runtime depends on your home's loads.",
   "solutions.cta_estimate": "Get my customized proposal",
   "solutions.cta_whatsapp": "Ask on WhatsApp"
 }

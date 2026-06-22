@@ -74,7 +74,10 @@ const hrs = (h: number) => t(locale, 'solutions.runtime_hours').replace('{h}', S
       ))}
     </ul>
 
-    <p class="ff-sol__microcopy">{t(locale, 'solutions.microcopy')}</p>
+    <p class="ff-sol__microcopy">
+      <strong class="ff-sol__micro-solar">{t(locale, 'solutions.micro_solar')}</strong>
+      <span class="ff-sol__micro-note">{t(locale, 'solutions.micro_note')}</span>
+    </p>
   </div>
 </section>
 
@@ -152,7 +155,9 @@ const hrs = (h: number) => t(locale, 'solutions.runtime_hours').replace('{h}', S
   .ff-sol__cta--ghost:hover { border-color: var(--ff-ink); }
   .ff-sol__cta:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
 
-  .ff-sol__microcopy { text-align: center; color: var(--ff-storm); font-size: var(--fs-small); margin: 0; max-width: 60ch; margin-inline: auto; }
+  .ff-sol__microcopy { text-align: center; margin: 0; max-width: 62ch; margin-inline: auto; line-height: var(--lh-body); }
+  .ff-sol__micro-solar { display: block; color: var(--ff-accent-dk); font-weight: 700; font-size: var(--fs-lead); margin: 0 0 0.35rem; }
+  .ff-sol__micro-note { color: var(--ff-storm); font-size: var(--fs-body); }
 
   @media (max-width: 600px) {
     .ff-sol__card { padding: var(--sp-3); }

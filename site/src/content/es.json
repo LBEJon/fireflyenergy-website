@@ -481,7 +481,8 @@
   "solutions.with_solar_note": "Se muestra con 6 paneles — capacidad solar adicional cotizada según tus necesidades.",
   "solutions.iva_note": "+ IVA",
   "solutions.starting_at": "Desde",
-  "solutions.microcopy": "Tiempo de respaldo aproximado solo con batería, con base en ~25 kWh/día de uso normal. Con solar, el sistema se recarga durante el día y supera la mayoría de los apagones — la duración real depende de las cargas de tu casa.",
+  "solutions.micro_solar": "☀ Con solar, el sistema se recarga durante el día — superando la mayoría de los apagones indefinidamente.",
+  "solutions.micro_note": "Los tiempos de respaldo son aproximados, solo con batería, con base en ~25 kWh/día de uso normal. La duración real depende de las cargas de tu casa.",
   "solutions.cta_estimate": "Quiero mi propuesta personalizada",
   "solutions.cta_whatsapp": "Preguntar por WhatsApp"
 }
