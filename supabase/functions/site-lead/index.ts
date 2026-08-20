@@ -83,6 +83,56 @@ Deno.serve(async (req: Request) => {
       if (er?.waitUntil) er.waitUntil(ping);
     }
 
+    // Best-effort mirror into the new (Fable) CRM's capture-first intake. Also not required for
+    // durability — site_lead is still the buffer, so a failure here is replayable by hand.
+    // ponytail: direct POST, no n8n hop. If this ever needs retries, move it behind the same
+    // reconcile loop that covers the n8n ping.
+    const crmUrl = Deno.env.get("FIREFLY_CRM_INTAKE_URL");
+    const crmSecret = Deno.env.get("FIREFLY_CRM_INTAKE_SECRET");
+    if (crmUrl && crmSecret) {
+      const a = (row.answers ?? {}) as Record<string, unknown>;
+      const b = (a.billAddress ?? {}) as Record<string, string>;
+      // CFE bill → the shape intake_promote_v1 (CRM migration 0060) reads. Sent only when the
+      // assessment actually produced something: a parked file, a daily figure, or both. Without
+      // this the bill was dropped on the floor — the site read the kWh and forgot the document.
+      const cfe = (a.billFilePath || a.billKwhPerDay)
+        ? {
+          file_path: a.billFilePath,
+          avg_daily_kwh: a.billKwhPerDay,
+          current_period_kwh: a.billKwhTotal,
+          billing_days: a.billPeriodDays,
+          tariff: a.billTariff,
+        }
+        : undefined;
+      const crmPing = fetch(crmUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${crmSecret}` },
+        body: JSON.stringify({
+          ...row,
+          site_lead_id: leadId,
+          cfe,
+          language: row.locale,
+          // `row` comes from the untyped lead.mjs builder, so config is inferred structurally
+          // and needs an explicit read to stay type-checkable.
+          whatsapp: (row.config as Record<string, unknown> | undefined)?.whatsapp_is_same
+            ? row.phone
+            : undefined,
+          address: b.address_line
+            ? {
+              line1: b.address_line,
+              city: b.city,
+              state: b.state,
+              colonia: b.colonia,
+              postal_code: b.postal_code,
+            }
+            : undefined,
+        }),
+      }).catch(() => {});
+      // deno-lint-ignore no-explicit-any
+      const er2 = (globalThis as any).EdgeRuntime;
+      if (er2?.waitUntil) er2.waitUntil(crmPing);
+    }
+
     return json({ ok: true }, 200, cors);
   } catch (_e) {
     return json({ ok: false, error: "lead_failed" }, 500, cors);

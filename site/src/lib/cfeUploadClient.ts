@@ -13,6 +13,9 @@ export interface CfeParseResult {
   periodDays?: number;
   tariff?: string | null;
   address?: CfeAddress | null;
+  /** Storage path of the bill parked in the CRM, to be forwarded with the lead. Null when the
+   *  storage leg is unconfigured or failed — it is best-effort and never blocks the parse. */
+  filePath?: string | null;
 }
 
 const MAX_FILE_BYTES = 8 * 1024 * 1024; // 8 MB
@@ -47,7 +50,7 @@ export async function fileToB64(
 export async function parseCfe(
   baseUrl: string,
   file: { mime: string; dataB64: string },
-): Promise<CfeParseResult | { fallback: 'manual' }> {
+): Promise<CfeParseResult | { fallback: 'manual'; filePath?: string | null }> {
   try {
     const res = await fetch(`${baseUrl}/functions/v1/site-cfe-parse`, {
       method: 'POST',
@@ -57,7 +60,9 @@ export async function parseCfe(
     if (!res.ok) return { fallback: 'manual' };
     const data = (await res.json()) as Partial<CfeParseResult>;
     if (!data || typeof data.kwhPerDay !== 'number' || !(data.kwhPerDay > 0)) {
-      return { fallback: 'manual' };
+      // Unreadable bill, but the edge function still parked the file — keep the path so the
+      // lead carries the attachment staff will need in order to read it by hand.
+      return { fallback: 'manual', filePath: data?.filePath ?? null };
     }
     return {
       kwhPerDay: data.kwhPerDay,
@@ -65,6 +70,7 @@ export async function parseCfe(
       periodDays: data.periodDays,
       tariff: data.tariff ?? null,
       address: data.address ?? null,
+      filePath: data.filePath ?? null,
     };
   } catch {
     return { fallback: 'manual' };

@@ -29,6 +29,12 @@ export interface CfeAddress {
 export interface AssessmentAnswers {
   billKwhPerDay?: number; // from CFE parse
   billAddress?: CfeAddress; // service address read from the CFE bill
+  // Bill provenance, forwarded verbatim to the CRM by site-lead so the lead arrives with the
+  // customer's actual bill attached (billFilePath is its storage path in the CRM's bucket).
+  billFilePath?: string;
+  billTariff?: string;
+  billKwhTotal?: number;
+  billPeriodDays?: number;
   dailyKwh?: number; // manual entry (kWh/day)
   backupHours?: number;
   hasExistingSolar?: boolean;

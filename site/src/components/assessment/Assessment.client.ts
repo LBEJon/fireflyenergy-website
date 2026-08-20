@@ -148,6 +148,7 @@ export function initAssessment(root: HTMLElement): void {
     if (!file) return;
     // Clear any prior parsed value; new attempt.
     answers.billKwhPerDay = undefined;
+    answers.billFilePath = undefined;
     syncNext();
     if (file.size > MAX_FILE_BYTES) {
       setCfeStatus(tr('assessment.consumption.too_large'));
@@ -158,12 +159,18 @@ export function initAssessment(root: HTMLElement): void {
     try {
       const payload = await fileToB64(file);
       const res = await parseCfe(baseUrl, payload);
+      // The bill file is parked in the CRM either way — keep its path even when the read
+      // failed, so staff still receive the bill they can read by hand.
+      answers.billFilePath = res.filePath ?? undefined;
       if ('fallback' in res) {
         setCfeStatus(tr('assessment.consumption.parse_failed'));
         revealManual();
         return;
       }
       answers.billKwhPerDay = res.kwhPerDay;
+      answers.billTariff = res.tariff ?? undefined;
+      answers.billKwhTotal = res.kwhTotal;
+      answers.billPeriodDays = res.periodDays;
       answers.billAddress = res.address ?? undefined;
       answers.dailyKwh = undefined;
       setCfeStatus(
