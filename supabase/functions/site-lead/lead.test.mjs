@@ -29,3 +29,18 @@ assert.throws(() => buildLeadRow({ name: "", email: "a@b.com" }), /missing_conta
 assert.throws(() => buildLeadRow({ hp: "bot", name: "A", email: "a@b.com" }), /spam/);
 
 console.log("lead.test.mjs OK");
+
+// validBillFilePath — only the CRM's own minted key shape is forwarded.
+{
+  const { validBillFilePath } = await import("./lead.mjs");
+  const good = "site-lead/2f1c9a4e-1b2d-4c3f-8a9b-0123456789ab.pdf";
+  assert.equal(validBillFilePath(good), good);
+  assert.equal(validBillFilePath(good.replace(".pdf", ".jpg")), good.replace(".pdf", ".jpg"));
+  // wrong prefix (another bucket path), traversal, wrong ext, non-uuid, non-string
+  assert.equal(validBillFilePath("cfe-bills/someone-elses.pdf"), undefined);
+  assert.equal(validBillFilePath("site-lead/../cfe-bills/x.pdf"), undefined);
+  assert.equal(validBillFilePath("site-lead/2f1c9a4e-1b2d-4c3f-8a9b-0123456789ab.exe"), undefined);
+  assert.equal(validBillFilePath("site-lead/not-a-uuid.pdf"), undefined);
+  assert.equal(validBillFilePath(undefined), undefined);
+  assert.equal(validBillFilePath({ toString: () => good }), undefined);
+}

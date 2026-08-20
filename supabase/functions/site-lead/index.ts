@@ -5,7 +5,7 @@
 // dedupe, and notification happen downstream in n8n; a reconcile job retries anything
 // unfinished, so durability NEVER depends on the n8n ping. Returns {ok:false} on any
 // pre-commit failure so the site falls back to the WhatsApp CTA (never fakes success).
-import { buildLeadRow } from "./lead.mjs";
+import { buildLeadRow, validBillFilePath } from "./lead.mjs";
 import { corsFor } from "./cors.mjs";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -95,9 +95,13 @@ Deno.serve(async (req: Request) => {
       // CFE bill → the shape intake_promote_v1 (CRM migration 0060) reads. Sent only when the
       // assessment actually produced something: a parked file, a daily figure, or both. Without
       // this the bill was dropped on the floor — the site read the kWh and forgot the document.
-      const cfe = (a.billFilePath || a.billKwhPerDay)
+      //
+      // billFilePath round-trips through the browser, so it is attacker-controlled by the time
+      // it reaches us — see validBillFilePath (lead.mjs) for the shape check and its rationale.
+      const filePath = validBillFilePath(a.billFilePath);
+      const cfe = (filePath || a.billKwhPerDay)
         ? {
-          file_path: a.billFilePath,
+          file_path: filePath,
           avg_daily_kwh: a.billKwhPerDay,
           current_period_kwh: a.billKwhTotal,
           billing_days: a.billPeriodDays,
