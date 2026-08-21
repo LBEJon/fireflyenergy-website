@@ -106,6 +106,21 @@ Deno.serve(async (req: Request) => {
           current_period_kwh: a.billKwhTotal,
           billing_days: a.billPeriodDays,
           tariff: a.billTariff,
+          // Also send the reading as an `extraction` object. These bills land at status
+          // 'extracted' for a human to confirm, and the CRM's confirm form pre-fills from this
+          // field (normalizeCfeExtraction) — without it a rep re-keys figures the site already
+          // read off the bill. Field names are the ones that normalizer looks for.
+          extraction: {
+            tariff: a.billTariff,
+            current_period_kwh: a.billKwhTotal,
+            billing_days: a.billPeriodDays,
+            address_line: b.address_line,
+            address2: b.address2,
+            colonia: b.colonia,
+            city: b.city,
+            state: b.state,
+            postal_code: b.postal_code,
+          },
         }
         : undefined;
       const crmPing = fetch(crmUrl, {
