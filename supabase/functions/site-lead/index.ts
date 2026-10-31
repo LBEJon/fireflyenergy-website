@@ -26,7 +26,9 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ ok: false, error: "method_not_allowed" }, 405, cors);
 
-  const ip = (req.headers.get("x-forwarded-for") || "unknown").split(",")[0].trim();
+  // Same client-IP rule as site-cfe-parse: Cloudflare's header first, gateway XFF as fallback.
+  const ip = req.headers.get("cf-connecting-ip")?.trim() ||
+    (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
   const userAgent = req.headers.get("user-agent") || null;
 
   // Parse + validate BEFORE env/DB so honeypot/bad bodies fail fast.

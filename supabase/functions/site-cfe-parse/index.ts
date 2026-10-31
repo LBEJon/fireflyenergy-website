@@ -136,7 +136,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
   if (!dataB64 || dataB64.length > MAX_B64_BYTES) return json({ fallback: "manual" }, 400, cors);
   if (!ALLOWED_MIME.includes(mime)) return json({ fallback: "manual" }, 400, cors);
 
-  const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
+  // cf-connecting-ip is set by Cloudflare in front of Supabase and can't be forged (a forged one is
+  // rejected at the edge); the gateway also rewrites x-forwarded-for, kept only as a fallback.
+  const ip = req.headers.get("cf-connecting-ip")?.trim() ||
+    (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
   if (!rateLimit(ip)) return json({ fallback: "manual" }, 429, cors);
 
   // Kick the storage leg off in parallel with the model call — it must not add latency, and it

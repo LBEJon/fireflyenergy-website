@@ -1,5 +1,11 @@
 name = "fireflyenergy-website"
 compatibility_date = "2024-09-23"
 
+# Workers Builds (git-connected) and `wrangler deploy` both run this first. The Astro site
+# lives in site/ and its output (site/dist) isn't committed, so without a build step every
+# git-triggered deploy failed. PUBLIC_SUPABASE_URL is public (it ships in the page anyway).
+[build]
+command = "cd site && npm ci && PUBLIC_SUPABASE_URL=https://tlsidpnhpirasfrhxfkz.supabase.co npm run build"
+
 [assets]
 directory = "./site/dist"
