@@ -1,0 +1,6 @@
+
+# large design masters + brainstorm scratch (kept on disk, not in git)
+docs/superpowers/specs/image-masters/
+.superpowers/
+.DS_Store
+supabase/.temp/
