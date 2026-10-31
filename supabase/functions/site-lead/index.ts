@@ -5,7 +5,7 @@
 // dedupe, and notification happen downstream in n8n; a reconcile job retries anything
 // unfinished, so durability NEVER depends on the n8n ping. Returns {ok:false} on any
 // pre-commit failure so the site falls back to the WhatsApp CTA (never fakes success).
-import { buildLeadRow } from "./lead.mjs";
+import { buildLeadRow, validBillFilePath } from "./lead.mjs";
 import { corsFor } from "./cors.mjs";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -81,6 +81,75 @@ Deno.serve(async (req: Request) => {
       // deno-lint-ignore no-explicit-any
       const er = (globalThis as any).EdgeRuntime;
       if (er?.waitUntil) er.waitUntil(ping);
+    }
+
+    // Best-effort mirror into the new (Fable) CRM's capture-first intake. Also not required for
+    // durability — site_lead is still the buffer, so a failure here is replayable by hand.
+    // ponytail: direct POST, no n8n hop. If this ever needs retries, move it behind the same
+    // reconcile loop that covers the n8n ping.
+    const crmUrl = Deno.env.get("FIREFLY_CRM_INTAKE_URL");
+    const crmSecret = Deno.env.get("FIREFLY_CRM_INTAKE_SECRET");
+    if (crmUrl && crmSecret) {
+      const a = (row.answers ?? {}) as Record<string, unknown>;
+      const b = (a.billAddress ?? {}) as Record<string, string>;
+      // CFE bill → the shape intake_promote_v1 (CRM migration 0060) reads. Sent only when the
+      // assessment actually produced something: a parked file, a daily figure, or both. Without
+      // this the bill was dropped on the floor — the site read the kWh and forgot the document.
+      //
+      // billFilePath round-trips through the browser, so it is attacker-controlled by the time
+      // it reaches us — see validBillFilePath (lead.mjs) for the shape check and its rationale.
+      const filePath = validBillFilePath(a.billFilePath);
+      const cfe = (filePath || a.billKwhPerDay)
+        ? {
+          file_path: filePath,
+          avg_daily_kwh: a.billKwhPerDay,
+          current_period_kwh: a.billKwhTotal,
+          billing_days: a.billPeriodDays,
+          tariff: a.billTariff,
+          // Also send the reading as an `extraction` object. These bills land at status
+          // 'extracted' for a human to confirm, and the CRM's confirm form pre-fills from this
+          // field (normalizeCfeExtraction) — without it a rep re-keys figures the site already
+          // read off the bill. Field names are the ones that normalizer looks for.
+          extraction: {
+            tariff: a.billTariff,
+            current_period_kwh: a.billKwhTotal,
+            billing_days: a.billPeriodDays,
+            address_line: b.address_line,
+            address2: b.address2,
+            colonia: b.colonia,
+            city: b.city,
+            state: b.state,
+            postal_code: b.postal_code,
+          },
+        }
+        : undefined;
+      const crmPing = fetch(crmUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${crmSecret}` },
+        body: JSON.stringify({
+          ...row,
+          site_lead_id: leadId,
+          cfe,
+          language: row.locale,
+          // `row` comes from the untyped lead.mjs builder, so config is inferred structurally
+          // and needs an explicit read to stay type-checkable.
+          whatsapp: (row.config as Record<string, unknown> | undefined)?.whatsapp_is_same
+            ? row.phone
+            : undefined,
+          address: b.address_line
+            ? {
+              line1: b.address_line,
+              city: b.city,
+              state: b.state,
+              colonia: b.colonia,
+              postal_code: b.postal_code,
+            }
+            : undefined,
+        }),
+      }).catch(() => {});
+      // deno-lint-ignore no-explicit-any
+      const er2 = (globalThis as any).EdgeRuntime;
+      if (er2?.waitUntil) er2.waitUntil(crmPing);
     }
 
     return json({ ok: true }, 200, cors);

@@ -1,0 +1,495 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>Lead-Capture Plan</title><style>:root{--ink:#1a1a1a;--mut:#5b6168;--line:#e7e3dc;--paper:#fbfaf7;--accent:#ff6a3d;--green:#2e7d4f;--code:#f3f0ea}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}.wrap{max-width:900px;margin:0 auto;padding:2.5rem 1.5rem 5rem}h1{font-size:1.9rem;line-height:1.2;border-bottom:3px solid var(--accent);padding-bottom:.5rem}h2{font-size:1.25rem;margin-top:2rem;color:var(--green);border-top:1px solid var(--line);padding-top:1.2rem}h3{font-size:1.05rem;margin-top:1.4rem}code{background:var(--code);padding:.12em .4em;border-radius:5px;font-size:.85em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}pre{background:#1e2126;color:#e6e6e6;padding:1rem;border-radius:8px;overflow:auto;font-size:.82em}pre code{background:none;padding:0;color:inherit}ul,ol{padding-left:1.3rem}li{margin:.25rem 0}blockquote{border-left:3px solid var(--accent);margin:1rem 0;padding:.4rem 1rem;background:#fff4ef;color:#3a3a3a}hr{border:0;border-top:1px solid var(--line);margin:2rem 0}input[type=checkbox]{margin-right:.4rem}</style></head><body><div class=wrap><h1 id="lead-capture-workflow-implementation-plan">Lead-Capture Workflow Implementation Plan</h1>
+<blockquote>
+<p><strong>For agentic workers:</strong> REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (<code>- [ ]</code>) syntax for tracking.</p>
+</blockquote>
+<p><strong>Goal:</strong> Make the FireflyEnergy.mx lead forms durably capture every lead — persisting to a <code>site_lead</code> buffer in the CRM Supabase before any fallible downstream step, then fanning out via n8n to a CRM contact + a Twilio-WhatsApp alert (email fallback), with a reconcile retry so no lead is ever lost.</p>
+<p><strong>Architecture:</strong> Capture-first (Approach A). The public <code>site-lead</code> edge function validates + inserts ONE <code>site_lead</code> row (system of record) and returns <code>{ok:true}</code> the instant that commits; it then best-effort pings an n8n webhook. n8n (processor) atomically claims the row, dedupes/creates a <strong>contact only</strong> in the CRM, sends the WhatsApp alert (email fallback), and flips status. A 15-min reconcile re-drives anything unfinished; a daily digest surfaces terminal failures. This <strong>supersedes a never-deployed v1</strong> (branch <code>feature/site-estimate-fn</code>) that took the rejected inline contact+deal approach and doesn't match the live schema.</p>
+<p><strong>Tech Stack:</strong> Supabase (Postgres + Deno Edge Functions), n8n (czlonkowski MCP), Twilio WhatsApp (sandbox first), Astro front-end (already posts the payload). Tests: <code>node --test</code> (backend pure modules), Playwright MCP (front-end E2E on a <code>*.pages.dev</code> preview).</p>
+<hr />
+<h2 id="critical-pre-flight-facts-verified-2026-06-14">Critical pre-flight facts (verified 2026-06-14)</h2>
+<ul>
+<li><strong>Live CRM project:</strong> <code>tlsidpnhpirasfrhxfkz</code> (<code>https://tlsidpnhpirasfrhxfkz.supabase.co</code>).</li>
+<li><strong>Live migrations run to <code>0079</code></strong> (<code>accounting_brex_ingest</code>); a parallel session is actively adding more. <strong>The true next free version MUST be re-checked with <code>list_migrations</code> immediately before applying</strong> — it may be &gt; <code>0080</code>. Apply via <code>execute_sql</code> (DDL + an explicit <code>insert into supabase_migrations.schema_migrations(version,name)</code>), NOT <code>apply_migration</code> (which records a timestamp version and breaks alignment). [memory: project_firefly_crm_po_local_delivery]</li>
+<li><strong>Repo divergence:</strong> the <code>firefly-crm</code> checkout is on the stale <code>feature/site-estimate-fn</code> branch (local migrations only to <code>0064_site_lead_fields</code>, which <em>collides</em> with live's <code>0064_contact_name_parts</code> and was never applied). <strong>Do NOT build there.</strong> Build in a fresh worktree off <code>origin/main</code> (which has 0065–0079).</li>
+<li><strong><code>site-lead</code>, <code>site-estimate</code>, <code>site-cfe-parse</code> are NOT deployed</strong> to live; nothing in production to break. (<code>site-estimate</code>/<code>site-cfe-parse</code> stay OUT OF SCOPE — they power the calculator's price/CFE parse, not lead capture. Test lead capture via <strong>Door B / site-visit</strong>, which submits without an estimate.)</li>
+<li><strong><code>contact.language</code> enum = <code>'en' | 'es'</code>.</strong> <code>contact.source</code> does NOT yet exist on live (added by our migration). Deal stays untouched (contact-only).</li>
+<li><strong>Payload reality:</strong> the site posts <code>LeadPayload { name, contact, segment, locale, answers, config, hp }</code> (site/src/lib/leadClient.ts). The v1 <code>lead.mjs</code> wrongly read <code>assessment</code>/<code>estimate</code> — we store <code>answers</code>/<code>config</code> verbatim as jsonb instead.</li>
+</ul>
+<hr />
+<h2 id="file-structure">File structure</h2>
+<p><strong>firefly-crm (fresh worktree off origin/main — e.g. <code>~/Claude Code/firefly-crm-leadcapture</code>):</strong>
+- Create: <code>supabase/migrations/0080_site_lead_capture.sql</code> — <code>site_lead</code> table + <code>contact.source</code> + RLS/REVOKE + index.
+- Rewrite: <code>supabase/functions/site-lead/lead.mjs</code> — pure <code>buildLeadRow(payload, meta)</code> (one <code>site_lead</code> row).
+- Rewrite: <code>supabase/functions/site-lead/lead.test.mjs</code> — <code>node --test</code> for <code>buildLeadRow</code>.
+- Rewrite: <code>supabase/functions/site-lead/index.ts</code> — Approach A handler (capture-first insert + best-effort n8n ping).</p>
+<p><strong>n8n (built via <code>mcp__n8n-mcp__*</code>, validated before activation):</strong>
+- <code>Firefly Site Lead — Processor</code> (webhook): claim → dedupe/create contact → WhatsApp (sandbox) → email fallback → status.
+- <code>Firefly Site Lead — Reconcile</code> (schedule 15 min): re-drive unfinished leads.
+- <code>Firefly Site Lead — Stuck Digest</code> (schedule daily): email terminal failures.</p>
+<p><strong>site (this repo):</strong>
+- Config: ensure <code>PUBLIC_SUPABASE_URL=https://tlsidpnhpirasfrhxfkz.supabase.co</code> at build/deploy (Astro <code>import.meta.env.PUBLIC_*</code>).
+- Verify only (no code change expected): <code>src/lib/leadClient.ts</code> posts the right shape.</p>
+<hr />
+<h2 id="task-1-isolated-worktree-off-originmain">Task 1: Isolated worktree off origin/main</h2>
+<p><strong>Files:</strong> none (workspace setup).</p>
+<ul>
+<li>[ ] <strong>Step 1: Fetch latest and create a clean worktree</strong></li>
+</ul>
+<pre><code class="language-bash">git -C &quot;/Users/jondenne/Claude Code/firefly-crm&quot; fetch origin main
+git -C &quot;/Users/jondenne/Claude Code/firefly-crm&quot; worktree add -b feature/site-lead-capture &quot;/Users/jondenne/Claude Code/firefly-crm-leadcapture&quot; origin/main
+</code></pre>
+<ul>
+<li>[ ] <strong>Step 2: Confirm the worktree has the funnel migrations (0065–0079 present, no stale 0064 collision)</strong></li>
+</ul>
+<p>Run: <code>ls "/Users/jondenne/Claude Code/firefly-crm-leadcapture/supabase/migrations" | tail -5</code>
+Expected: shows <code>0079_accounting_brex_ingest.sql</code> (or later); NO <code>0064_site_lead_fields.sql</code>.</p>
+<ul>
+<li>[ ] <strong>Step 3: Install deps (for <code>node --test</code>)</strong></li>
+</ul>
+<p>Run: <code>cd "/Users/jondenne/Claude Code/firefly-crm-leadcapture" &amp;&amp; npm install</code>
+Expected: completes without error.</p>
+<hr />
+<h2 id="task-2-pure-lead-row-builder-tdd">Task 2: Pure lead-row builder (TDD)</h2>
+<p><strong>Files:</strong>
+- Test: <code>supabase/functions/site-lead/lead.test.mjs</code>
+- Modify (rewrite): <code>supabase/functions/site-lead/lead.mjs</code></p>
+<ul>
+<li>[ ] <strong>Step 1: Write the failing test</strong></li>
+</ul>
+<pre><code class="language-js">// supabase/functions/site-lead/lead.test.mjs
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { buildLeadRow } from './lead.mjs';
+
+test('email contact → lowercased email, null phone', () =&gt; {
+  const r = buildLeadRow({ name: ' Ana ', contact: 'Ana@Example.com', locale: 'es',
+    segment: 'residential', answers: { a: 1 }, config: { selectedTier: 'recommended' } });
+  assert.equal(r.name, 'Ana');
+  assert.equal(r.email, 'ana@example.com');
+  assert.equal(r.phone, null);
+  assert.equal(r.locale, 'es');
+  assert.equal(r.segment, 'residential');
+  assert.deepEqual(r.answers, { a: 1 });
+  assert.equal(r.source, 'website');
+  assert.equal(r.status, 'received');
+});
+
+test('10-digit phone → MX-normalized with 52 prefix, null email', () =&gt; {
+  const r = buildLeadRow({ name: 'Bob', contact: '(415) 123-4567' });
+  assert.equal(r.email, null);
+  assert.equal(r.phone, '524151234567');
+  assert.equal(r.segment, 'residential'); // default
+  assert.equal(r.locale, 'en'); // default
+});
+
+test('honeypot throws spam', () =&gt; {
+  assert.throws(() =&gt; buildLeadRow({ name: 'X', contact: 'x@y.z', hp: 'bot' }), /spam/);
+});
+
+test('missing name or contact throws missing_contact', () =&gt; {
+  assert.throws(() =&gt; buildLeadRow({ name: '', contact: 'x@y.z' }), /missing_contact/);
+  assert.throws(() =&gt; buildLeadRow({ name: 'X', contact: '  ' }), /missing_contact/);
+});
+
+test('over-long fields throw field_too_long', () =&gt; {
+  assert.throws(() =&gt; buildLeadRow({ name: 'a'.repeat(201), contact: 'x@y.z' }), /field_too_long/);
+});
+
+test('industrial segment + meta ip/userAgent passthrough', () =&gt; {
+  const r = buildLeadRow({ name: 'Co', contact: 'co@x.com', segment: 'industrial' },
+    { ip: '1.2.3.4', userAgent: 'UA' });
+  assert.equal(r.segment, 'industrial');
+  assert.equal(r.ip, '1.2.3.4');
+  assert.equal(r.user_agent, 'UA');
+});
+</code></pre>
+<ul>
+<li>[ ] <strong>Step 2: Run test to verify it fails</strong></li>
+</ul>
+<p>Run: <code>cd "/Users/jondenne/Claude Code/firefly-crm-leadcapture" &amp;&amp; node --test supabase/functions/site-lead/lead.test.mjs</code>
+Expected: FAIL — <code>buildLeadRow</code> is not exported (old file exports <code>buildRecords</code>).</p>
+<ul>
+<li>[ ] <strong>Step 3: Rewrite the implementation</strong></li>
+</ul>
+<pre><code class="language-js">// supabase/functions/site-lead/lead.mjs
+// Pure record-builder for the public site-lead edge function (Approach A).
+// Produces ONE `site_lead` row — the durable capture buffer. Contact creation +
+// dedupe happen downstream in n8n, so this stays simple and side-effect-free
+// (unit-tested under node, reused verbatim by the Deno handler).
+const MAX_LEN = 200;
+
+export function buildLeadRow(p, meta = {}) {
+  if (p.hp) throw new Error('spam'); // honeypot tripped → caller quietly 200s
+  const name = (p.name || '').trim();
+  const contactRaw = (p.contact || '').trim();
+  if (!name || !contactRaw) throw new Error('missing_contact');
+  if (name.length &gt; MAX_LEN || contactRaw.length &gt; MAX_LEN) throw new Error('field_too_long');
+
+  const isEmail = contactRaw.includes('@');
+  const email = isEmail ? contactRaw.toLowerCase() : null;
+  let phone = null;
+  if (!isEmail) {
+    const digits = contactRaw.replace(/\D/g, '');
+    phone = digits.length === 10 ? '52' + digits : digits; // MX-local → +52
+  }
+
+  return {
+    name,
+    contact_raw: contactRaw,
+    email,
+    phone,
+    segment: p.segment === 'industrial' ? 'industrial' : 'residential',
+    locale: p.locale === 'es' ? 'es' : 'en',
+    answers: p.answers ?? null,
+    config: p.config ?? null,
+    source: 'website',
+    status: 'received',
+    ip: meta.ip ?? null,
+    user_agent: meta.userAgent ?? null,
+  };
+}
+</code></pre>
+<ul>
+<li>[ ] <strong>Step 4: Run test to verify it passes</strong></li>
+</ul>
+<p>Run: <code>cd "/Users/jondenne/Claude Code/firefly-crm-leadcapture" &amp;&amp; node --test supabase/functions/site-lead/lead.test.mjs</code>
+Expected: PASS — all 6 tests green.</p>
+<ul>
+<li>[ ] <strong>Step 5: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">cd &quot;/Users/jondenne/Claude Code/firefly-crm-leadcapture&quot;
+git add supabase/functions/site-lead/lead.mjs supabase/functions/site-lead/lead.test.mjs
+git commit -m &quot;feat(site-lead): pure site_lead row builder (capture-first, contact-only)&quot;
+</code></pre>
+<hr />
+<h2 id="task-3-migration-site_lead-table-contactsource">Task 3: Migration — site_lead table + contact.source</h2>
+<p><strong>Files:</strong>
+- Create: <code>supabase/migrations/0080_site_lead_capture.sql</code> (rename to the true next free version at apply time)</p>
+<ul>
+<li>[ ] <strong>Step 1: Write the migration</strong></li>
+</ul>
+<pre><code class="language-sql">-- 0080_site_lead_capture.sql
+-- Durable capture buffer for public website leads (Approach A). The site-lead edge
+-- function inserts here FIRST (system of record); n8n then creates the CRM contact,
+-- notifies, and flips status, with a reconcile retry. Additive + nullable elsewhere.
+
+create table if not exists public.site_lead (
+  id                  uuid primary key default gen_random_uuid(),
+  created_at          timestamptz not null default now(),
+  name                text not null,
+  contact_raw         text not null,
+  email               text,
+  phone               text,
+  segment             text,
+  locale              text,
+  answers             jsonb,
+  config              jsonb,
+  source              text not null default 'website',
+  status              text not null default 'received'
+                        check (status in ('received','processing','processed','error')),
+  crm_contact_id      uuid references public.contact(id),
+  crm_contact_matched boolean,
+  attempts            int not null default 0,
+  last_error          text,
+  processing_at       timestamptz,
+  processed_at        timestamptz,
+  notified_at         timestamptz,
+  ip                  text,
+  user_agent          text
+);
+
+create index if not exists site_lead_status_idx on public.site_lead (status, created_at);
+create index if not exists site_lead_ip_created_idx on public.site_lead (ip, created_at);
+
+-- Public never touches the table directly: RLS on with NO policies (deny anon/auth);
+-- service_role bypasses RLS. REVOKE is defence-in-depth vs PostgREST.
+alter table public.site_lead enable row level security;
+revoke all on public.site_lead from anon, authenticated;
+
+-- Contact provenance for website-originated contacts (added by us; nullable).
+alter table public.contact add column if not exists source text;
+</code></pre>
+<ul>
+<li>[ ] <strong>Step 2: Validate the SQL parses (dry syntax check, no apply)</strong></li>
+</ul>
+<p>Run: <code>cd "/Users/jondenne/Claude Code/firefly-crm-leadcapture" &amp;&amp; node -e "const fs=require('fs');const s=fs.readFileSync('supabase/migrations/0080_site_lead_capture.sql','utf8');if(!/create table if not exists public\.site_lead/.test(s)||!/enable row level security/.test(s))process.exit(1);console.log('migration shape OK')"</code>
+Expected: prints <code>migration shape OK</code>.</p>
+<ul>
+<li>[ ] <strong>Step 3: Commit (apply to live is gated — Task 9)</strong></li>
+</ul>
+<pre><code class="language-bash">cd &quot;/Users/jondenne/Claude Code/firefly-crm-leadcapture&quot;
+git add supabase/migrations/0080_site_lead_capture.sql
+git commit -m &quot;feat(site-lead): migration — site_lead capture buffer + contact.source&quot;
+</code></pre>
+<blockquote>
+<p>NOTE: Do NOT apply yet. At apply time (Task 9), FIRST re-run <code>list_migrations</code> on <code>tlsidpnhpirasfrhxfkz</code>; if <code>0080</code> is taken, rename the file to the next free version and apply via <code>execute_sql</code> (run the DDL, then <code>insert into supabase_migrations.schema_migrations(version,name) values ('&lt;v&gt;','site_lead_capture');</code>).</p>
+</blockquote>
+<hr />
+<h2 id="task-4-edge-function-capture-first-handler-approach-a">Task 4: Edge function — capture-first handler (Approach A)</h2>
+<p><strong>Files:</strong>
+- Modify (rewrite): <code>supabase/functions/site-lead/index.ts</code></p>
+<ul>
+<li>[ ] <strong>Step 1: Rewrite the handler</strong></li>
+</ul>
+<pre><code class="language-ts">// site-lead — Supabase Edge Function (Deno). PUBLIC, capture-first write endpoint.
+//
+// Approach A: validate → INSERT one `site_lead` row (durable system of record) →
+// return {ok:true} the instant it commits → best-effort ping n8n. Contact creation,
+// dedupe, and notification happen downstream in n8n; a reconcile job retries anything
+// unfinished, so durability NEVER depends on the n8n ping. Returns {ok:false} on any
+// pre-commit failure so the site falls back to the WhatsApp CTA (never fakes success).
+import { buildLeadRow } from &quot;./lead.mjs&quot;;
+import { createClient } from &quot;https://esm.sh/@supabase/supabase-js@2&quot;;
+
+const ALLOWED_ORIGINS = (Deno.env.get(&quot;ALLOWED_ORIGINS&quot;) ??
+  &quot;https://fireflyenergy.mx,https://www.fireflyenergy.mx&quot;)
+  .split(&quot;,&quot;).map((s) =&gt; s.trim()).filter(Boolean);
+const PAGES_DEV = /^https:\/\/[a-z0-9-]+\.pages\.dev$/; // anchored — no substring match
+
+function corsFor(origin: string | null): Record&lt;string, string&gt; {
+  const ok = !!origin &amp;&amp; (ALLOWED_ORIGINS.includes(origin) || PAGES_DEV.test(origin));
+  return {
+    &quot;Access-Control-Allow-Origin&quot;: ok ? origin! : &quot;null&quot;,
+    &quot;Access-Control-Allow-Headers&quot;: &quot;authorization, x-client-info, apikey, content-type&quot;,
+    &quot;Access-Control-Allow-Methods&quot;: &quot;POST, OPTIONS&quot;,
+    &quot;Vary&quot;: &quot;Origin&quot;,
+  };
+}
+function json(body: unknown, status: number, cors: Record&lt;string, string&gt;): Response {
+  return new Response(JSON.stringify(body), {
+    status, headers: { &quot;Content-Type&quot;: &quot;application/json&quot;, ...cors },
+  });
+}
+
+const MAX_BODY_BYTES = 32 * 1024;
+
+Deno.serve(async (req: Request) =&gt; {
+  const cors = corsFor(req.headers.get(&quot;origin&quot;));
+  if (req.method === &quot;OPTIONS&quot;) return new Response(&quot;ok&quot;, { headers: cors });
+  if (req.method !== &quot;POST&quot;) return json({ ok: false, error: &quot;method_not_allowed&quot; }, 405, cors);
+
+  const ip = (req.headers.get(&quot;x-forwarded-for&quot;) || &quot;unknown&quot;).split(&quot;,&quot;)[0].trim();
+  const userAgent = req.headers.get(&quot;user-agent&quot;) || null;
+
+  // Parse + validate BEFORE env/DB so honeypot/bad bodies fail fast.
+  let row: Record&lt;string, unknown&gt;;
+  try {
+    const text = await req.text();
+    if (text.length &gt; MAX_BODY_BYTES) return json({ ok: false, error: &quot;payload_too_large&quot; }, 413, cors);
+    let raw: unknown;
+    try { raw = text ? JSON.parse(text) : {}; }
+    catch { return json({ ok: false, error: &quot;invalid_json&quot; }, 400, cors); }
+    if (raw === null || typeof raw !== &quot;object&quot; || Array.isArray(raw)) {
+      return json({ ok: false, error: &quot;bad_body&quot; }, 400, cors);
+    }
+    row = buildLeadRow(raw as Record&lt;string, unknown&gt;, { ip, userAgent });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : &quot;invalid_input&quot;;
+    if (msg === &quot;spam&quot;) return json({ ok: true }, 200, cors); // honeypot → no signal to bots
+    return json({ ok: false, error: msg }, 400, cors);
+  }
+
+  const url = Deno.env.get(&quot;SUPABASE_URL&quot;);
+  const serviceKey = Deno.env.get(&quot;SUPABASE_SERVICE_ROLE_KEY&quot;);
+  if (!url || !serviceKey) return json({ ok: false, error: &quot;not_configured&quot; }, 503, cors);
+
+  try {
+    const admin = createClient(url, serviceKey, { auth: { persistSession: false } });
+
+    // DB-backed per-IP throttle: &gt; 5 inserts from this IP in the last minute → 429.
+    if (ip !== &quot;unknown&quot;) {
+      const since = new Date(Date.now() - 60_000).toISOString();
+      const { count } = await admin.from(&quot;site_lead&quot;)
+        .select(&quot;id&quot;, { count: &quot;exact&quot;, head: true })
+        .eq(&quot;ip&quot;, ip).gte(&quot;created_at&quot;, since);
+      if ((count ?? 0) &gt;= 5) return json({ ok: false, error: &quot;rate_limited&quot; }, 429, cors);
+    }
+
+    // DURABLE CAPTURE — the guarantee. Success is returned only after this commits.
+    const { data: inserted, error: insErr } = await admin
+      .from(&quot;site_lead&quot;).insert(row).select(&quot;id&quot;).single();
+    if (insErr) throw insErr;
+    const leadId = inserted.id as string;
+
+    // Best-effort n8n ping (NOT required for durability — reconcile covers failures).
+    const hook = Deno.env.get(&quot;N8N_WEBHOOK_URL&quot;);
+    const secret = Deno.env.get(&quot;WEBHOOK_SHARED_SECRET&quot;);
+    if (hook &amp;&amp; secret) {
+      const ping = fetch(hook, {
+        method: &quot;POST&quot;,
+        headers: { &quot;Content-Type&quot;: &quot;application/json&quot;, &quot;X-Webhook-Secret&quot;: secret },
+        body: JSON.stringify({ lead_id: leadId }),
+      }).catch(() =&gt; {});
+      // Fire after responding if the runtime supports it; otherwise let it race the return.
+      // deno-lint-ignore no-explicit-any
+      const er = (globalThis as any).EdgeRuntime;
+      if (er?.waitUntil) er.waitUntil(ping);
+    }
+
+    return json({ ok: true }, 200, cors);
+  } catch (_e) {
+    return json({ ok: false, error: &quot;lead_failed&quot; }, 500, cors);
+  }
+});
+</code></pre>
+<ul>
+<li>[ ] <strong>Step 2: Type/lint sanity check (Deno not required locally — grep guard)</strong></li>
+</ul>
+<p>Run: <code>cd "/Users/jondenne/Claude Code/firefly-crm-leadcapture" &amp;&amp; node -e "const s=require('fs').readFileSync('supabase/functions/site-lead/index.ts','utf8');for(const m of ['buildLeadRow','site_lead','EdgeRuntime','PAGES_DEV','WEBHOOK_SHARED_SECRET']){if(!s.includes(m)){console.error('missing',m);process.exit(1)}}console.log('handler refs OK')"</code>
+Expected: prints <code>handler refs OK</code>.</p>
+<ul>
+<li>[ ] <strong>Step 3: Re-run the unit tests (builder still green)</strong></li>
+</ul>
+<p>Run: <code>cd "/Users/jondenne/Claude Code/firefly-crm-leadcapture" &amp;&amp; node --test supabase/functions/site-lead/lead.test.mjs</code>
+Expected: PASS.</p>
+<ul>
+<li>[ ] <strong>Step 4: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">cd &quot;/Users/jondenne/Claude Code/firefly-crm-leadcapture&quot;
+git add supabase/functions/site-lead/index.ts
+git commit -m &quot;feat(site-lead): capture-first handler — durable insert + best-effort n8n ping&quot;
+</code></pre>
+<hr />
+<h2 id="task-5-n8n-site-lead-processor-webhook">Task 5: n8n — Site Lead Processor (webhook)</h2>
+<p><strong>Files:</strong> built via <code>mcp__n8n-mcp__n8n_create_workflow</code>; validate with <code>mcp__n8n-mcp__n8n_validate_workflow</code> before activating.</p>
+<blockquote>
+<p>Prereqs collected now: Twilio <strong>sandbox</strong> Account SID + Auth Token + sandbox sender (<code>whatsapp:+14155238886</code>) and Jon's destination WhatsApp number (Jon joins the sandbox once); reuse the existing <code>jondenne@lbedesign.com</code> email credential; recipient <code>jon@fireflyenergy.mx</code>. Generate <code>WEBHOOK_SHARED_SECRET</code> (a random 32-byte hex) — store it as the edge-function secret AND in the n8n workflow.</p>
+</blockquote>
+<ul>
+<li>[ ] <strong>Step 1: Create the workflow with these nodes (in order)</strong></li>
+</ul>
+<ol>
+<li><strong>Webhook</strong> (POST, path <code>firefly-site-lead</code>). Capture <code>{{$json.body.lead_id}}</code> and header <code>x-webhook-secret</code>.</li>
+<li><strong>IF — secret valid:</strong> <code>{{$json.headers['x-webhook-secret']}}</code> equals the stored secret. False → <strong>Respond 401</strong> + stop.</li>
+<li><strong>Postgres/Supabase — atomic claim</strong> (service-role creds):
+   <code>sql
+   update public.site_lead set status='processing', processing_at=now()
+   where id = $1 and status in ('received','error')
+   returning *;</code>
+   Param <code>$1 = lead_id</code>. If 0 rows → another worker owns it → <strong>No-Op / stop</strong>.</li>
+<li><strong>Postgres — dedupe contact</strong> (normalize both sides):
+   <code>sql
+   select id from public.contact
+   where ($1 is not null and lower(email) = lower($1))
+      or ($2 is not null and regexp_replace(coalesce(phone,''),'\\D','','g') = $2)
+   limit 1;</code>
+   Params: <code>$1 = email</code>, <code>$2 = phone</code> (already normalized on the row).</li>
+<li><strong>IF — contact found:</strong> True → set <code>contactId</code> = found id, <code>matched=true</code>. False → <strong>Postgres insert contact</strong>:
+   <code>sql
+   insert into public.contact (full_name, email, phone, whatsapp, language, source)
+   values ($1, $2, $3, $3, $4, 'website') returning id;</code>
+   Params: <code>full_name=name</code>, <code>email</code>, <code>phone</code>, <code>language=locale</code>. <code>matched=false</code>.</li>
+<li><strong>IF — notify-once:</strong> proceed to notify only if the row's <code>notified_at is null</code>.</li>
+<li><strong>Twilio (WhatsApp, sandbox)</strong> — send to Jon's number. Body: <code>New Firefly lead{{matched?' (returning)':''}}: {{name}} · {{contact_raw}} · {{segment}} · {{config.selectedTier || 'site visit'}}</code>. On error → continue (don't fail the run).</li>
+<li><strong>IF — Twilio errored → Email</strong> (existing <code>jondenne@lbedesign.com</code> cred) to <code>jon@fireflyenergy.mx</code>, subject <code>Firefly lead (WhatsApp failed): {{name}}</code>, body = same summary + lead_id.</li>
+<li><strong>Postgres — mark notified</strong> (right after a successful send, before final status):
+   <code>update public.site_lead set notified_at=now() where id=$1 and notified_at is null;</code></li>
+<li><strong>Postgres — finalize success:</strong>
+    <code>update public.site_lead set status='processed', crm_contact_id=$2, crm_contact_matched=$3, processed_at=now() where id=$1;</code></li>
+<li><strong>Error Trigger / catch path</strong> for the whole workflow → <strong>Postgres mark error:</strong>
+    <code>update public.site_lead set status='error', last_error=$2, attempts=attempts+1 where id=$1;</code></li>
+</ol>
+<ul>
+<li>[ ] <strong>Step 2: Validate</strong></li>
+</ul>
+<p>Run: <code>mcp__n8n-mcp__n8n_validate_workflow</code> on the new workflow id.
+Expected: no errors (warnings about optional creds acceptable until Twilio is wired).</p>
+<ul>
+<li>[ ] <strong>Step 3: Manual test with a seeded row</strong></li>
+</ul>
+<p>Insert a test <code>site_lead</code> row via <code>execute_sql</code> (status <code>received</code>), POST <code>{lead_id}</code> to the webhook with the correct secret, then <code>select status, crm_contact_id, notified_at from site_lead where id=...</code>.
+Expected: <code>status='processed'</code>, a <code>crm_contact_id</code>, <code>notified_at</code> set; a WhatsApp (or fallback email) received. Clean up the test row + test contact afterward.</p>
+<hr />
+<h2 id="task-6-n8n-site-lead-reconcile-schedule">Task 6: n8n — Site Lead Reconcile (schedule)</h2>
+<ul>
+<li>[ ] <strong>Step 1: Create the workflow</strong></li>
+</ul>
+<ol>
+<li><strong>Schedule Trigger</strong> — every 15 minutes.</li>
+<li><strong>Postgres — select stragglers:</strong>
+   <code>sql
+   select id from public.site_lead
+   where status in ('received','error')
+     and attempts &lt; 5
+     and created_at &lt; now() - interval '2 minutes'
+     and (processing_at is null or processing_at &lt; now() - interval '10 minutes')
+   order by created_at limit 50;</code></li>
+<li><strong>Loop</strong> → for each, <strong>HTTP Request</strong> POST to the Processor webhook with <code>{lead_id}</code> + <code>X-Webhook-Secret</code> (re-uses the exact same claim→process logic; the atomic claim makes this safe against the live webhook).</li>
+</ol>
+<ul>
+<li>[ ] <strong>Step 2: Validate + dry-run</strong></li>
+</ul>
+<p>Validate via MCP. Seed one <code>error</code> row, run once manually, confirm it transitions to <code>processed</code>.</p>
+<hr />
+<h2 id="task-7-n8n-stuck-lead-daily-digest">Task 7: n8n — Stuck-Lead Daily Digest</h2>
+<ul>
+<li>[ ] <strong>Step 1: Create the workflow</strong></li>
+</ul>
+<ol>
+<li><strong>Schedule Trigger</strong> — daily (e.g. 08:00).</li>
+<li><strong>Postgres — terminal failures:</strong>
+   <code>select id, name, contact_raw, last_error, created_at from public.site_lead where status='error' and attempts &gt;= 5 order by created_at;</code></li>
+<li><strong>IF rows &gt; 0 → Email</strong> (existing cred) to <code>jon@fireflyenergy.mx</code>, subject <code>Firefly: N stuck leads need attention</code>, body = the list. No rows → No-Op.</li>
+</ol>
+<ul>
+<li>[ ] <strong>Step 2: Validate</strong> via MCP; manually run once (expect "no rows / no email" on a clean table).</li>
+</ul>
+<hr />
+<h2 id="task-8-front-end-config-payload-verification">Task 8: Front-end config + payload verification</h2>
+<p><strong>Files:</strong>
+- Verify: <code>site/src/lib/leadClient.ts</code> (no change expected)
+- Config: site build env (<code>PUBLIC_SUPABASE_URL</code>)</p>
+<ul>
+<li>[ ] <strong>Step 1: Confirm the posted payload matches <code>buildLeadRow</code></strong></li>
+</ul>
+<p>Run: <code>grep -n "segment\|answers\|config\|contact\|locale\|hp" "/Users/jondenne/Claude Code/fireflyenergy-website/site/src/lib/leadClient.ts"</code>
+Expected: payload includes <code>name, contact, segment, locale, answers, config, hp</code> — consumed verbatim by <code>buildLeadRow</code>. No change needed.</p>
+<ul>
+<li>[ ] <strong>Step 2: Set the Supabase base URL for builds</strong></li>
+</ul>
+<p>Ensure <code>PUBLIC_SUPABASE_URL=https://tlsidpnhpirasfrhxfkz.supabase.co</code> is present in the site's <code>.env</code>/Cloudflare Pages env (used by <code>leadClient</code> to build <code>${baseUrl}/functions/v1/site-lead</code>).</p>
+<p>Run: <code>grep -rn "PUBLIC_SUPABASE_URL" "/Users/jondenne/Claude Code/fireflyenergy-website/site" --include=*.ts --include=*.astro --include=.env* 2&gt;/dev/null | head</code>
+Expected: referenced where <code>baseUrl</code> is read; add to env if missing.</p>
+<ul>
+<li>[ ] <strong>Step 3: Verify header-less invocation assumption</strong></li>
+</ul>
+<p>After deploy (Task 9), <code>curl -i -X POST https://tlsidpnhpirasfrhxfkz.supabase.co/functions/v1/site-lead -H 'content-type: application/json' -d '{}'</code> with NO apikey.
+Expected: a JSON response from OUR handler (e.g. <code>{"ok":false,"error":"missing_contact"}</code>), NOT a gateway 401. If 401 → add the project publishable key to <code>leadClient</code> request headers (it's public) and re-test.</p>
+<hr />
+<h2 id="task-9-deploy-e2e-gated-on-jons-go-ahead">Task 9: Deploy + E2E (GATED on Jon's go-ahead)</h2>
+<blockquote>
+<p>Nothing here runs without Jon's explicit OK. Claude may run Supabase/wrangler deploys after approval.</p>
+</blockquote>
+<ul>
+<li>[ ] <strong>Step 1: Apply the migration to live</strong></li>
+</ul>
+<p>Re-run <code>list_migrations</code> on <code>tlsidpnhpirasfrhxfkz</code> → confirm the next free version; rename <code>0080_*</code> if needed; apply DDL + <code>schema_migrations</code> insert via <code>execute_sql</code>. Verify: <code>select to_regclass('public.site_lead');</code> is non-null and <code>contact.source</code> exists.</p>
+<ul>
+<li>[ ] <strong>Step 2: Set edge-function secrets + deploy the function</strong></li>
+</ul>
+<p>Set secrets on the project: <code>ALLOWED_ORIGINS</code>, <code>N8N_WEBHOOK_URL</code>, <code>WEBHOOK_SHARED_SECRET</code> (<code>SUPABASE_URL</code>/<code>SUPABASE_SERVICE_ROLE_KEY</code> are auto-injected). Deploy with <code>--no-verify-jwt</code>:
+<code>supabase functions deploy site-lead --project-ref tlsidpnhpirasfrhxfkz --no-verify-jwt</code></p>
+<ul>
+<li>
+<p>[ ] <strong>Step 3: Activate the three n8n workflows.</strong></p>
+</li>
+<li>
+<p>[ ] <strong>Step 4: Deploy a <code>*.pages.dev</code> preview of the site and run the E2E</strong></p>
+</li>
+</ul>
+<p>Use the Playwright MCP: open the preview calculator, take <strong>Door B (site visit)</strong> (no estimate needed), submit a real lead. Confirm: success state shown; a <code>site_lead</code> row appears (<code>status</code> → <code>processed</code> within ~1 run); a contact is created/matched in the CRM; WhatsApp (sandbox) or fallback email received. Then submit the SAME contact again → confirm dedupe (no duplicate contact). Clean up test data.</p>
+<ul>
+<li>[ ] <strong>Step 5: Verify durability</strong></li>
+</ul>
+<p>Temporarily point <code>N8N_WEBHOOK_URL</code> at an invalid URL, submit a lead → confirm <code>{ok:true}</code> still returns and the row is <code>received</code>, then the reconcile job promotes it to <code>processed</code>. Restore the URL.</p>
+<ul>
+<li>[ ] <strong>Step 6: Open the development branch for finishing</strong></li>
+</ul>
+<p>Use <code>superpowers:finishing-a-development-branch</code> to PR/merge the firefly-crm worktree branch.</p>
+<hr />
+<h2 id="self-review-notes">Self-review notes</h2>
+<ul>
+<li><strong>Spec coverage:</strong> durable buffer (T3), capture-first fn (T4), n8n fan-out/contact-only/dedupe/notify-once/claim (T5), reconcile (T6), stuck digest (T7), CORS+rate-limit+honeypot+size cap (T4), Twilio sandbox + email fallback (T5), pages.dev E2E + durability proof (T9). All Approach-A hardened decisions mapped.</li>
+<li><strong>Out of scope (unchanged):</strong> deal creation; <code>site-estimate</code>/<code>site-cfe-parse</code> deploy (calculator dep — Door B avoids it for lead testing); legacy Airtable intake; the Solutions page (separate spec).</li>
+<li><strong>Residual risks (carried from PLAN.md):</strong> two simultaneous brand-new leads for the same person could both insert a contact (accept-and-clean); Twilio sandbox only messages pre-joined numbers (fine for testing; production sender + approved template before launch); header-less invocation verified in T8 step 3.</li>
+</ul></div></body></html>

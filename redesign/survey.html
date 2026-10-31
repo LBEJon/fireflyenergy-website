@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Firefly — Design My System</title>
+<link rel="icon" href="assets/firefly-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Narrow:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--ff-sans);font-size:var(--fs-body);line-height:var(--lh-body);color:var(--ff-ink);
+       background:var(--ff-paper);-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+  h1,h2,h3,.display{font-family:var(--ff-display);line-height:var(--lh-tight);font-weight:700;letter-spacing:-0.01em}
+  a{color:inherit;text-decoration:none}
+  img,svg{display:block;max-width:100%}
+  .wrap{max-width:var(--container);margin:0 auto;padding:0 var(--sp-3);width:100%}
+  .eyebrow{font-size:var(--fs-eyebrow);font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ff-ink)}
+  .eyebrow::before{content:"";display:inline-block;width:18px;height:2px;background:var(--ff-green);vertical-align:middle;margin-right:.55rem;border-radius:2px}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-weight:600;font-size:var(--fs-small);
+       padding:.85rem 1.6rem;border-radius:var(--r-pill);transition:all var(--dur) var(--ease);cursor:pointer;border:0;font-family:var(--ff-sans)}
+  .btn-green{background:var(--ff-green);color:var(--ff-ink)}
+  .btn-green:hover{background:var(--ff-green-soft);transform:translateY(-2px);box-shadow:0 10px 30px var(--ff-glow)}
+  .btn-accent{background:var(--ff-accent);color:#fff}
+  .btn-accent:hover{background:var(--ff-accent-dk);transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,106,61,.35)}
+  .btn-ghost{background:transparent;color:var(--ff-storm);border:1.5px solid var(--ff-line)}
+  .btn-ghost:hover{border-color:var(--ff-ink);color:var(--ff-ink)}
+  .btn[disabled]{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+
+  /* header */
+  header{border-bottom:1px solid var(--ff-line);background:#fff}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:70px}
+  .nav .logo{height:28px}
+  .lang{display:flex;font-size:var(--fs-small);font-weight:600;border:1px solid var(--ff-line);border-radius:var(--r-pill);overflow:hidden}
+  .lang button{border:0;background:transparent;padding:.35rem .7rem;cursor:pointer;color:var(--ff-storm);font-weight:600}
+  .lang button.active{background:var(--ff-ink);color:#fff}
+
+  main{flex:1;padding:var(--sp-6) 0}
+  .intro{text-align:center;max-width:48ch;margin:0 auto var(--sp-4)}
+  .intro h1{font-size:clamp(1.9rem,4vw,2.7rem);margin:var(--sp-2) 0 .4rem}
+  .intro p{color:var(--ff-slate);font-size:var(--fs-lead)}
+
+  /* card */
+  .form-card{max-width:640px;margin:0 auto;background:#fff;border:1px solid var(--ff-line);
+             border-radius:var(--r-lg);box-shadow:var(--shadow-lift);overflow:hidden}
+  .progress{height:5px;background:var(--ff-mist)}
+  .progress span{display:block;height:100%;width:33.33%;background:linear-gradient(90deg,var(--ff-green),var(--ff-green-soft));
+                 transition:width .45s var(--ease)}
+  .card-body{padding:var(--sp-5)}
+  @media(max-width:560px){.card-body{padding:var(--sp-4)}}
+  .step-meta{font-size:var(--fs-eyebrow);font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ff-storm)}
+  .step-title{font-size:var(--fs-h3);margin:.4rem 0 var(--sp-4)}
+
+  .step{display:none}
+  .step.active{display:block;animation:fade .4s var(--ease)}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* option cards (Q1) */
+  .opt{display:flex;gap:var(--sp-3);align-items:flex-start;width:100%;text-align:left;background:#fff;
+       border:1.5px solid var(--ff-line);border-radius:var(--r-md);padding:var(--sp-3);cursor:pointer;
+       transition:all var(--dur) var(--ease);margin-bottom:var(--sp-2)}
+  .opt:hover{border-color:var(--ff-green);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+  .opt.sel{border-color:var(--ff-green);background:var(--ff-green-tint);box-shadow:0 8px 24px var(--ff-glow)}
+  .opt .ic{flex:none;width:46px;height:46px;border-radius:var(--r-md);background:var(--ff-mist);
+           display:flex;align-items:center;justify-content:center;transition:all var(--dur) var(--ease)}
+  .opt.sel .ic{background:var(--ff-green)}
+  .opt .ic svg{width:26px;height:26px;stroke:var(--ff-ink);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .opt h3{font-size:1.1rem;margin-bottom:.2rem}
+  .opt p{font-size:var(--fs-small);color:var(--ff-slate);line-height:1.45}
+  .opt .check{margin-left:auto;flex:none;width:24px;height:24px;border-radius:50%;border:2px solid var(--ff-line);
+              display:flex;align-items:center;justify-content:center;transition:all var(--dur) var(--ease)}
+  .opt.sel .check{background:var(--ff-green);border-color:var(--ff-green)}
+  .opt .check svg{width:13px;height:13px;stroke:var(--ff-ink);stroke-width:3;fill:none;opacity:0;transition:opacity .2s}
+  .opt.sel .check svg{opacity:1}
+
+  /* fields */
+  .field{margin-bottom:var(--sp-4)}
+  .field > label{display:block;font-weight:600;font-size:var(--fs-small);margin-bottom:.5rem;color:var(--ff-ink)}
+  .hint{font-weight:400;color:var(--ff-storm)}
+  .inp{width:100%;font-family:var(--ff-sans);font-size:var(--fs-body);color:var(--ff-ink);background:#fff;
+       border:1.5px solid var(--ff-line);border-radius:var(--r-md);padding:.8rem 1rem;transition:border-color var(--dur) var(--ease)}
+  .inp:focus{outline:0;border-color:var(--ff-green)}
+  .inp-suffix{position:relative}
+  .inp-suffix .inp{padding-right:90px}
+  .inp-suffix input[type=number]{appearance:textfield;-moz-appearance:textfield}
+  .inp-suffix input[type=number]::-webkit-outer-spin-button,
+  .inp-suffix input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .inp-suffix .suf{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--ff-storm);font-size:var(--fs-small);font-weight:600;pointer-events:none}
+
+  /* upload */
+  .upload{border:2px dashed var(--ff-line);border-radius:var(--r-md);padding:var(--sp-4);text-align:center;
+          cursor:pointer;transition:all var(--dur) var(--ease);background:var(--ff-paper)}
+  .upload:hover{border-color:var(--ff-green);background:var(--ff-green-tint)}
+  .upload.has{border-style:solid;border-color:var(--ff-green);background:var(--ff-green-tint)}
+  .upload svg{width:30px;height:30px;stroke:var(--ff-storm);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;margin:0 auto .5rem}
+  .upload .u-main{font-weight:600;font-size:var(--fs-small)}
+  .upload .u-sub{font-size:var(--fs-small);color:var(--ff-storm);margin-top:.2rem}
+  .upload .u-file{display:none;align-items:center;gap:.6rem;justify-content:center;font-weight:600;font-size:var(--fs-small);color:var(--ff-green-deep)}
+  .upload.has .u-file{display:flex}.upload.has .u-prompt{display:none}
+  .u-thumb{width:38px;height:38px;border-radius:6px;object-fit:cover;border:1px solid var(--ff-line);display:none}
+
+  /* hours slider */
+  .hrs-readout{display:flex;align-items:baseline;gap:.4rem;margin-bottom:.6rem}
+  .hrs-readout .n{font-family:var(--ff-display);font-size:2.4rem;line-height:1;color:var(--ff-green-deep)}
+  .hrs-readout .u{font-size:var(--fs-small);color:var(--ff-slate);font-weight:600}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:999px;
+                    background:var(--ff-mist);outline:0;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;
+       background:var(--ff-green);border:4px solid #fff;box-shadow:0 2px 8px var(--ff-glow);cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--ff-green);
+       border:4px solid #fff;box-shadow:0 2px 8px var(--ff-glow);cursor:pointer}
+  .hrs-scale{display:flex;justify-content:space-between;font-size:var(--fs-eyebrow);color:var(--ff-storm);margin-top:.5rem;font-weight:600}
+
+  /* whatsapp check */
+  .field > label.wa{display:flex;flex-flow:row nowrap;align-items:center;gap:.5rem;margin:.7rem 0 0;font-weight:500;cursor:pointer;font-size:var(--fs-small);color:var(--ff-slate)}
+  .wa input{position:absolute;opacity:0;width:0;height:0}
+  .wa-text{white-space:nowrap}
+  .wa .box{flex:none;width:22px;height:22px;border-radius:6px;border:2px solid var(--ff-line);display:flex;
+           align-items:center;justify-content:center;transition:all var(--dur) var(--ease)}
+  .wa .box svg{width:12px;height:12px;stroke:#fff;stroke-width:3;fill:none;opacity:0;transition:opacity .2s}
+  .wa input:checked + .box{background:#25D366;border-color:#25D366}
+  .wa input:checked + .box svg{opacity:1}
+  .wa .wa-ic{flex:none;width:18px;height:18px}
+
+  .err{display:none;color:var(--ff-accent-dk);font-size:var(--fs-small);font-weight:600;margin-top:.7rem;
+       background:rgba(255,106,61,.08);border:1px solid rgba(255,106,61,.3);border-radius:var(--r-md);padding:.6rem .8rem}
+  .err.show{display:block;animation:fade .3s var(--ease)}
+  .inp.bad{border-color:var(--ff-accent)}
+  .actions{display:flex;justify-content:space-between;gap:var(--sp-2);margin-top:var(--sp-5);
+            border-top:1px solid var(--ff-line);padding-top:var(--sp-4)}
+
+  /* done state */
+  .done{display:none;text-align:center;padding:var(--sp-5) var(--sp-3)}
+  .done.active{display:block;animation:fade .4s var(--ease)}
+  .done .seal{width:74px;height:74px;border-radius:50%;background:var(--ff-green);margin:0 auto var(--sp-3);
+              display:flex;align-items:center;justify-content:center}
+  .done .seal svg{width:36px;height:36px;stroke:var(--ff-ink);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .done h2{font-size:var(--fs-h2);margin-bottom:.5rem}
+  .done p{color:var(--ff-slate);max-width:42ch;margin:0 auto var(--sp-4)}
+  .recap{text-align:left;background:var(--ff-paper);border:1px solid var(--ff-line);border-radius:var(--r-md);
+         padding:var(--sp-3);max-width:420px;margin:0 auto var(--sp-4)}
+  .recap .r-row{display:flex;justify-content:space-between;gap:var(--sp-2);padding:.45rem 0;font-size:var(--fs-small);border-bottom:1px solid var(--ff-line)}
+  .recap .r-row:last-child{border-bottom:0}
+  .recap .r-row span{color:var(--ff-storm)}.recap .r-row b{font-weight:600;text-align:right}
+  .wa-btn{background:#25D366;color:#fff}.wa-btn:hover{background:#1eb955;transform:translateY(-2px)}
+
+  footer{padding:var(--sp-4) 0;text-align:center;font-size:var(--fs-small);color:var(--ff-storm)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="index.html"><img class="logo" src="assets/firefly-logo.svg" alt="Firefly"></a>
+    <div class="lang">
+      <button data-lang="en" class="active">EN</button>
+      <button data-lang="es">ES</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="intro">
+      <span class="eyebrow" data-en="Design my system" data-es="Diseña mi sistema">Design my system</span>
+      <h1 data-en="Three quick questions." data-es="Tres preguntas rápidas.">Three quick questions.</h1>
+      <p data-en="Tell us what you need and we'll send a custom analysis and quote within 24 hours."
+         data-es="Cuéntanos qué necesitas y te enviaremos un análisis y cotización personalizados en menos de 24 horas.">Tell us what you need and we'll send a custom analysis and quote within 24 hours.</p>
+    </div>
+
+    <div class="form-card">
+      <div class="progress"><span id="bar"></span></div>
+      <div class="card-body">
+
+        <!-- STEP 1 -->
+        <section class="step active" data-step="1">
+          <div class="step-meta" data-en="Question 1 of 3" data-es="Pregunta 1 de 3">Question 1 of 3</div>
+          <h2 class="step-title" data-en="What are you looking for?" data-es="¿Qué estás buscando?">What are you looking for?</h2>
+
+          <button type="button" class="opt" data-val="backup">
+            <span class="ic"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="16" height="10" rx="2"/><path d="M21 10v4"/><path d="M9 9l-2 4h3l-2 4"/></svg></span>
+            <div>
+              <h3 data-en="Battery backup only" data-es="Solo respaldo con batería">Battery backup only</h3>
+              <p data-en="Keep my home powered through outages. No solar needed."
+                 data-es="Mantener mi hogar con energía durante los apagones. Sin solar.">Keep my home powered through outages. No solar needed.</p>
+            </div>
+            <span class="check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+          </button>
+
+          <button type="button" class="opt" data-val="solar_battery">
+            <span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M12 2v2M12 14v1M5 9H3M21 9h-2M6 3l1.5 1.5M18 3l-1.5 1.5"/><rect x="6" y="17" width="12" height="5" rx="1.5"/></svg></span>
+            <div>
+              <h3 data-en="Solar + battery (the complete system)" data-es="Solar + batería (el sistema completo)">Solar + battery (the complete system)</h3>
+              <p data-en="Save on utilities, plus battery backup for outages and power conditioning for my home."
+                 data-es="Ahorrar en servicios, más respaldo de batería para apagones y acondicionamiento de energía para mi hogar.">Save on utilities, plus battery backup for outages and power conditioning for my home.</p>
+            </div>
+            <span class="check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+          </button>
+
+          <button type="button" class="opt" data-val="add_battery">
+            <span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="11" height="9" rx="1"/><path d="M3 8h11M8 4v9"/><rect x="15" y="14" width="6" height="7" rx="1.5"/><path d="M18 16v3M16.5 17.5h3"/></svg></span>
+            <div>
+              <h3 data-en="Add battery to existing solar" data-es="Añadir batería a mi solar existente">Add battery to existing solar</h3>
+              <p data-en="I already have solar and want to add a battery backup solution."
+                 data-es="Ya tengo solar y quiero añadir una solución de respaldo con batería.">I already have solar and want to add a battery backup solution.</p>
+            </div>
+            <span class="check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+          </button>
+        </section>
+
+        <!-- STEP 2 -->
+        <section class="step" data-step="2">
+          <div class="step-meta" data-en="Question 2 of 3" data-es="Pregunta 2 de 3">Question 2 of 3</div>
+          <h2 class="step-title" data-en="Tell us about your energy." data-es="Cuéntanos sobre tu energía.">Tell us about your energy.</h2>
+
+          <div class="field" id="solarField" style="display:none">
+            <label data-en="Current solar capacity <span class='hint'>— optional</span>"
+                   data-es="Capacidad solar actual <span class='hint'>— opcional</span>">Current solar capacity <span class="hint">— optional</span></label>
+            <div class="inp-suffix">
+              <input class="inp" id="solarCap" type="number" min="0" inputmode="decimal" placeholder="e.g. 5">
+              <span class="suf">kW</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label data-en="Current CFE usage <span class='hint'>— optional if you upload your bill</span>"
+                   data-es="Consumo actual de CFE <span class='hint'>— opcional si subes tu recibo</span>">Current CFE usage <span class="hint">— optional if you upload your bill</span></label>
+            <div class="inp-suffix">
+              <input class="inp" id="kwh" type="number" min="0" inputmode="decimal" placeholder="e.g. 18">
+              <span class="suf" data-en="kWh / day" data-es="kWh / día">kWh / day</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label data-en="Upload your CFE bill" data-es="Sube tu recibo de CFE">Upload your CFE bill</label>
+            <label class="upload" id="drop" for="bill">
+              <div class="u-prompt">
+                <svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+                <div class="u-main" data-en="Upload or take a photo" data-es="Sube o toma una foto">Upload or take a photo</div>
+                <div class="u-sub" data-en="Don't know your numbers? Just send a photo or PDF of your CFE bill and we'll prepare a free Firefly Energy Independence Solution Analysis."
+                     data-es="¿No conoces tus datos? Envía una foto o PDF de tu recibo de CFE y prepararemos un Análisis de Solución de Independencia Energética Firefly gratis.">Don't know your numbers? Just send a photo or PDF of your CFE bill and we'll prepare a free Firefly Energy Independence Solution Analysis.</div>
+              </div>
+              <div class="u-file"><img class="u-thumb" id="thumb" alt=""><span id="fname"></span></div>
+            </label>
+            <input id="bill" type="file" accept="image/*,application/pdf" hidden>
+          </div>
+
+          <div class="field">
+            <label data-en="How many hours of backup do you want?" data-es="¿Cuántas horas de respaldo quieres?">How many hours of backup do you want?</label>
+            <div class="hrs-readout"><span class="n" id="hrsVal">6</span><span class="u" id="hrsUnit" data-en="hours of standard backup" data-es="horas de respaldo estándar">hours of standard backup</span></div>
+            <input type="range" id="hrs" min="0" max="16" value="6" step="2">
+            <div class="hrs-scale"><span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span><span>12</span><span>14</span><span>15+</span></div>
+          </div>
+        </section>
+
+        <!-- STEP 3 -->
+        <section class="step" data-step="3">
+          <div class="step-meta" data-en="Question 3 of 3" data-es="Pregunta 3 de 3">Question 3 of 3</div>
+          <h2 class="step-title" data-en="How do we reach you?" data-es="¿Cómo te contactamos?">How do we reach you?</h2>
+
+          <div class="field">
+            <label data-en="Address" data-es="Dirección">Address</label>
+            <input class="inp" id="addr" type="text" placeholder="Calle y número">
+          </div>
+          <div class="field">
+            <label data-en="Colonia / neighborhood" data-es="Colonia">Colonia / neighborhood</label>
+            <input class="inp" id="colonia" type="text" placeholder="Colonia / fraccionamiento">
+          </div>
+          <div class="field">
+            <label data-en="City" data-es="Ciudad">City</label>
+            <input class="inp" id="city" type="text" placeholder="San Miguel de Allende">
+          </div>
+          <div class="field">
+            <label data-en="Email <span class='hint'>— email or WhatsApp required</span>" data-es="Correo <span class='hint'>— correo o WhatsApp requerido</span>">Email <span class="hint">— email or WhatsApp required</span></label>
+            <input class="inp" id="email" type="email" placeholder="you@email.com">
+          </div>
+          <div class="field" style="margin-bottom:.4rem">
+            <label data-en="Phone" data-es="Teléfono">Phone</label>
+            <input class="inp" id="phone" type="tel" placeholder="+52 415 000 0000">
+            <label class="wa">
+              <input type="checkbox" id="waChk" checked>
+              <span class="box"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+              <span class="wa-text" data-en="This number is on WhatsApp" data-es="Este número está en WhatsApp">This number is on WhatsApp</span>
+              <svg class="wa-ic" viewBox="0 0 24 24" fill="#25D366"><path d="M12 2a10 10 0 00-8.6 15l-1.4 5 5.1-1.3A10 10 0 1012 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.2.1-1.9-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5-4.5-.2-.2-1.2-1.6-1.2-3s.7-2.1 1-2.4c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.1.1.3 0 .5l-.4.6c-.2.2-.3.4-.1.6.6 1 1.3 1.6 2.2 2.1.2.1.4.1.5 0l.7-.8c.2-.2.3-.2.6-.1l1.9.9c.2.1.4.2.4.3.1.2.1.7-.1 1.3z"/></svg>
+            </label>
+          </div>
+          <p class="err" id="err" data-en="Please add an email or WhatsApp number so we can send your analysis."
+             data-es="Agrega un correo o número de WhatsApp para poder enviarte tu análisis.">Please add an email or WhatsApp number so we can send your analysis.</p>
+        </section>
+
+        <div class="actions">
+          <button type="button" class="btn btn-ghost" id="back" style="visibility:hidden" data-en="← Back" data-es="← Atrás">← Back</button>
+          <button type="button" class="btn btn-green" id="next" data-en="Next →" data-es="Siguiente →">Next →</button>
+        </div>
+      </div>
+
+      <!-- DONE -->
+      <div class="done card-body" id="done">
+        <div class="seal"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+        <h2 data-en="Got it — thank you!" data-es="¡Listo — gracias!">Got it — thank you!</h2>
+        <p data-en="Our team will review your details and send a custom analysis and quote within 24 hours."
+           data-es="Nuestro equipo revisará tus datos y te enviará un análisis y cotización personalizados en menos de 24 horas.">Our team will review your details and send a custom analysis and quote within 24 hours.</p>
+        <div class="recap" id="recap"></div>
+        <a class="btn wa-btn" href="https://wa.me/5214151805030" data-en="Chat with us on WhatsApp" data-es="Escríbenos por WhatsApp">Chat with us on WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer><span data-en="Firefly by Nordic Electric · San Miguel de Allende" data-es="Firefly by Nordic Electric · San Miguel de Allende">Firefly by Nordic Electric · San Miguel de Allende</span></footer>
+
+<script>
+  let lang = 'en';
+  const t = (en, es) => (lang === 'es' ? es : en);
+
+  // language toggle
+  const setLang = (l) => {
+    lang = l;
+    document.documentElement.lang = l;
+    document.querySelectorAll('[data-en]').forEach(el => {
+      const v = el.getAttribute('data-' + l);
+      if (v == null) return;
+      if (/<span/.test(v)) { // label with inline hint markup
+        el.textContent = '';
+        const parts = v.split(/<span class='hint'>|<\/span>/);
+        el.appendChild(document.createTextNode(parts[0]));
+        if (parts[1]) { const s = document.createElement('span'); s.className = 'hint'; s.textContent = parts[1]; el.appendChild(s); }
+      } else { el.textContent = v; }
+    });
+    document.querySelectorAll('.lang button').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
+    syncHrs();
+  };
+  document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+
+  // --- state ---
+  const state = { goal: null, kwh: '', solarCap: '', file: null, hrs: 6, addr: '', colonia: '', city: '', email: '', phone: '', wa: true };
+
+  // Show "current solar capacity" only when they already have solar
+  function updateSolarField() {
+    document.getElementById('solarField').style.display = (state.goal === 'add_battery') ? 'block' : 'none';
+  }
+
+  // Q1 option select
+  document.querySelectorAll('.opt').forEach(o => o.addEventListener('click', () => {
+    document.querySelectorAll('.opt').forEach(x => x.classList.remove('sel'));
+    o.classList.add('sel');
+    state.goal = o.dataset.val;
+    updateSolarField();
+    updateNext();
+  }));
+
+  // upload
+  const bill = document.getElementById('bill'), drop = document.getElementById('drop'),
+        fname = document.getElementById('fname'), thumb = document.getElementById('thumb');
+  bill.addEventListener('change', () => {
+    const f = bill.files[0];
+    if (!f) return;
+    state.file = f.name;
+    fname.textContent = f.name;
+    drop.classList.add('has');
+    if (f.type.startsWith('image/')) { thumb.src = URL.createObjectURL(f); thumb.style.display = 'block'; }
+    else { thumb.style.display = 'none'; }
+  });
+
+  // hours slider
+  const hrs = document.getElementById('hrs');
+  function syncHrs() {
+    const v = +hrs.value;
+    state.hrs = v;
+    document.getElementById('hrsVal').textContent = v >= 16 ? '15+' : v;
+    const unit = document.getElementById('hrsUnit');
+    if (v === 0) unit.textContent = t('— savings focus, minimal backup', '— enfoque en ahorro, respaldo mínimo');
+    else unit.textContent = t('hours of standard backup', 'horas de respaldo estándar');
+    const pct = (v / 16) * 100;
+    hrs.style.background = 'linear-gradient(90deg, var(--ff-green) ' + pct + '%, var(--ff-mist) ' + pct + '%)';
+  }
+  hrs.addEventListener('input', syncHrs);
+  syncHrs();
+
+  // --- wizard nav ---
+  let step = 1; const TOTAL = 3;
+  const bar = document.getElementById('bar'), back = document.getElementById('back'), next = document.getElementById('next');
+
+  function show(n) {
+    step = n;
+    document.querySelectorAll('.step').forEach(s => s.classList.toggle('active', +s.dataset.step === n));
+    bar.style.width = (n / TOTAL * 100) + '%';
+    back.style.visibility = n > 1 ? 'visible' : 'hidden';
+    next.setAttribute('data-en', n === TOTAL ? 'Get my analysis →' : 'Next →');
+    next.setAttribute('data-es', n === TOTAL ? 'Obtener mi análisis →' : 'Siguiente →');
+    next.classList.toggle('btn-accent', n === TOTAL);
+    next.classList.toggle('btn-green', n !== TOTAL);
+    next.textContent = next.getAttribute('data-' + lang);
+    if (n === 2) updateSolarField();
+    updateNext();
+  }
+  function updateNext() { next.disabled = (step === 1 && !state.goal); }
+
+  back.addEventListener('click', () => { if (step > 1) show(step - 1); });
+  next.addEventListener('click', () => {
+    // capture step fields
+    state.kwh = document.getElementById('kwh').value;
+    state.solarCap = document.getElementById('solarCap').value;
+    state.addr = document.getElementById('addr').value;
+    state.colonia = document.getElementById('colonia').value;
+    state.city = document.getElementById('city').value;
+    state.email = document.getElementById('email').value;
+    state.phone = document.getElementById('phone').value;
+    state.wa = document.getElementById('waChk').checked;
+    if (step < TOTAL) { show(step + 1); return; }
+    // final step: require email OR phone (WhatsApp number)
+    const err = document.getElementById('err');
+    const emailEl = document.getElementById('email'), phoneEl = document.getElementById('phone');
+    if (!state.email.trim() && !state.phone.trim()) {
+      err.classList.add('show');
+      emailEl.classList.add('bad'); phoneEl.classList.add('bad');
+      emailEl.focus();
+      return;
+    }
+    err.classList.remove('show');
+    emailEl.classList.remove('bad'); phoneEl.classList.remove('bad');
+    finish();
+  });
+  // clear the error as soon as either contact field gets input
+  ['email', 'phone'].forEach(id => document.getElementById(id).addEventListener('input', () => {
+    document.getElementById('err').classList.remove('show');
+    document.getElementById('email').classList.remove('bad');
+    document.getElementById('phone').classList.remove('bad');
+  }));
+
+  // --- done ---
+  function finish() {
+    const goalLabels = {
+      backup: t('Battery backup only', 'Solo respaldo con batería'),
+      solar_battery: t('Solar + battery', 'Solar + batería'),
+      add_battery: t('Add battery to existing solar', 'Añadir batería a solar existente')
+    };
+    const rows = [
+      [t('Goal', 'Objetivo'), goalLabels[state.goal] || '—'],
+      [t('CFE usage', 'Consumo CFE'), state.kwh ? state.kwh + ' kWh/' + t('day', 'día') : t('from bill', 'del recibo')],
+      [t('Bill', 'Recibo'), state.file || t('not attached', 'no adjuntado')],
+      [t('Backup wanted', 'Respaldo deseado'), (state.hrs >= 16 ? '15+' : state.hrs) + ' ' + t('hrs', 'h')],
+      [t('Location', 'Ubicación'), [state.addr, state.colonia, state.city].filter(Boolean).join(', ') || '—'],
+      [t('Contact', 'Contacto'), state.email || state.phone || '—'],
+      ['WhatsApp', state.wa ? (state.phone || '✓') : t('no', 'no')]
+    ];
+    if (state.goal === 'add_battery' && state.solarCap)
+      rows.splice(1, 0, [t('Existing solar', 'Solar existente'), state.solarCap + ' kW']);
+    const recap = document.getElementById('recap');
+    recap.textContent = '';
+    rows.forEach(([k, v]) => {
+      const row = document.createElement('div'); row.className = 'r-row';
+      const ks = document.createElement('span'); ks.textContent = k;
+      const vb = document.createElement('b'); vb.textContent = v;
+      row.appendChild(ks); row.appendChild(vb); recap.appendChild(row);
+    });
+    document.querySelector('.card-body').style.display = 'none';
+    document.querySelector('.actions').style.display = 'none';
+    bar.style.width = '100%';
+    document.getElementById('done').classList.add('active');
+  }
+
+  show(1);
+</script>
+</body>
+</html>

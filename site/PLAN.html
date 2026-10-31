@@ -1,0 +1,149 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Firefly lead-capture — Plan</title>
+<style>
+:root{--ink:#1a1a1a;--mut:#5b6168;--line:#e7e3dc;--paper:#fbfaf7;--accent:#ff6a3d;--green:#2e7d4f;--code:#f3f0ea}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:3rem 1.5rem 5rem}
+h1{font-size:2rem;line-height:1.2;margin:0 0 .25rem;border-bottom:3px solid var(--accent);padding-bottom:.6rem}
+h2{font-size:1.3rem;margin:2.2rem 0 .6rem;color:var(--green)}
+h3{font-size:1.05rem;margin:1.4rem 0 .4rem}
+p,li{color:#26292e}
+code{background:var(--code);padding:.12em .4em;border-radius:5px;font-size:.86em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+pre{background:var(--code);padding:1rem;border-radius:8px;overflow:auto}
+pre code{background:none;padding:0}
+em{color:var(--mut)}
+ol,ul{padding-left:1.4rem}
+li{margin:.3rem 0}
+hr{border:0;border-top:1px solid var(--line);margin:2rem 0}
+a{color:var(--accent)}
+.badge{display:inline-block;background:var(--green);color:#fff;font-size:.7rem;font-weight:700;letter-spacing:.04em;padding:.2rem .6rem;border-radius:999px;vertical-align:middle;margin-left:.5rem}
+</style></head><body><div class="wrap"><h1 id="plan-fireflyenergymx-lead-capture-workflow-durable-capture-n8n-fan-out">Plan: FireflyEnergy.mx lead-capture workflow (durable capture → n8n fan-out)</h1>
+<p><em>Locked via grill — by Claude + Jon (2026-06-14)</em></p>
+<h2 id="goal">Goal</h2>
+<p>Make the marketing site's existing lead forms actually capture leads, with <strong>zero data loss</strong> as the
+overriding requirement (Jon has been burned by silent Airtable write failures). The site front-end
+already POSTs a rich <code>LeadPayload</code> to <code>${PUBLIC_SUPABASE_URL}/functions/v1/site-lead</code>, but that edge
+function and its storage do not exist yet — so every submission currently falls back to WhatsApp.
+We build the backend as a <strong>capture-first</strong> pipeline: the lead is durably persisted before anything
+that can fail (CRM write, notification) runs, and a reconcile job retries anything that didn't
+complete. Everything lives in the existing <strong>Firefly CRM</strong> Supabase project (<code>tlsidpnhpirasfrhxfkz</code>).</p>
+<h2 id="approach">Approach</h2>
+<ol>
+<li><strong><code>site_lead</code> table (CRM Supabase, new migration).</strong> System of record / durable buffer.
+   Columns (proposed): <code>id uuid pk default gen_random_uuid()</code>, <code>created_at timestamptz default now()</code>,
+   <code>name text not null</code>, <code>contact_raw text not null</code>, <code>email text</code>, <code>phone text</code>, <code>segment text</code>,
+   <code>locale text</code>, <code>answers jsonb</code>, <code>config jsonb</code>, <code>source text default 'website'</code>,
+   <code>status text not null default 'received'</code> with <code>CHECK (status in
+   ('received','processing','processed','error'))</code> — text+CHECK, NOT a new enum type, to avoid
+   enum-migration friction on the prod CRM. <code>crm_contact_id uuid</code>, <code>crm_contact_matched boolean</code>,
+   <code>attempts int not null default 0</code>, <code>last_error text</code>, <code>processing_at timestamptz</code>,
+   <code>processed_at timestamptz</code>, <code>notified_at timestamptz</code>, <code>ip text</code>, <code>user_agent text</code>.
+   RLS <strong>enabled with NO anon/authenticated policies</strong>, plus explicit
+   <code>REVOKE ALL ON site_lead FROM anon, authenticated</code> (defence-in-depth vs PostgREST) — only the
+   service role (which bypasses RLS) reads/writes. The public never touches the table directly.</li>
+<li><strong><code>site-lead</code> edge function (Deno, <code>verify_jwt=false</code>).</strong> The ONLY public surface.
+   - CORS: reflect origin only if in <code>ALLOWED_ORIGINS</code> (env): <code>https://fireflyenergy.mx</code>,
+     <code>https://www.fireflyenergy.mx</code>, and <code>*.pages.dev</code> previews. The pages.dev wildcard MUST be
+     anchored — match <code>^https://[a-z0-9-]+\.pages\.dev$</code> (never substring/<code>endsWith</code>, which would let
+     <code>pages.dev.attacker.com</code> through). Handle <code>OPTIONS</code> preflight.
+   - <strong>Abuse limits:</strong> reject bodies over ~32 KB; cap <code>name</code>/<code>contact</code> length (~200 chars) and
+     <code>answers</code>/<code>config</code> serialized size (~16 KB); <strong>honeypot</strong>: if <code>hp</code> non-empty, return 200
+     <code>{ok:true}</code> WITHOUT inserting (silently swallow the bot); <strong>per-IP throttle</strong> — reject (HTTP 429,
+     still CORS-friendly) if this IP has inserted more than ~5 rows in the last minute (a
+     <code>select count(*) from site_lead where ip=$1 and created_at &gt; now()-interval '1 min'</code> check via
+     service role before inserting).
+   - Parse <code>contact</code> → <code>email</code> (contains <code>@</code>, lowercased+trimmed) or <code>phone</code> (digits only; if 10 digits
+     assume MX-local and prepend <code>52</code>), keep the raw string in <code>contact_raw</code>.
+   - <strong>INSERT the <code>site_lead</code> row via service role.</strong> Respond <code>200 {ok:true}</code> the instant this succeeds.
+     This is the durability guarantee — success is returned ONLY after the row is committed.
+   - After responding, <strong>best-effort</strong> POST to <code>N8N_WEBHOOK_URL</code> carrying <code>{ lead_id }</code> +
+     <code>X-Webhook-Secret: WEBHOOK_SHARED_SECRET</code>, via <code>EdgeRuntime.waitUntil</code> if available, else awaited
+     with a ~2 s timeout. <strong>Durability does NOT depend on this call</strong> — if it fails or <code>waitUntil</code> is
+     unavailable, the row stays <code>status='received'</code> and the reconcile job (step 4) processes it. The
+     n8n POST is purely a latency optimization for the happy path. Never fails the user response.</li>
+<li><strong>n8n "site-lead processor" workflow (new, webhook-triggered).</strong>
+   - Verify <code>X-Webhook-Secret</code>. <strong>Atomically claim</strong> the row to prevent the webhook and the reconcile
+     job from processing the same lead at once: <code>UPDATE site_lead SET status='processing',
+     processing_at=now() WHERE id=$1 AND status IN ('received','error') RETURNING *</code>. If it returns no
+     row, another worker already owns it → exit. Only the claimer proceeds.
+   - <strong>Contact dedup:</strong> look up <code>contact</code> by normalized email OR phone (normalize BOTH sides in the
+     query — e.g. <code>lower(email)</code> and <code>regexp_replace(phone,'\D','','g')</code> — since stored values aren't
+     pre-normalized). If found → reuse (set <code>crm_contact_matched=true</code>), do NOT create a duplicate. If
+     not found → insert a new <code>contact</code> (<code>full_name</code>=name, <code>email</code>/<code>phone</code>/<code>whatsapp</code>,
+     <code>language</code>=locale). <strong>Contact only — no deal.</strong>
+   - <strong>Notify Jon via Twilio WhatsApp</strong> — but only if <code>notified_at IS NULL</code> (notify-once guard); set
+     <code>notified_at=now()</code> immediately on successful send (separate update) so a later failure can't
+     re-notify. Message = name / contact / segment / system-size summary; "returning lead" tag when
+     matched. <strong>If the WhatsApp send errors → email fallback</strong> to jon@lbedesign.com.
+   - On success: update <code>site_lead</code> → <code>status='processed'</code>, <code>crm_contact_id</code>, <code>processed_at</code>. On any
+     failure: <code>status='error'</code>, <code>last_error</code>, <code>attempts=attempts+1</code> (leave for retry).</li>
+<li><strong>n8n "site-lead reconcile" workflow (new, scheduled ~every 15 min).</strong> Select <code>site_lead</code> where
+   <code>status in ('received','error')</code> AND <code>attempts &lt; 5</code> AND <code>created_at &lt; now()-interval '2 min'</code>
+   AND (<code>processing_at IS NULL OR processing_at &lt; now()-interval '10 min'</code>) (re-claims stale
+   <code>processing</code> rows whose worker died), and re-drive each through the SAME claim→process logic in
+   step 3. This is the backstop that makes lost leads impossible.</li>
+<li><strong>n8n "stuck-lead digest" (new, scheduled daily).</strong> Email Jon a digest of any <code>site_lead</code> with
+   <code>status='error'</code> and <code>attempts &gt;= 5</code> (terminal failures needing manual attention) — mirrors the
+   existing <code>ErrorsNotifications</code> pattern so silent dead-ends surface within 24 h.</li>
+<li><strong>Front-end:</strong> likely no functional change — <code>leadClient.ts</code> already posts the correct payload and
+   fails safe to WhatsApp. Config: set <code>PUBLIC_SUPABASE_URL</code> to the CRM project URL at build/deploy.
+   ONE thing to verify first: <code>leadClient</code> sends NO <code>apikey</code>/<code>Authorization</code> header. Confirm a
+   <code>verify_jwt=false</code> function is invocable header-less on this Supabase project; if the gateway still
+   requires an <code>apikey</code>, add the project's (public) publishable key to the request headers.</li>
+</ol>
+<h2 id="key-decisions-tradeoffs">Key decisions &amp; tradeoffs</h2>
+<ul>
+<li><strong>Capture-first durability (Approach A).</strong> Durable insert precedes CRM/notify; the HTTP 200 means
+  "saved," not "fully processed." Trades a tiny bit of latency-to-CRM for never losing a lead.</li>
+<li><strong>Reuse the CRM Supabase project</strong> rather than a separate site project. Simpler, one DB; the cost is
+  a public edge function on the production CRM — mitigated by <code>verify_jwt=false</code> + strict input
+  validation + honeypot + service-role-only table RLS (no anon table access).</li>
+<li><strong>Contact only, never a deal.</strong> The <code>deal</code> table has 6 NOT-NULL columns + enums + a stage write-guard
+  RPC; auto-filling it from the web is fragile. The full assessment is preserved on <code>site_lead.answers</code>
+  /<code>config</code> for a rep to build the deal in the CRM wizard. Robustness over richness.</li>
+<li><strong>Match-and-don't-duplicate dedup</strong> by normalized email OR phone — directly avoids the duplicate-
+  contact cleanup Jon has done before.</li>
+<li><strong>Twilio WhatsApp + email fallback.</strong> WhatsApp is the requested channel; email fallback guarantees a
+  hot lead is never silently missed if a WhatsApp template/24h-window issue blocks delivery.</li>
+<li><strong>n8n is the fan-out mechanism, not redundant with the CRM.</strong> n8n writes to the CRM + notifies +
+  retries; the <code>site_lead</code> table is the safety net. The edge function stays decoupled from CRM schema.</li>
+<li><strong>CORS excludes localhost</strong> (Jon's choice: prod domains + <code>*.pages.dev</code> only).</li>
+</ul>
+<h2 id="risks-open-questions">Risks / open questions</h2>
+<ul>
+<li><strong>Pre-launch E2E testing without localhost CORS.</strong> How do we test the real form submit before launch?
+  Options: (a) test on a <code>*.pages.dev</code> preview deploy (already allowlisted); (b) temporarily add
+  localhost to <code>ALLOWED_ORIGINS</code> in a dev-only function deploy; (c) hit the function directly with
+  curl/n8n (no Origin = no CORS enforcement server-side). Leaning (a). <strong>Confirm.</strong></li>
+<li><strong>Twilio WhatsApp business-initiated template approval.</strong> Self-alerts may require an approved template
+  and respect the 24h session window; email fallback mitigates but template setup is a prerequisite task.</li>
+<li><strong>Phone normalization.</strong> MX numbers arrive as <code>+52…</code>, <code>52…</code>, or local; normalize to digits for the
+  dedup match to be reliable. Email lowercased/trimmed.</li>
+<li><strong>Reconcile idempotency.</strong> Reconcile must not double-create contacts or double-notify; guard on
+  <code>status</code> transitions and the contact-match lookup. Cap <code>attempts</code> (5) then leave <code>error</code> for manual review.</li>
+<li><strong><code>EdgeRuntime.waitUntil</code> availability</strong> on Supabase Edge (Deno Deploy) — verify the post-response
+  hook actually runs; if unavailable, fall back to awaiting the n8n POST with a short timeout (reconcile
+  still covers failures).</li>
+<li><strong>Header-less invocation</strong> of the <code>verify_jwt=false</code> function — see Approach step 6; confirm before
+  wiring, since the whole front-end path assumes no <code>apikey</code> is needed.</li>
+<li><strong>Residual duplicate-contact risk:</strong> the atomic claim serializes processing of a <em>single</em> lead, but
+  two <em>different</em> brand-new leads for the same person arriving within the same window could both miss
+  the dedup match and both insert a contact. Low probability; accept-and-clean, or (riskier) add a
+  partial unique index on normalized email/phone to <code>contact</code> — deferred because the prod table may
+  already hold duplicates that would break the index.</li>
+<li><strong>Twilio per-message cost + sandbox vs production sender</strong> — confirm a production WhatsApp sender (not
+  just the sandbox, which only messages pre-joined numbers) before relying on it; sandbox is fine for testing.</li>
+<li><strong>Reviewed via Superpowers self-critique, not cross-model</strong> — Codex Act 2 was blocked by a usage limit
+  (see PLAN-REVIEW-LOG.md). If a cross-model pass is wanted later, the plan is ready to hand to Codex unchanged.</li>
+</ul>
+<h2 id="out-of-scope">Out of scope</h2>
+<ul>
+<li>The <strong>Solutions page</strong> (separate spec, brainstormed next).</li>
+<li><strong>Deal creation</strong> in the CRM (contact only).</li>
+<li>The calculator's <strong>estimate / CFE-parse edge functions</strong> (<code>fetchEstimate</code>/<code>parseCfe</code> hit the same
+  base URL but are separate functions; the calculator needs them but they're not part of lead-capture).</li>
+<li><strong>Legacy Airtable intake</strong> workflows (superseded; CRM is the new system of record).</li>
+<li><strong>Actual production deploy / launch</strong> — gated on Jon's explicit go-ahead (nothing deployed without OK).</li>
+</ul></div></body></html>

@@ -1,42 +1,37 @@
 ---
 import { t, altUrl, type Locale } from '../../lib/i18n';
-import { SOLUTION_TIERS, priceFor, formatPrice } from '../../lib/solutionsPricing';
+import { SOLUTION_TIERS } from '../../lib/solutionsPricing';
 
 interface Props {
   locale: Locale;
-  /** Build-baked USD→MXN rate (falls back to FX_FALLBACK locally). */
-  fxUsdMxn: number;
 }
-const { locale, fxUsdMxn } = Astro.props;
+const { locale } = Astro.props;
 
 const calcHref = altUrl(locale, 'calculator');
 const wa = t(locale, 'common.whatsapp');
 const waHref = `https://wa.me/${wa}`;
 
-// Server-render the DEFAULT price (MXN, without solar) so it's correct with JS
-// off; the client re-renders on toggle. Keeps the table as one source of truth.
 const chip = (key: string, kw: number | string) => t(locale, key).replace('{kw}', String(kw));
 const chipKwh = (key: string, kwh: number) => t(locale, key).replace('{kwh}', String(kwh));
+
+// Backup-runtime estimate (battery only, no solar). Deliberately conservative:
+// applies a usable-capacity + inverter-loss derate and the heavier end of the
+// essentials load, so published hours under-promise rather than over-promise.
+// ponytail: real runtime varies with actual loads — this is a comparison guide,
+// not a guarantee (the microcopy says so).
+const USABLE = 0.9;          // LiFePO4 depth-of-discharge × inverter efficiency
+const ESSENTIALS_KW = 0.6;   // ~550–600 W of essentials running continuously
+const NORMAL_KW = 25 / 24;   // 25 kWh/day average household use
+const runtimeHrs = (kwh: number, loadKw: number) => Math.round((kwh * USABLE) / loadKw);
+const hrs = (h: number) => t(locale, 'solutions.runtime_hours').replace('{h}', String(h));
 ---
-<section class="ff-sol" aria-labelledby="ff-sol-title" data-solutions data-fx={fxUsdMxn}>
+<section class="ff-sol" aria-labelledby="ff-sol-title">
   <div class="ff-sol__inner">
     <header class="ff-sol__head">
       <p class="ff-sol__eyebrow">{t(locale, 'solutions.tiers_eyebrow')}</p>
       <h2 id="ff-sol-title" class="ff-sol__title display">{t(locale, 'solutions.tiers_title')}</h2>
       <p class="ff-sol__sub">{t(locale, 'solutions.tiers_sub')}</p>
     </header>
-
-    <!-- Toggles: MXN + Without-solar selected by default -->
-    <div class="ff-sol__toggles">
-      <div class="ff-sol__toggle" role="radiogroup" aria-label={t(locale, 'solutions.toggle_solar_aria')}>
-        <button type="button" class="ff-sol__tog is-active" role="radio" aria-checked="true" data-solar="off">{t(locale, 'solutions.toggle_without_solar')}</button>
-        <button type="button" class="ff-sol__tog" role="radio" aria-checked="false" data-solar="on">{t(locale, 'solutions.toggle_with_solar')}</button>
-      </div>
-      <div class="ff-sol__toggle" role="radiogroup" aria-label={t(locale, 'solutions.toggle_currency_aria')}>
-        <button type="button" class="ff-sol__tog is-active" role="radio" aria-checked="true" data-currency="MXN">{t(locale, 'solutions.toggle_mxn')}</button>
-        <button type="button" class="ff-sol__tog" role="radio" aria-checked="false" data-currency="USD">{t(locale, 'solutions.toggle_usd')}</button>
-      </div>
-    </div>
 
     <ul class="ff-sol__grid">
       {SOLUTION_TIERS.map((tier) => (
@@ -48,7 +43,7 @@ const chipKwh = (key: string, kwh: number) => t(locale, key).replace('{kwh}', St
             <h3 class="ff-sol__name">{t(locale, `solutions.tier_${tier.key}_name`)}</h3>
             <p class="ff-sol__covers">{t(locale, `solutions.tier_${tier.key}_covers`)}</p>
 
-            <ul class="ff-sol__chips" aria-hidden="false">
+            <ul class="ff-sol__chips">
               <li class="ff-sol__chip">{chip('solutions.chip_inverter', tier.inverterKw)}</li>
               <li class="ff-sol__chip">{chipKwh('solutions.chip_battery', tier.batteryKwh)}</li>
               <li class="ff-sol__chip ff-sol__chip--ghost">{chip('solutions.chip_solar_cap', tier.solarCapKw)}</li>
@@ -58,13 +53,16 @@ const chipKwh = (key: string, kwh: number) => t(locale, key).replace('{kwh}', St
               <p class="ff-sol__caveat">{t(locale, 'solutions.essentials_caveat')}</p>
             )}
 
-            <div class="ff-sol__price">
-              <span class="ff-sol__from">{t(locale, 'solutions.starting_at')}</span>
-              <span class="ff-sol__amount" data-price data-tier={tier.key}>
-                {formatPrice(priceFor(tier.key, false), 'MXN', fxUsdMxn)}
-              </span>
-              <span class="ff-sol__iva">{t(locale, 'solutions.iva_note')}</span>
-              <span class="ff-sol__solar-note" data-solar-note hidden>{t(locale, 'solutions.with_solar_note')}</span>
+            <div class="ff-sol__runtime">
+              <span class="ff-sol__runtime-head">{t(locale, 'solutions.runtime_head')}</span>
+              <div class="ff-sol__runtime-row">
+                <span class="ff-sol__runtime-label">{t(locale, 'solutions.runtime_essentials')}</span>
+                <span class="ff-sol__runtime-val">{hrs(runtimeHrs(tier.batteryKwh, ESSENTIALS_KW))}</span>
+              </div>
+              <div class="ff-sol__runtime-row">
+                <span class="ff-sol__runtime-label">{t(locale, 'solutions.runtime_normal')}</span>
+                <span class="ff-sol__runtime-val">{hrs(runtimeHrs(tier.batteryKwh, NORMAL_KW))}</span>
+              </div>
             </div>
 
             <div class="ff-sol__ctas">
@@ -76,31 +74,23 @@ const chipKwh = (key: string, kwh: number) => t(locale, key).replace('{kwh}', St
       ))}
     </ul>
 
-    <p class="ff-sol__microcopy">{t(locale, 'solutions.microcopy')}</p>
+    <p class="ff-sol__microcopy">
+      <strong class="ff-sol__micro-solar">{t(locale, 'solutions.micro_solar')}</strong>
+      <span class="ff-sol__micro-note">{t(locale, 'solutions.micro_note')}</span>
+    </p>
   </div>
 </section>
 
 <style>
   .ff-sol { background: var(--ff-green-tint); padding: var(--sp-7) var(--sp-3); }
   .ff-sol__inner { max-width: var(--container); margin: 0 auto; }
-  .ff-sol__head { max-width: var(--container-tight); margin: 0 auto var(--sp-4); text-align: center; }
+  .ff-sol__head { max-width: var(--container-tight); margin: 0 auto var(--sp-5); text-align: center; }
   .ff-sol__eyebrow {
     text-transform: uppercase; letter-spacing: 0.12em; font-size: var(--fs-eyebrow);
     font-weight: 700; color: var(--ff-accent-dk); margin: 0 0 var(--sp-2);
   }
   .ff-sol__title { font-size: var(--fs-h1); line-height: var(--lh-snug); margin: 0 0 var(--sp-2); }
   .ff-sol__sub { font-size: var(--fs-lead); color: var(--ff-slate); margin: 0; }
-
-  /* ---- Toggles ---- */
-  .ff-sol__toggles { display: flex; flex-wrap: wrap; gap: var(--sp-2); justify-content: center; margin: 0 0 var(--sp-5); }
-  .ff-sol__toggle { display: inline-flex; border: 1px solid var(--ff-line); border-radius: var(--r-pill); overflow: hidden; background: var(--ff-white); }
-  .ff-sol__tog {
-    background: var(--ff-white); border: 0; padding: 0.5rem 1.1rem; font-weight: 700; font-size: var(--fs-small);
-    color: var(--ff-slate); cursor: pointer; font-family: var(--ff-sans);
-    transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
-  }
-  .ff-sol__tog.is-active { background: var(--ff-ink); color: var(--ff-white); }
-  .ff-sol__tog:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: -3px; }
 
   /* ---- Tier grid ---- */
   .ff-sol__grid { list-style: none; display: grid; gap: var(--sp-3); padding: 0; margin: 0 0 var(--sp-4); }
@@ -136,13 +126,21 @@ const chipKwh = (key: string, kwh: number) => t(locale, key).replace('{kwh}', St
     line-height: var(--lh-body);
   }
 
-  .ff-sol__price { margin-top: auto; padding-top: var(--sp-2); display: flex; flex-direction: column; gap: 0.15rem; }
-  .ff-sol__from {
-    color: var(--ff-storm); font-size: var(--fs-eyebrow); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
+  /* ---- Runtime (replaces price) ---- */
+  .ff-sol__runtime {
+    margin-top: auto; padding-top: var(--sp-3);
+    border-top: 1px solid var(--ff-line); display: flex; flex-direction: column; gap: 0.4rem;
   }
-  .ff-sol__amount { font-family: var(--ff-display); font-size: var(--fs-h1); color: var(--ff-accent-dk); line-height: var(--lh-snug); }
-  .ff-sol__iva { color: var(--ff-slate); font-size: var(--fs-small); }
-  .ff-sol__solar-note { color: var(--ff-storm); font-size: var(--fs-small); margin-top: 0.25rem; line-height: var(--lh-body); }
+  .ff-sol__runtime-head {
+    color: var(--ff-storm); font-size: var(--fs-eyebrow); text-transform: uppercase;
+    letter-spacing: 0.08em; font-weight: 700;
+  }
+  .ff-sol__runtime-row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2); }
+  .ff-sol__runtime-label { color: var(--ff-slate); font-size: var(--fs-small); }
+  .ff-sol__runtime-val {
+    font-family: var(--ff-display); font-size: var(--fs-h3); color: var(--ff-accent-dk);
+    line-height: 1; white-space: nowrap;
+  }
 
   .ff-sol__ctas { display: flex; flex-direction: column; gap: var(--sp-1); margin-top: var(--sp-3); }
   .ff-sol__cta {
@@ -157,15 +155,11 @@ const chipKwh = (key: string, kwh: number) => t(locale, key).replace('{kwh}', St
   .ff-sol__cta--ghost:hover { border-color: var(--ff-ink); }
   .ff-sol__cta:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
 
-  .ff-sol__microcopy { text-align: center; color: var(--ff-storm); font-size: var(--fs-small); margin: 0; max-width: 54ch; margin-inline: auto; }
+  .ff-sol__microcopy { text-align: center; margin: 0; max-width: 62ch; margin-inline: auto; line-height: var(--lh-body); }
+  .ff-sol__micro-solar { display: block; color: var(--ff-accent-dk); font-weight: 700; font-size: var(--fs-lead); margin: 0 0 0.35rem; }
+  .ff-sol__micro-note { color: var(--ff-storm); font-size: var(--fs-body); }
 
   @media (max-width: 600px) {
     .ff-sol__card { padding: var(--sp-3); }
   }
 </style>
-
-<script>
-  import { initSolutionsTiers } from './solutions.client';
-  const root = document.querySelector<HTMLElement>('[data-solutions]');
-  if (root) initSolutionsTiers(root);
-</script>

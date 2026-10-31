@@ -4,10 +4,17 @@
 // tool-call ("read_cfe_usage") so the model returns structured JSON -> computes daily
 // usage (kWh per day) and returns { kwhPerDay, kwhTotal, periodDays, tariff }.
 //
-// Public counterpart to the CRM's extract-cfe-bill: no auth, no Storage, no DB. The
-// website calculator calls this directly with a base64 upload. Fails safe — any error
-// returns { fallback: "manual" } so the site drops the user to manual kWh entry and the
-// flow never blocks. Inert by design: if ANTHROPIC_API_KEY is unset it returns fallback.
+// Public counterpart to the CRM's extract-cfe-bill. The website calculator calls this directly
+// with a base64 upload. Fails safe — any error returns { fallback: "manual" } so the site drops
+// the user to manual kWh entry and the flow never blocks. Inert by design: if ANTHROPIC_API_KEY
+// is unset it returns fallback.
+//
+// It ALSO parks the bill in the CRM (POST /api/intake/lead/cfe) and returns the resulting
+// storage path as `filePath`, which the browser carries into site-lead so the lead arrives with
+// its bill attached. Before this, the bytes lived for exactly one request and the bill never
+// reached the CRM at all. Two rules for that leg: it is entirely best-effort (a failure only
+// costs the attachment, never the parse or the lead), and it runs REGARDLESS of whether the
+// model could read the bill — an unreadable bill is precisely the one staff most need to see.
 import { corsFor } from "./cors.mjs";
 import { kwhPerDayFrom } from "./usage.mjs";
 
@@ -17,6 +24,37 @@ const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") ??
 
 const MODEL = Deno.env.get("CFE_BILL_MODEL") || "claude-sonnet-4-6";
 const MAX_B64_BYTES = 12 * 1024 * 1024; // ~8 MB file -> ~10.7 MB base64; 12 MB headroom
+
+// Mirrors ALLOWED_BILL_MIME_TYPES in the CRM (src/server/services/crm/cfe/upload.ts) — the set
+// the Anthropic API accepts AND the set the park endpoint will store. Previously the client's
+// `mime` string was passed straight into mediaBlock (which silently coerced anything unknown to
+// image/jpeg, so junk reached the model) and, since the park was added, into the CRM.
+const ALLOWED_MIME = ["application/pdf", "image/jpeg", "image/png", "image/webp"];
+
+// In-memory per-IP throttle. This function is PUBLIC and unauthenticated, and now has a side
+// effect that outlives the request (a stored object in the CRM's bucket) on top of the Anthropic
+// spend it always had — so an unbounded caller could fill the bucket with junk. Same shape as the
+// CRM's own public-endpoint limiter (server/services/crm/lead/partner-link.ts).
+// ponytail: per-isolate and therefore leaky across regions/cold starts — it caps a naive flood,
+// not a distributed one. The CRM's park endpoint applies the authoritative limit (one long-lived
+// process, keyed on the same client IP we forward); move to a DB-backed counter like site-lead's
+// only if abuse actually gets past both.
+const RATE_LIMIT = 10;
+const RATE_WINDOW_MS = 60_000;
+const hits = new Map<string, { count: number; resetAt: number }>();
+
+function rateLimit(ip: string): boolean {
+  const now = Date.now();
+  const b = hits.get(ip);
+  if (!b || now >= b.resetAt) {
+    if (hits.size > 5_000) hits.clear(); // crude bound; the window makes staleness self-healing
+    hits.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return true;
+  }
+  if (b.count >= RATE_LIMIT) return false;
+  b.count += 1;
+  return true;
+}
 
 function json(body: unknown, status: number, cors: Record<string, string>): Response {
   return new Response(JSON.stringify(body), {
@@ -45,6 +83,35 @@ const READ_CFE_USAGE_TOOL = {
   },
 } as const;
 
+/** Park the bill bytes in the CRM's private cfe-bills bucket; returns the storage path or null.
+ *  Best-effort by contract: any failure (unconfigured, non-2xx, network, timeout) returns null
+ *  and the flow continues without an attachment. Authenticated with the same intake secret the
+ *  site already uses for the lead mirror — no new secret, no CRM service-role key over here. */
+async function parkBillInCrm(mime: string, dataB64: string, ip: string): Promise<string | null> {
+  const url = Deno.env.get("FIREFLY_CRM_BILL_URL");
+  const secret = Deno.env.get("FIREFLY_CRM_INTAKE_SECRET");
+  if (!url || !secret) return null;
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${secret}`,
+        // The CRM keys its own rate limit on this; every call reaches it from this one function,
+        // so without it the whole public site shares a single bucket.
+        "X-Client-Ip": ip,
+      },
+      body: JSON.stringify({ mime, dataB64 }),
+      signal: AbortSignal.timeout(20_000), // never let the customer wait on our storage leg
+    });
+    if (!res.ok) return null;
+    const body = await res.json();
+    return typeof body?.file_path === "string" ? body.file_path : null;
+  } catch {
+    return null;
+  }
+}
+
 function mediaBlock(mime: string, b64: string) {
   if (mime === "application/pdf") {
     return { type: "document", source: { type: "base64", media_type: "application/pdf", data: b64 } };
@@ -58,9 +125,6 @@ Deno.serve(async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ fallback: "manual" }, 405, cors);
 
-  const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
-  if (!apiKey) return json({ fallback: "manual" }, 200, cors); // not configured → manual entry
-
   let mime: string, dataB64: string;
   try {
     const body = await req.json();
@@ -70,6 +134,19 @@ Deno.serve(async (req: Request): Promise<Response> => {
     return json({ fallback: "manual" }, 400, cors);
   }
   if (!dataB64 || dataB64.length > MAX_B64_BYTES) return json({ fallback: "manual" }, 400, cors);
+  if (!ALLOWED_MIME.includes(mime)) return json({ fallback: "manual" }, 400, cors);
+
+  const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
+  if (!rateLimit(ip)) return json({ fallback: "manual" }, 429, cors);
+
+  // Kick the storage leg off in parallel with the model call — it must not add latency, and it
+  // must happen even on the fallback paths below, so it is started before the first `return`.
+  const parked = parkBillInCrm(mime, dataB64, ip);
+
+  // Reading is optional; PARKING the bill is not, so the not-configured path returns only after
+  // the storage leg has had its turn (it used to return before the body was even parsed).
+  const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
+  if (!apiKey) return json({ fallback: "manual", filePath: await parked }, 200, cors);
 
   try {
     const resp = await fetch("https://api.anthropic.com/v1/messages", {
@@ -93,15 +170,15 @@ Deno.serve(async (req: Request): Promise<Response> => {
         }],
       }),
     });
-    if (!resp.ok) return json({ fallback: "manual" }, 200, cors);
+    if (!resp.ok) return json({ fallback: "manual", filePath: await parked }, 200, cors);
     const payload = await resp.json();
     const toolUse = (payload?.content ?? []).find(
       (b: { type: string; name?: string }) => b.type === "tool_use" && b.name === "read_cfe_usage",
     );
     const out = kwhPerDayFrom(toolUse?.input);
-    if (!out) return json({ fallback: "manual" }, 200, cors);
-    return json(out, 200, cors);
+    if (!out) return json({ fallback: "manual", filePath: await parked }, 200, cors);
+    return json({ ...out, filePath: await parked }, 200, cors);
   } catch {
-    return json({ fallback: "manual" }, 200, cors);
+    return json({ fallback: "manual", filePath: await parked }, 200, cors);
   }
 });

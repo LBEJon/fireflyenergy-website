@@ -57,3 +57,21 @@ export function buildLeadRow(p, meta = {}) {
     user_agent: meta.userAgent ?? null,
   };
 }
+
+// The exact storage key the CRM's park endpoint mints (websiteBillStorageKey in
+// src/server/services/crm/cfe/upload.ts): `site-lead/<uuid v4>.<ext>`.
+const BILL_PATH_RE =
+  /^site-lead\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.(pdf|jpg|png|webp)$/;
+
+/**
+ * Gate the CFE bill path before forwarding it to the CRM. The value round-trips through the
+ * BROWSER (site-cfe-parse hands it to the page; the page posts it back), so it is
+ * attacker-controlled by the time we see it — anything shaped like a storage key can be claimed.
+ * Returning undefined for a non-matching value means the lead still lands, just unlinked.
+ * What actually protects another customer's bill is the unguessable uuid inside the key; this is
+ * the cheap outer wall, and the CRM re-validates the `site-lead/` prefix independently
+ * (migration 0060).
+ */
+export function validBillFilePath(v) {
+  return typeof v === "string" && BILL_PATH_RE.test(v) ? v : undefined;
+}
