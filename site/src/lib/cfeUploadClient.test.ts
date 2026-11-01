@@ -4,7 +4,7 @@ vi.mock('./downscaleImage', () => ({
   downscaleImage: vi.fn(async (f: File) => new File(['DOWNSCALED'], f.name, { type: f.type })),
 }));
 
-import { uploadCfePages } from './cfeUploadClient';
+import { uploadCfePages, cfeFailureNoticeKey } from './cfeUploadClient';
 import { downscaleImage } from './downscaleImage';
 
 const img = new File(['x'], 'a.jpg', { type: 'image/jpeg' });
@@ -38,5 +38,35 @@ describe('uploadCfePages', () => {
     vi.stubGlobal('fetch', vi.fn(async () => new Response('{}', { status: 500 })));
     expect(await uploadCfePages([img], 'https://x')).toEqual({ fallback: 'manual' });
     expect(await uploadCfePages([img, img, img, img, img], 'https://x')).toEqual({ fallback: 'manual' });
+  });
+});
+
+describe('busy (CRM read limit) fallback', () => {
+  it('carries reason: busy from the proxy, with or without pagePaths', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () =>
+      new Response(JSON.stringify({ fallback: 'manual', reason: 'busy' }), { status: 200 })));
+    expect(await uploadCfePages([img], 'https://x')).toEqual({ fallback: 'manual', reason: 'busy' });
+    vi.stubGlobal('fetch', vi.fn(async () =>
+      new Response(JSON.stringify({ fallback: 'manual', reason: 'busy', pagePaths: ['p1'] }), { status: 200 })));
+    expect(await uploadCfePages([img], 'https://x')).toEqual({ fallback: 'manual', pagePaths: ['p1'], reason: 'busy' });
+  });
+  it('ignores any other reason value', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () =>
+      new Response(JSON.stringify({ fallback: 'manual', reason: 'whatever' }), { status: 200 })));
+    expect(await uploadCfePages([img], 'https://x')).toEqual({ fallback: 'manual' });
+  });
+  it('cfeFailureNoticeKey: busy wins; else meter vs first-bill parse_failed', () => {
+    expect(cfeFailureNoticeKey({ reason: 'busy' }, false)).toBe('assessment.consumption.busy');
+    expect(cfeFailureNoticeKey({ reason: 'busy' }, true)).toBe('assessment.consumption.busy');
+    expect(cfeFailureNoticeKey({}, false)).toBe('assessment.consumption.parse_failed');
+    expect(cfeFailureNoticeKey({}, true)).toBe('assessment.consumption.meter_parse_failed');
+  });
+  it('busy copy exists in EN and ES', async () => {
+    const en = (await import('../content/en.json')).default as Record<string, string>;
+    const es = (await import('../content/es.json')).default as Record<string, string>;
+    expect(en['assessment.consumption.busy']).toBe(
+      "We're reading a lot of bills right now — try again in a few minutes, or enter your daily kWh.");
+    expect(es['assessment.consumption.busy']).toBe(
+      'Estamos leyendo muchos recibos en este momento. Intenta de nuevo en unos minutos o ingresa tus kWh diarios.');
   });
 });

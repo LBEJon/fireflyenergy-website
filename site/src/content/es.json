@@ -365,6 +365,7 @@
   "assessment.consumption.back_skip": "Omitir",
   "assessment.consumption.back_failed": "No pudimos leer el reverso, así que usaremos el frente.",
   "assessment.consumption.meter_parse_failed": "No pudimos leer ese recibo.",
+  "assessment.consumption.busy": "Estamos leyendo muchos recibos en este momento. Intenta de nuevo en unos minutos o ingresa tus kWh diarios.",
   "assessment.consumption.meters_prompt": "¿Tienes otros medidores de CFE en esta propiedad que quieras incluir?",
   "assessment.consumption.meters_add": "Agregar otro medidor",
   "assessment.consumption.meters_done": "No, es todo",

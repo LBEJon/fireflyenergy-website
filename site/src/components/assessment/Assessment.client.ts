@@ -14,7 +14,7 @@ import {
   type OtherLoad,
 } from '../../lib/assessment';
 import { fetchEstimate, type EstimateResult } from '../../lib/estimateClient';
-import { uploadCfePages, MAX_BILL_PAGES, type CfePagesResult } from '../../lib/cfeUploadClient';
+import { uploadCfePages, cfeFailureNoticeKey, MAX_BILL_PAGES, type CfePagesResult } from '../../lib/cfeUploadClient';
 import { submitLead, type LeadPayload } from '../../lib/leadClient';
 import { t, type Locale } from '../../lib/i18n';
 import { buildWaSuccessHref } from '../../lib/waLink';
@@ -327,8 +327,10 @@ export function initAssessment(root: HTMLElement): void {
         billFiles.push(files);
       }
       // With other meters already read, the manual field stays hidden — just say this one failed.
+      // A "busy" answer (CRM read limit) says so and to retry; with no reading the manual field
+      // is still revealed by syncBills, so the visitor can type their kWh instead.
       const haveReading = billsDailyKwh(bills()) > 0;
-      syncBills(tr(haveReading ? 'assessment.consumption.meter_parse_failed' : 'assessment.consumption.parse_failed'));
+      syncBills(tr(cfeFailureNoticeKey(res, haveReading)));
       if (haveReading) askForMoreMeters();
       return;
     }

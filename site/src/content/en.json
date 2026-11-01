@@ -365,6 +365,7 @@
   "assessment.consumption.back_skip": "Skip",
   "assessment.consumption.back_failed": "We couldn't read the back, so we'll use the front.",
   "assessment.consumption.meter_parse_failed": "We couldn't read that bill.",
+  "assessment.consumption.busy": "We're reading a lot of bills right now — try again in a few minutes, or enter your daily kWh.",
   "assessment.consumption.meters_prompt": "Do you have other CFE meters on this property you'd like included?",
   "assessment.consumption.meters_add": "Add another meter",
   "assessment.consumption.meters_done": "No, that's all",

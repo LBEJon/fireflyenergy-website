@@ -38,7 +38,18 @@ export type CfePagesResult =
       address?: CfeAddress | null;
       extraction?: unknown;
     }
-  | { fallback: 'manual'; pagePaths?: string[] };
+  | {
+      fallback: 'manual';
+      pagePaths?: string[];
+      /** 'busy' = the CRM's per-IP read limit (429): say "try again in a few minutes". */
+      reason?: 'busy';
+    };
+
+/** i18n key for the status line after a failed first read of a bill. */
+export function cfeFailureNoticeKey(res: { reason?: string }, haveReading: boolean): string {
+  if (res.reason === 'busy') return 'assessment.consumption.busy';
+  return haveReading ? 'assessment.consumption.meter_parse_failed' : 'assessment.consumption.parse_failed';
+}
 
 /**
  * Downscale each page (images only; PDFs pass through) and POST them as { pages } to the
@@ -65,7 +76,8 @@ export async function uploadCfePages(files: File[], baseUrl: string): Promise<Cf
     if (data && data.ok === true && typeof data.kwhPerDay === 'number' && data.kwhPerDay > 0) {
       return data as unknown as CfePagesResult;
     }
-    return paths ? { fallback: 'manual', pagePaths: paths } : { fallback: 'manual' };
+    const busy = data?.reason === 'busy' ? ({ reason: 'busy' } as const) : {};
+    return paths ? { fallback: 'manual', pagePaths: paths, ...busy } : { fallback: 'manual', ...busy };
   } catch {
     return { fallback: 'manual' };
   }
