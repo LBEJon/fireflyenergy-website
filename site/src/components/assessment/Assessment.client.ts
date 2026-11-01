@@ -6,6 +6,7 @@ import {
   offsetPct,
   upsertBill,
   billsDailyKwh,
+  billsPending,
   MAX_METERS,
   type AssessmentAnswers,
   type BillAnswer,
@@ -182,24 +183,38 @@ export function initAssessment(root: HTMLElement): void {
     };
   }
 
+  // Bills the CRM parked but couldn't read. Their card keeps a "daily kWh" field even after
+  // the customer types a figure into it (which becomes that bill's kwhPerDay).
+  const unreadBills = new WeakSet<BillAnswer>();
+
   // Everything derived from the bill list: the lead's top-level address (site-lead reads
   // `billAddress`), the summed reading, the meter rows, and the Next gate.
   function syncBills(notice = '') {
+    renderMeters();
+    syncSummary(notice);
+  }
+
+  // Status line, manual-field visibility and the Next gate — without rebuilding the meter rows
+  // (so typing in a meter's kWh field keeps focus).
+  function syncSummary(notice = '') {
     const list = bills();
     const firstAddr = list.find((b) => b.address)?.address;
     answers.billAddress = firstAddr ?? undefined;
     const total = billsDailyKwh(list);
+    const pending = billsPending(list);
     if (total > 0) {
       answers.dailyKwh = undefined;
       if (dailyInput) dailyInput.value = '';
       if (manualWrap) manualWrap.hidden = true;
-      const parsed = tr('assessment.consumption.parsed').replace('{kwh}', String(Math.round(total)));
-      setCfeStatus(notice ? `${notice} ${parsed}` : parsed);
+      // Mixed read + unread meters: never show a partial total as if it were the whole home.
+      const line = pending > 0
+        ? tr('assessment.consumption.meter_pending')
+        : tr('assessment.consumption.parsed').replace('{kwh}', String(Math.round(total)));
+      setCfeStatus(notice ? `${notice} ${line}` : line);
     } else {
       revealManual();
       if (notice) setCfeStatus(notice);
     }
-    renderMeters();
     if (meterAddBtn) meterAddBtn.disabled = list.length >= MAX_METERS;
     syncNext();
   }
@@ -212,15 +227,15 @@ export function initAssessment(root: HTMLElement): void {
     list.forEach((b, i) => {
       const li = document.createElement('li');
       li.className = 'ff-as__meter';
-      const read = typeof b.kwhPerDay === 'number' && b.kwhPerDay > 0;
-      if (!read) li.classList.add('is-unread');
+      const unread = unreadBills.has(b);
+      if (unread) li.classList.add('is-unread');
       const label = document.createElement('span');
       label.className = 'ff-as__meter-label';
-      label.textContent = read
-        ? tr('assessment.consumption.meter_item')
+      label.textContent = unread
+        ? tr('assessment.consumption.meter_unread').replace('{n}', String(i + 1))
+        : tr('assessment.consumption.meter_item')
             .replace('{n}', String(i + 1))
-            .replace('{kwh}', String(Math.round(billsDailyKwh([b]))))
-        : tr('assessment.consumption.meter_unread').replace('{n}', String(i + 1));
+            .replace('{kwh}', String(Math.round(billsDailyKwh([b]))));
       const rm = document.createElement('button');
       rm.type = 'button';
       rm.className = 'ff-as__meter-remove';
@@ -229,6 +244,27 @@ export function initAssessment(root: HTMLElement): void {
       rm.addEventListener('click', () => removeMeter(i));
       li.appendChild(label);
       li.appendChild(rm);
+      if (unread) {
+        const field = document.createElement('label');
+        field.className = 'ff-as__meter-kwh';
+        const cap = document.createElement('span');
+        cap.textContent = tr('assessment.consumption.meter_kwh_label');
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.inputMode = 'decimal';
+        input.min = '0';
+        input.step = 'any';
+        input.dataset.meterKwh = String(i);
+        if (typeof b.kwhPerDay === 'number' && b.kwhPerDay > 0) input.value = String(b.kwhPerDay);
+        input.addEventListener('input', () => {
+          const v = Number(input.value);
+          b.kwhPerDay = v > 0 ? v : null; // sent as this meter's kwhPerDay; pages kept
+          syncSummary();
+        });
+        field.appendChild(cap);
+        field.appendChild(input);
+        li.appendChild(field);
+      }
       meterList.appendChild(li);
     });
   }
@@ -266,8 +302,13 @@ export function initAssessment(root: HTMLElement): void {
       return;
     }
     if (pdfTooLarge(files)) {
-      setCfeStatus(tr('assessment.consumption.too_large'));
-      revealManual();
+      // With meters already read, the global manual field is ignored — don't offer it.
+      if (billsDailyKwh(bills()) > 0) {
+        setCfeStatus(tr('assessment.consumption.meter_too_large'));
+      } else {
+        setCfeStatus(tr('assessment.consumption.too_large'));
+        revealManual();
+      }
       return;
     }
     busy = true;
@@ -280,7 +321,9 @@ export function initAssessment(root: HTMLElement): void {
     if (!('ok' in res)) {
       // Unreadable, but if the CRM parked the pages keep them, so staff still get the bill.
       if (res.pagePaths?.length && bills().length < MAX_METERS) {
-        bills().push({ pagePaths: res.pagePaths, kwhPerDay: null });
+        const unread: BillAnswer = { pagePaths: res.pagePaths, kwhPerDay: null };
+        unreadBills.add(unread);
+        bills().push(unread);
         billFiles.push(files);
       }
       // With other meters already read, the manual field stays hidden — just say this one failed.
@@ -336,7 +379,12 @@ export function initAssessment(root: HTMLElement): void {
     setCfeStatus(tr('assessment.consumption.reading'));
     const res = await uploadCfePages(pages, baseUrl);
     busy = false;
-    if (backIndex !== idx) return; // the meter was removed while reading
+    if (backIndex !== idx) {
+      // Skipped or removed while reading: drop the result, but don't leave "Reading…" up.
+      setCfeStatus('', false);
+      syncSummary();
+      return;
+    }
     if ('ok' in res) {
       bills()[idx] = toBill(res);
       billFiles[idx] = pages;

@@ -8,6 +8,7 @@ import {
   perPanelDailyKwh,
   upsertBill,
   billsDailyKwh,
+  billsPending,
   MAX_METERS,
   type BillAnswer,
 } from './assessment';
@@ -126,5 +127,33 @@ describe('multi-meter bills', () => {
     expect(consumptionKnown({ bills: [bill({ kwhPerDay: null })] })).toBe(false);
     expect(toEstimateBody({ bills, dailyKwh: 3 }).cfeKwhPerDay).toBe(25);
     expect(toEstimateBody({ bills: [bill({ kwhPerDay: null })], dailyKwh: 3 }).cfeKwhPerDay).toBe(3);
+  });
+});
+
+describe('mixed read + unread meters', () => {
+  const read = bill({ meterNo: 'M1', kwhPerDay: 10 });
+  const unread = (): BillAnswer => bill({ pagePaths: ['site-lead/x/1.jpg'], kwhPerDay: null });
+  it('one read + one unread with no value => consumption not known, no estimate figure', () => {
+    const bills = [read, unread()];
+    expect(consumptionKnown({ bills })).toBe(false);
+    expect(consumptionKnown({ bills, dailyKwh: 30 })).toBe(false);
+    expect(toEstimateBody({ bills, dailyKwh: 30 }).cfeKwhPerDay).toBeUndefined();
+    expect(billsPending(bills)).toBe(1);
+  });
+  it('unread meter with a typed value => summed, keeps its pages', () => {
+    const u = unread();
+    u.kwhPerDay = 8;
+    const bills = [read, u];
+    expect(billsPending(bills)).toBe(0);
+    expect(consumptionKnown({ bills })).toBe(true);
+    expect(toEstimateBody({ bills }).cfeKwhPerDay).toBe(18);
+    expect(u.pagePaths).toEqual(['site-lead/x/1.jpg']);
+  });
+  it('removing the unread meter => known again', () => {
+    expect(consumptionKnown({ bills: [read] })).toBe(true);
+  });
+  it('only unread meters still fall back to the manual field', () => {
+    expect(consumptionKnown({ bills: [unread()], dailyKwh: 12 })).toBe(true);
+    expect(toEstimateBody({ bills: [unread()], dailyKwh: 12 }).cfeKwhPerDay).toBe(12);
   });
 });

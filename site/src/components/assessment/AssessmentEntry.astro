@@ -397,6 +397,16 @@ const backupOpts = ['4', '8', '12', '24'];
     background: var(--ff-paper); border: 1px solid var(--ff-line); border-radius: var(--r-md);
     padding: 0.5rem 0.85rem;
   }
+  .ff-as__meters :global(.ff-as__meter) { flex-wrap: wrap; }
+  .ff-as__meters :global(.ff-as__meter-kwh) {
+    flex: 1 1 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem var(--sp-2);
+    font-size: var(--fs-small); font-weight: 700; color: var(--ff-ink);
+  }
+  .ff-as__meters :global(.ff-as__meter-kwh input) {
+    width: 6rem; box-sizing: border-box; padding: 0.45rem 0.6rem; border: 2px solid var(--ff-line);
+    border-radius: var(--r-md); font-family: var(--ff-sans); font-size: var(--fs-body); background: var(--ff-white);
+  }
+  .ff-as__meters :global(.ff-as__meter-kwh input:focus-visible) { outline: 3px solid var(--ff-accent); outline-offset: 1px; border-color: var(--ff-accent); }
   .ff-as__meters :global(.ff-as__meter-label) { color: var(--ff-ink); font-size: var(--fs-small); }
   .ff-as__meters :global(.ff-as__meter.is-unread .ff-as__meter-label) { color: var(--ff-slate); }
   .ff-as__meters :global(.ff-as__meter-remove) {

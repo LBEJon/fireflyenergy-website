@@ -80,6 +80,26 @@ export function billsDailyKwh(bills: BillAnswer[] | undefined): number {
   return sum;
 }
 
+const billRead = (b: BillAnswer) => typeof b.kwhPerDay === 'number' && b.kwhPerDay > 0;
+
+/**
+ * Meters still missing a daily figure (unread, nothing typed). Only counts once some meter IS
+ * read: in that mixed state a price would silently leave a meter out, so the estimate is gated
+ * until each pending meter gets a typed value or is removed. With no meter read at all, the
+ * global manual field remains the fallback (returns 0).
+ */
+export function billsPending(bills: BillAnswer[] | undefined): number {
+  if (!Array.isArray(bills) || !bills.some(billRead)) return 0;
+  return bills.filter((b) => !billRead(b)).length;
+}
+
+/** Daily kWh from the meters, or undefined when there is none or the mixed state is pending. */
+function billsFigure(bills: BillAnswer[] | undefined): number | undefined {
+  if (billsPending(bills) > 0) return undefined;
+  const sum = billsDailyKwh(bills);
+  return sum > 0 ? sum : undefined;
+}
+
 export interface AssessmentAnswers {
   /** One entry per CFE meter (website multi-page flow). Wins over the legacy single-bill fields. */
   bills?: BillAnswer[];
@@ -178,8 +198,9 @@ export function existingSolarKw(count: number, watts: number): number {
  * means no price can be produced (the UI routes to a site visit / Door B).
  */
 export function consumptionKnown(a: AssessmentAnswers): boolean {
+  if (billsPending(a.bills) > 0) return false;
   return (
-    billsDailyKwh(a.bills) > 0 ||
+    billsFigure(a.bills) !== undefined ||
     (typeof a.billKwhPerDay === 'number' && a.billKwhPerDay > 0) ||
     (typeof a.dailyKwh === 'number' && a.dailyKwh > 0)
   );
@@ -192,8 +213,10 @@ export function consumptionKnown(a: AssessmentAnswers): boolean {
  */
 export function toEstimateBody(a: AssessmentAnswers): EstimateBody {
   let cfeKwhPerDay: number | undefined;
-  const fromBills = billsDailyKwh(a.bills);
-  if (fromBills > 0) {
+  const fromBills = billsFigure(a.bills);
+  if (billsPending(a.bills) > 0) {
+    cfeKwhPerDay = undefined; // a meter is missing its figure — never price a partial total
+  } else if (fromBills !== undefined) {
     cfeKwhPerDay = fromBills;
   } else if (typeof a.billKwhPerDay === 'number' && a.billKwhPerDay > 0) {
     cfeKwhPerDay = a.billKwhPerDay;
