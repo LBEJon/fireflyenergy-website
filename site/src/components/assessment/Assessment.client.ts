@@ -1,19 +1,17 @@
 import {
-  toEstimateBody,
-  consumptionKnown,
   existingSolarKw,
   recommendPanels,
   offsetPct,
   upsertBill,
   billsDailyKwh,
   billsPending,
+  usageKwhPerDay,
   MAX_METERS,
   type AssessmentAnswers,
   type BillAnswer,
   type CoverageTier,
   type OtherLoad,
 } from '../../lib/assessment';
-import { fetchEstimate, type EstimateResult } from '../../lib/estimateClient';
 import { uploadCfePages, cfeFailureNoticeKey, MAX_BILL_PAGES, type CfePagesResult } from '../../lib/cfeUploadClient';
 import { submitLead, type LeadPayload } from '../../lib/leadClient';
 import { t, type Locale } from '../../lib/i18n';
@@ -22,11 +20,12 @@ import { buildWaSuccessHref } from '../../lib/waLink';
 const MAX_FILE_BYTES = 8 * 1024 * 1024; // 8 MB
 
 /**
- * Two-door, engine-backed assessment wizard. Framework-free.
+ * Two-door assessment wizard. Framework-free.
  *
- * CORE INVARIANT: a price is NEVER rendered without a successful estimate
- * derived from known consumption. Every uncertain path (no usage, estimate
- * error, needsSiteVisit, lead-submit failure) fails safe to Door B / WhatsApp.
+ * CORE INVARIANT: the customer is NEVER shown a price. Firefly prices each job after speaking
+ * with the customer, so every completed assessment ends in the same outcome: a contact form,
+ * a lead submit, and "we'll prepare your customized proposal and contact you". No pricing
+ * endpoint is called from here. A failed lead submit falls back to WhatsApp, never fake success.
  */
 export function initAssessment(root: HTMLElement): void {
   const baseUrl = root.dataset.baseUrl ?? '';
@@ -53,8 +52,6 @@ export function initAssessment(root: HTMLElement): void {
     },
   };
   let uiStep = 1;
-  let lastResult: EstimateResult | null = null;
-  let selectedTier: string | null = null;
 
   // ---- View elements ----
   const views = {
@@ -102,29 +99,19 @@ export function initAssessment(root: HTMLElement): void {
       d.classList.toggle('is-done', idx < n);
     });
     if (backBtn) backBtn.hidden = n === 1;
-    // The result step (5) drives its own flow; hide the generic Next there.
+    // The final step (5) is the contact form; hide the generic Next there.
     if (navEl) navEl.hidden = n === TOTAL;
-    syncNext();
     const heading = stepEls
       .find((el) => Number(el.dataset.step) === n)
-      ?.querySelector<HTMLElement>('.ff-as__legend, .ff-as__result-title, .ff-as__loading');
+      ?.querySelector<HTMLElement>('.ff-as__legend, .ff-as__capture-title');
     heading?.setAttribute('tabindex', '-1');
     heading?.focus({ preventScroll: false });
     if (n === 3) prepareSolarStep();
-    if (n === TOTAL) runResult();
   }
 
-  // Per-step gate for the Next button. Consumption (1) requires known usage.
-  function stepValid(n: number): boolean {
-    if (n === 1) return consumptionKnown(answers);
-    return true; // 2,3,4 always have safe defaults
-  }
-  function syncNext() {
-    if (nextBtn) nextBtn.disabled = !stepValid(uiStep);
-  }
-
+  // No step gates Next: usage helps size the proposal but is optional (a customer who can't
+  // read a bill, or leaves a meter's kWh blank, still continues and submits their details).
   nextBtn?.addEventListener('click', () => {
-    if (!stepValid(uiStep)) return;
     if (uiStep < TOTAL) showStep(uiStep + 1);
   });
   backBtn?.addEventListener('click', () => {
@@ -188,13 +175,13 @@ export function initAssessment(root: HTMLElement): void {
   const unreadBills = new WeakSet<BillAnswer>();
 
   // Everything derived from the bill list: the lead's top-level address (site-lead reads
-  // `billAddress`), the summed reading, the meter rows, and the Next gate.
+  // `billAddress`), the summed reading, and the meter rows.
   function syncBills(notice = '') {
     renderMeters();
     syncSummary(notice);
   }
 
-  // Status line, manual-field visibility and the Next gate — without rebuilding the meter rows
+  // Status line and manual-field visibility — without rebuilding the meter rows
   // (so typing in a meter's kWh field keeps focus).
   function syncSummary(notice = '') {
     const list = bills();
@@ -207,16 +194,14 @@ export function initAssessment(root: HTMLElement): void {
       if (dailyInput) dailyInput.value = '';
       if (manualWrap) manualWrap.hidden = true;
       // Mixed read + unread meters: never show a partial total as if it were the whole home.
-      const line = pending > 0
-        ? tr('assessment.consumption.meter_pending')
-        : tr('assessment.consumption.parsed').replace('{kwh}', String(Math.round(total)));
-      setCfeStatus(notice ? `${notice} ${line}` : line);
+      const line = pending > 0 ? '' : tr('assessment.consumption.parsed').replace('{kwh}', String(Math.round(total)));
+      const msg = [notice, line].filter(Boolean).join(' ');
+      setCfeStatus(msg, msg !== '');
     } else {
       revealManual();
       if (notice) setCfeStatus(notice);
     }
     if (meterAddBtn) meterAddBtn.disabled = list.length >= MAX_METERS;
-    syncNext();
   }
 
   function renderMeters() {
@@ -407,12 +392,10 @@ export function initAssessment(root: HTMLElement): void {
   dailyInput?.addEventListener('input', () => {
     const v = Number(dailyInput.value);
     answers.dailyKwh = v > 0 ? v : undefined;
-    // Manual entry is the fallback when no meter was read (the field is hidden once one is);
-    // the estimate prefers the read meters whenever any exist.
-    syncNext();
+    // Manual entry is the fallback when no meter was read (the field is hidden once one is).
   });
 
-  // "I don't know my usage" → straight to Door B. NO price.
+  // "I don't know my usage" → straight to the contact form (Door B).
   root.querySelector<HTMLButtonElement>('[data-dont-know]')?.addEventListener('click', () => {
     routeToDoorB(true);
   });
@@ -579,15 +562,8 @@ export function initAssessment(root: HTMLElement): void {
   let solarTouched = false; // once the user adjusts, stop auto-resetting to rec
   let lastRec = 0; // most recent recommendation, for the "Use recommended" button
 
-  // Current consumption (kWh/day) from a parsed bill or manual monthly entry.
-  function currentCfeKwhPerDay(): number {
-    const fromBills = billsDailyKwh(answers.bills);
-    if (fromBills > 0) return fromBills;
-    if (typeof answers.dailyKwh === 'number' && answers.dailyKwh > 0) {
-      return answers.dailyKwh;
-    }
-    return 0;
-  }
+  // Current consumption (kWh/day) from the meters or manual entry; 0 when unknown.
+  const currentCfeKwhPerDay = () => usageKwhPerDay(answers);
   function currentExistingKw(): number {
     return answers.hasExistingSolar
       ? existingSolarKw(answers.panelCount ?? 0, answers.panelWatts ?? 0)
@@ -643,7 +619,7 @@ export function initAssessment(root: HTMLElement): void {
       addSolarHelp.textContent = tr(hasExisting ? 'assessment.addsolar.help_existing' : 'assessment.addsolar.help');
     if (noneBtn)
       noneBtn.textContent = tr(hasExisting ? 'assessment.solar.none_existing' : 'assessment.solar.none');
-    // No recommendation without consumption (shouldn't happen in Door A): keep the
+    // No recommendation without consumption (usage is optional): keep the
     // stepper for free entry, hide the rec line + "Use recommended" button.
     lastRec = cfe > 0 ? recommendPanels(cfe, currentExistingKw()) : 0;
     if (recLine) {
@@ -673,32 +649,8 @@ export function initAssessment(root: HTMLElement): void {
   });
 
   // ====================================================================
-  // STEP 5 — RESULT
+  // STEP 5 — CONTACT FORM (no price shown; same outcome with or without known usage)
   // ====================================================================
-  const loadingEl = root.querySelector<HTMLElement>('[data-result-loading]');
-  const resultBlock = root.querySelector<HTMLElement>('[data-result-block]');
-
-  function runResult() {
-    // No known consumption → we can't size a proposal from inputs alone; route to
-    // the site-visit door so an expert can gather what's needed.
-    if (!consumptionKnown(answers)) {
-      routeToDoorB(true);
-      return;
-    }
-
-    // Show the capture form immediately — there's no price to wait for. The estimate
-    // is best-effort enrichment for the CRM: run it in the background and, if it
-    // returns before the lead is submitted, attach the suggested config. A slow or
-    // unreachable endpoint never makes the customer wait.
-    if (loadingEl) loadingEl.hidden = true;
-    if (resultBlock) resultBlock.hidden = false;
-    void fetchEstimate(baseUrl, toEstimateBody(answers)).then((res) => {
-      if (!('error' in res) && res.tiers && res.tiers.length > 0) {
-        lastResult = res;
-        selectedTier = res.tiers.find((t) => t.highlighted)?.key ?? res.tiers[0].key;
-      }
-    });
-  }
 
   // Compose the contact fields into a lead payload's contact parts. The phone is
   // prefixed with the selected country code (e.g. "+52 415 180 5030"). `contact`
@@ -712,7 +664,7 @@ export function initAssessment(root: HTMLElement): void {
   // A lead is submittable once we have a name and at least one way to reach them.
   const hasContact = (phone: string, email: string) => !!(phone.trim() || email.trim());
 
-  // ---- Door A capture form ----
+  // ---- Door A contact form ----
   const captureForm = root.querySelector<HTMLFormElement>('[data-capture]');
   const nameInput = root.querySelector<HTMLInputElement>('[data-name]');
   const ccInput = root.querySelector<HTMLSelectElement>('[data-phone-cc]');
@@ -743,7 +695,7 @@ export function initAssessment(root: HTMLElement): void {
       segment: 'residential',
       locale,
       answers,
-      config: { selectedTier, tiers: lastResult?.tiers ?? [] },
+      config: { selectedTier: null, tiers: [] }, // unchanged shape for site-lead; no tiers are computed
       hp: hpInput?.value ?? '',
     };
   }
@@ -886,14 +838,5 @@ export function initAssessment(root: HTMLElement): void {
         void submitLead(baseUrl, payload);
       }
     });
-  }
-
-  // ---- HTML escaping for innerHTML-built tier cards ----
-  function esc(s: string): string {
-    return s
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
   }
 }

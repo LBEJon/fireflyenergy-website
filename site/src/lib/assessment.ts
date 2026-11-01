@@ -84,20 +84,13 @@ const billRead = (b: BillAnswer) => typeof b.kwhPerDay === 'number' && b.kwhPerD
 
 /**
  * Meters still missing a daily figure (unread, nothing typed). Only counts once some meter IS
- * read: in that mixed state a price would silently leave a meter out, so the estimate is gated
- * until each pending meter gets a typed value or is removed. With no meter read at all, the
- * global manual field remains the fallback (returns 0).
+ * read: in that mixed state the summed figure would silently leave a meter out, so it is not
+ * used for sizing hints. Typing a value is optional and never blocks the wizard. With no meter
+ * read at all, the global manual field remains the fallback (returns 0).
  */
 export function billsPending(bills: BillAnswer[] | undefined): number {
   if (!Array.isArray(bills) || !bills.some(billRead)) return 0;
   return bills.filter((b) => !billRead(b)).length;
-}
-
-/** Daily kWh from the meters, or undefined when there is none or the mixed state is pending. */
-function billsFigure(bills: BillAnswer[] | undefined): number | undefined {
-  if (billsPending(bills) > 0) return undefined;
-  const sum = billsDailyKwh(bills);
-  return sum > 0 ? sum : undefined;
 }
 
 export interface AssessmentAnswers {
@@ -121,29 +114,7 @@ export interface AssessmentAnswers {
   language?: 'en' | 'es';
 }
 
-export interface EstimateBody {
-  cfeKwhPerDay?: number;
-  backupHours: number;
-  existingSolarKw: number;
-  hasExistingSolar: boolean;
-  addSolarPanels: number;
-  appliances: Required<ApplianceAnswers>;
-  coverageTier: CoverageTier;
-  language: 'en' | 'es';
-}
-
-const APPLIANCE_DEFAULTS: Required<ApplianceAnswers> = {
-  miniSplits: 0,
-  refrigerators: 0,
-  waterPump: 'none',
-  poolPump: false,
-  electricOven: false,
-  inductionCooktop: false,
-  elevator: false,
-  otherLoads: [],
-};
-
-/** Engine solar constants (FIXED — mirror the site-estimate engine). */
+/** Solar sizing constants (fixed): used only for the on-screen panel suggestion. */
 export const PANEL_WATTS = 645;
 export const PSH = 5.5; // peak sun hours/day
 export const SYSTEM_EFF = 0.8; // system efficiency
@@ -193,52 +164,15 @@ export function existingSolarKw(count: number, watts: number): number {
 }
 
 /**
- * Whether the customer's consumption is known — either a parsed CFE bill
- * value or a manual monthly entry. This is the gate: no consumption known
- * means no price can be produced (the UI routes to a site visit / Door B).
+ * Best-known daily usage (kWh/day) for sizing the on-screen panel suggestion, or 0 when unknown.
+ * Usage is optional input for the proposal; it never gates anything. In a mixed read + unread
+ * meter state the partial sum is NOT returned (it would understate the whole home).
  */
-export function consumptionKnown(a: AssessmentAnswers): boolean {
-  if (billsPending(a.bills) > 0) return false;
-  return (
-    billsFigure(a.bills) !== undefined ||
-    (typeof a.billKwhPerDay === 'number' && a.billKwhPerDay > 0) ||
-    (typeof a.dailyKwh === 'number' && a.dailyKwh > 0)
-  );
-}
-
-/**
- * Map wizard answers to the /site-estimate request body. Enforces the
- * consumption gate: when no consumption is known, cfeKwhPerDay is left
- * undefined so the estimator cannot fabricate a price.
- */
-export function toEstimateBody(a: AssessmentAnswers): EstimateBody {
-  let cfeKwhPerDay: number | undefined;
-  const fromBills = billsFigure(a.bills);
-  if (billsPending(a.bills) > 0) {
-    cfeKwhPerDay = undefined; // a meter is missing its figure — never price a partial total
-  } else if (fromBills !== undefined) {
-    cfeKwhPerDay = fromBills;
-  } else if (typeof a.billKwhPerDay === 'number' && a.billKwhPerDay > 0) {
-    cfeKwhPerDay = a.billKwhPerDay;
-  } else if (typeof a.dailyKwh === 'number' && a.dailyKwh > 0) {
-    cfeKwhPerDay = a.dailyKwh;
-  } else {
-    cfeKwhPerDay = undefined;
-  }
-
-  const hasExistingSolar = a.hasExistingSolar === true;
-  const solarKw = hasExistingSolar
-    ? existingSolarKw(a.panelCount ?? 0, a.panelWatts ?? 0)
-    : 0;
-
-  return {
-    cfeKwhPerDay,
-    backupHours: typeof a.backupHours === 'number' ? a.backupHours : 12,
-    existingSolarKw: solarKw,
-    hasExistingSolar,
-    addSolarPanels: typeof a.addSolarPanels === 'number' ? a.addSolarPanels : 0,
-    appliances: { ...APPLIANCE_DEFAULTS, ...a.appliances },
-    coverageTier: a.coverageTier ?? 'comfort',
-    language: a.language ?? 'en',
-  };
+export function usageKwhPerDay(a: AssessmentAnswers): number {
+  if (billsPending(a.bills) > 0) return 0;
+  const fromBills = billsDailyKwh(a.bills);
+  if (fromBills > 0) return fromBills;
+  if (typeof a.billKwhPerDay === 'number' && a.billKwhPerDay > 0) return a.billKwhPerDay;
+  if (typeof a.dailyKwh === 'number' && a.dailyKwh > 0) return a.dailyKwh;
+  return 0;
 }

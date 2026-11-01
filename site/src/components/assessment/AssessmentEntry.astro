@@ -4,7 +4,7 @@ import SiteVisitLead from './SiteVisitLead.astro';
 
 interface Props {
   locale: Locale;
-  /** CRM base URL; falls back to PUBLIC_SUPABASE_URL or '' (→ no live estimate → Door B). */
+  /** CRM base URL; falls back to PUBLIC_SUPABASE_URL or ''. Used for the lead + CFE-bill endpoints only. */
   baseUrl?: string;
 }
 const { locale, baseUrl } = Astro.props;
@@ -245,12 +245,9 @@ const backupOpts = ['4', '8', '12', '24'];
           </div>
         </div>
 
-        <!-- STEP 5: Result -->
+        <!-- STEP 5: Contact form (no price is ever shown) -->
         <div class="ff-as__step ff-as__results" data-step="5" hidden>
-          <!-- Loading / routing notice -->
-          <p class="ff-as__loading" data-result-loading role="status">{t(locale, 'assessment.result.loading')}</p>
-
-          <div class="ff-as__result-block" data-result-block hidden>
+          <div class="ff-as__result-block">
             <!-- Capture form (no on-the-spot quote — answers feed a proposal we deliver within 24h) -->
             <form class="ff-as__capture" data-capture novalidate>
               <h3 class="ff-as__capture-title">{t(locale, 'assessment.form.capture_title')}</h3>
@@ -310,7 +307,7 @@ const backupOpts = ['4', '8', '12', '24'];
         <!-- Wizard nav -->
         <div class="ff-as__nav" data-nav>
           <button type="button" class="ff-as__back" data-back hidden>{t(locale, 'assessment.common.back')}</button>
-          <button type="button" class="ff-as__next" data-next disabled>{t(locale, 'assessment.common.next')}</button>
+          <button type="button" class="ff-as__next" data-next>{t(locale, 'assessment.common.next')}</button>
         </div>
       </div>
 
@@ -557,48 +554,7 @@ const backupOpts = ['4', '8', '12', '24'];
   }
   .ff-as__added-remove:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
 
-  /* ---- Results (mirror Estimator look) ---- */
-  .ff-as__loading { text-align: center; color: var(--ff-slate); font-size: var(--fs-small); }
-  .ff-as__daily, .ff-as__offset { color: var(--ff-slate); font-size: var(--fs-small); margin: 0 0 0.25rem; }
-  .ff-as__result-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); flex-wrap: wrap; margin: 0 0 var(--sp-3); }
-  .ff-as__result-title { font-size: var(--fs-h3); margin: 0; color: var(--ff-ink); }
-  .ff-as__currency { display: inline-flex; border: 1px solid var(--ff-line); border-radius: var(--r-pill); overflow: hidden; }
-  .ff-as__cur { background: var(--ff-white); border: 0; padding: 0.35rem 0.9rem; font-weight: 700; font-size: var(--fs-small); color: var(--ff-slate); cursor: pointer; font-family: var(--ff-sans); }
-  .ff-as__cur.is-active { background: var(--ff-ink); color: var(--ff-white); }
-  .ff-as__cur:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: -3px; }
-
-  .ff-as__tiers { list-style: none; display: grid; gap: var(--sp-2); padding: 0; margin: 0 0 var(--sp-3); }
-  @media (min-width: 720px) { .ff-as__tiers { grid-template-columns: repeat(3, 1fr); align-items: stretch; } }
-  .ff-as__tier { display: flex; }
-  .ff-as__tier-btn {
-    position: relative; display: flex; flex-direction: column; gap: 0.35rem; width: 100%;
-    text-align: left; background: var(--ff-paper); border: 2px solid var(--ff-line);
-    border-radius: var(--r-md); padding: var(--sp-3); cursor: pointer; font-family: var(--ff-sans);
-    transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
-  }
-  .ff-as__tier-btn:hover { transform: translateY(-2px); border-color: var(--ff-green); }
-  .ff-as__tier-btn:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
-  .ff-as__tier.is-highlight .ff-as__tier-btn { border-color: var(--ff-accent); box-shadow: var(--shadow-md); }
-  .ff-as__tier-btn[aria-checked='true'] { border-color: var(--ff-accent); background: var(--ff-accent-tint); }
-  .ff-as__tier-badge {
-    position: absolute; top: -0.7rem; right: var(--sp-3); background: var(--ff-accent); color: var(--ff-white);
-    font-size: var(--fs-eyebrow); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
-    padding: 0.2rem 0.6rem; border-radius: var(--r-pill);
-  }
-  .ff-as__tier-name { font-weight: 700; font-size: var(--fs-body); color: var(--ff-ink); }
-  .ff-as__tier-cover { color: var(--ff-slate); font-size: var(--fs-small); }
-  .ff-as__tier-chips { color: var(--ff-ink); font-size: var(--fs-small); font-weight: 700; }
-  .ff-as__tier-price { margin-top: auto; padding-top: var(--sp-2); display: flex; flex-direction: column; }
-  .ff-as__tier-from { color: var(--ff-storm); font-size: var(--fs-eyebrow); text-transform: uppercase; letter-spacing: 0.08em; }
-  .ff-as__tier-amount { font-family: var(--ff-display); font-size: var(--fs-h3); color: var(--ff-accent-dk); line-height: var(--lh-snug); }
-  .ff-as__tier-iva { color: var(--ff-slate); font-size: var(--fs-small); }
-  .ff-as__tier-final { color: var(--ff-storm); font-size: var(--fs-small); margin-top: var(--sp-1); }
-  .ff-as__tier-cta {
-    margin-top: var(--sp-2); display: inline-block; text-align: center; background: var(--ff-ink); color: var(--ff-white);
-    font-weight: 700; font-size: var(--fs-small); padding: 0.5rem 1rem; border-radius: var(--r-pill);
-  }
-  .ff-as__tier-btn[aria-checked='true'] .ff-as__tier-cta { background: var(--ff-accent); }
-  .ff-as__qualifier { color: var(--ff-storm); font-size: var(--fs-small); margin: 0 0 var(--sp-4); }
+  /* ---- Final step ---- */
 
   /* ---- Capture ---- */
   .ff-as__capture-title { font-size: var(--fs-h3); margin: 0 0 0.25rem; color: var(--ff-ink); }
