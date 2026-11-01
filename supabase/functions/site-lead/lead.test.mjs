@@ -107,3 +107,31 @@ assert.equal(buildCfeBills({ billFilePath: `site-lead/${U1}/1.png` })[0].page_pa
 // nothing => undefined
 assert.equal(buildCfeBills({}), undefined);
 assert.equal(buildCfeBills({ billFilePath: "evil" }), undefined);
+
+// ---- fix round 1 ----
+// no valid paths + no figures => skipped entirely
+assert.equal(buildCfeBills({ bills: [{ pagePaths: ["site-lead/../x"] }] }), undefined);
+assert.equal(buildCfeBills({ bills: [{ pagePaths: [], extraction: {} }] }), undefined);
+// forged paths but a figure => kept, empty page_paths
+{
+  const r = buildCfeBills({ bills: [{ pagePaths: ["site-lead/../x"], kwhPerDay: 8 }] });
+  assert.equal(r.length, 1);
+  assert.deepEqual(r[0].page_paths, []);
+  assert.equal(r[0].avg_daily_kwh, 8);
+}
+// a path-only bill: no figures => extraction omitted, not {}
+{
+  const r = buildCfeBills({ bills: [{ pagePaths: [`site-lead/${U1}/1.jpg`] }] });
+  assert.equal(r[0].extraction, undefined);
+}
+// extraction must be a plain object, <= 20_000 chars JSON
+{
+  const p = [`site-lead/${U1}/1.jpg`];
+  assert.equal(buildCfeBills({ bills: [{ pagePaths: p, extraction: [1, 2] }] })[0].extraction, undefined);
+  assert.equal(buildCfeBills({ bills: [{ pagePaths: p, extraction: "x" }] })[0].extraction, undefined);
+  const big = { blob: "x".repeat(20_001) };
+  assert.equal(buildCfeBills({ bills: [{ pagePaths: p, extraction: big }] })[0].extraction, undefined);
+  const big2 = buildCfeBills({ bills: [{ pagePaths: p, kwhPerDay: 3, tariff: "T", extraction: big }] })[0];
+  assert.deepEqual(big2.extraction, { tariff: "T" });
+  assert.deepEqual(buildCfeBills({ bills: [{ pagePaths: p, extraction: { tariff: "X" } }] })[0].extraction, { tariff: "X" });
+}

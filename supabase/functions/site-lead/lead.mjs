@@ -96,6 +96,25 @@ function addressFields(addr) {
   return out;
 }
 
+// Drop undefined/null keys; return undefined when nothing is left (the CRM treats any non-null
+// key as a figure, so an empty object must not be sent).
+function definedOnly(o) {
+  const out = {};
+  for (const [k, v] of Object.entries(o)) if (v !== undefined && v !== null) out[k] = v;
+  return Object.keys(out).length ? out : undefined;
+}
+
+// Browser-supplied extraction: plain object only, bounded size.
+function cleanExtraction(x) {
+  if (!x || typeof x !== "object" || Array.isArray(x)) return undefined;
+  try {
+    if (JSON.stringify(x).length > 20_000) return undefined;
+  } catch {
+    return undefined;
+  }
+  return Object.keys(x).length ? x : undefined;
+}
+
 function pagePathOk(v) {
   return validBillPagePath(v) ?? validBillFilePath(v);
 }
@@ -115,14 +134,15 @@ export function buildCfeBills(a) {
         .slice(0, 4)
         .map(pagePathOk)
         .filter(Boolean);
-      const extraction = b.extraction && typeof b.extraction === "object"
-        ? b.extraction
-        : {
-          tariff: b.tariff,
-          current_period_kwh: b.kwhTotal,
-          billing_days: b.periodDays,
-          ...addressFields(b.address),
-        };
+      const extraction = cleanExtraction(b.extraction) ?? definedOnly({
+        tariff: b.tariff,
+        current_period_kwh: b.kwhTotal,
+        billing_days: b.periodDays,
+        ...addressFields(b.address),
+      });
+      const hasFigure = [b.kwhPerDay, b.kwhTotal, b.periodDays, b.annualKwh, b.tariff, b.meterNo, b.serviceNo]
+        .some((x) => x !== undefined && x !== null);
+      if (!pagePaths.length && !hasFigure && !extraction) continue;
       out.push({
         page_paths: pagePaths,
         file_path: pagePaths[0],
@@ -143,12 +163,12 @@ export function buildCfeBills(a) {
   return [{
     page_paths: filePath ? [filePath] : [],
     file_path: filePath,
-    extraction: {
+    extraction: definedOnly({
       tariff: answers.billTariff,
       current_period_kwh: answers.billKwhTotal,
       billing_days: answers.billPeriodDays,
       ...addressFields(answers.billAddress),
-    },
+    }),
     tariff: answers.billTariff,
     current_period_kwh: answers.billKwhTotal,
     billing_days: answers.billPeriodDays,
