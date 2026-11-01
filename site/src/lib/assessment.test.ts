@@ -1,7 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import {
-  toEstimateBody,
-  consumptionKnown,
   existingSolarKw,
   recommendPanels,
   offsetPct,
@@ -9,6 +7,7 @@ import {
   upsertBill,
   billsDailyKwh,
   billsPending,
+  usageKwhPerDay,
   MAX_METERS,
   type BillAnswer,
 } from './assessment';
@@ -18,37 +17,14 @@ describe('assessment mapping', () => {
     expect(existingSolarKw(8, 645)).toBeCloseTo(5.16);
     expect(existingSolarKw(0, 645)).toBe(0);
   });
-  it('manual daily kWh -> kwhPerDay (used directly)', () => {
-    const b = toEstimateBody({ dailyKwh: 20, backupHours: 12, appliances: { miniSplits: 2 }, coverageTier: 'comfort', addSolarPanels: 0 });
-    expect(b.cfeKwhPerDay).toBeCloseTo(20);
-    expect(b.backupHours).toBe(12);
-    expect(b.appliances.miniSplits).toBe(2);
+  it('usageKwhPerDay: manual daily kWh is used directly', () => {
+    expect(usageKwhPerDay({ dailyKwh: 20 })).toBe(20);
   });
-  it('bill kwhPerDay wins over manual', () => {
-    const b = toEstimateBody({ billKwhPerDay: 25, dailyKwh: 20, backupHours: 12, appliances: {}, coverageTier: 'comfort' });
-    expect(b.cfeKwhPerDay).toBe(25);
+  it('usageKwhPerDay: legacy bill figure wins over manual', () => {
+    expect(usageKwhPerDay({ billKwhPerDay: 25, dailyKwh: 20 })).toBe(25);
   });
-  it('no consumption => cfeKwhPerDay undefined + consumptionKnown false', () => {
-    expect(consumptionKnown({ appliances: {} })).toBe(false);
-    const b = toEstimateBody({ appliances: {}, coverageTier: 'comfort' });
-    expect(b.cfeKwhPerDay).toBeUndefined();
-  });
-  it('consumptionKnown true with bill or manual', () => {
-    expect(consumptionKnown({ billKwhPerDay: 25 })).toBe(true);
-    expect(consumptionKnown({ dailyKwh: 20 })).toBe(true);
-  });
-  it('existing panels feed existingSolarKw + hasExistingSolar', () => {
-    const b = toEstimateBody({ dailyKwh: 20, hasExistingSolar: true, panelCount: 8, panelWatts: 645, appliances: {}, coverageTier: 'comfort' });
-    expect(b.existingSolarKw).toBeCloseTo(5.16);
-    expect(b.hasExistingSolar).toBe(true);
-  });
-  it('passes custom otherLoads through to the estimate body', () => {
-    const b = toEstimateBody({ dailyKwh: 20, appliances: { otherLoads: [{ name: 'Workshop', watts: 1200, critical: false }] }, coverageTier: 'comfort' });
-    expect(b.appliances.otherLoads).toEqual([{ name: 'Workshop', watts: 1200, critical: false }]);
-  });
-  it('defaults otherLoads to [] when not provided', () => {
-    const b = toEstimateBody({ dailyKwh: 20, appliances: {}, coverageTier: 'comfort' });
-    expect(b.appliances.otherLoads).toEqual([]);
+  it('usageKwhPerDay: unknown usage is 0 (optional, never blocks)', () => {
+    expect(usageKwhPerDay({})).toBe(0);
   });
 });
 
@@ -121,39 +97,34 @@ describe('multi-meter bills', () => {
     expect(billsDailyKwh(undefined)).toBe(0);
     expect(billsDailyKwh([bill({ kwhPerDay: null })])).toBe(0);
   });
-  it('bills drive consumption + the estimate body', () => {
+  it('bills drive usage, ahead of the manual field', () => {
     const bills = [bill({ kwhPerDay: 10 }), bill({ kwhPerDay: 15 })];
-    expect(consumptionKnown({ bills })).toBe(true);
-    expect(consumptionKnown({ bills: [bill({ kwhPerDay: null })] })).toBe(false);
-    expect(toEstimateBody({ bills, dailyKwh: 3 }).cfeKwhPerDay).toBe(25);
-    expect(toEstimateBody({ bills: [bill({ kwhPerDay: null })], dailyKwh: 3 }).cfeKwhPerDay).toBe(3);
+    expect(usageKwhPerDay({ bills, dailyKwh: 3 })).toBe(25);
+    expect(usageKwhPerDay({ bills: [bill({ kwhPerDay: null })], dailyKwh: 3 })).toBe(3);
   });
 });
 
 describe('mixed read + unread meters', () => {
   const read = bill({ meterNo: 'M1', kwhPerDay: 10 });
   const unread = (): BillAnswer => bill({ pagePaths: ['site-lead/x/1.jpg'], kwhPerDay: null });
-  it('one read + one unread with no value => consumption not known, no estimate figure', () => {
+  it('one read + one unread with no value => partial sum is not used for sizing', () => {
     const bills = [read, unread()];
-    expect(consumptionKnown({ bills })).toBe(false);
-    expect(consumptionKnown({ bills, dailyKwh: 30 })).toBe(false);
-    expect(toEstimateBody({ bills, dailyKwh: 30 }).cfeKwhPerDay).toBeUndefined();
     expect(billsPending(bills)).toBe(1);
+    expect(usageKwhPerDay({ bills, dailyKwh: 30 })).toBe(0);
   });
   it('unread meter with a typed value => summed, keeps its pages', () => {
     const u = unread();
     u.kwhPerDay = 8;
     const bills = [read, u];
     expect(billsPending(bills)).toBe(0);
-    expect(consumptionKnown({ bills })).toBe(true);
-    expect(toEstimateBody({ bills }).cfeKwhPerDay).toBe(18);
+    expect(usageKwhPerDay({ bills })).toBe(18);
     expect(u.pagePaths).toEqual(['site-lead/x/1.jpg']);
   });
   it('removing the unread meter => known again', () => {
-    expect(consumptionKnown({ bills: [read] })).toBe(true);
+    expect(usageKwhPerDay({ bills: [read] })).toBe(10);
   });
   it('only unread meters still fall back to the manual field', () => {
-    expect(consumptionKnown({ bills: [unread()], dailyKwh: 12 })).toBe(true);
-    expect(toEstimateBody({ bills: [unread()], dailyKwh: 12 }).cfeKwhPerDay).toBe(12);
+    expect(billsPending([unread()])).toBe(0);
+    expect(usageKwhPerDay({ bills: [unread()], dailyKwh: 12 })).toBe(12);
   });
 });
