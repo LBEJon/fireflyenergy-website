@@ -6,6 +6,10 @@ import {
   recommendPanels,
   offsetPct,
   perPanelDailyKwh,
+  upsertBill,
+  billsDailyKwh,
+  MAX_METERS,
+  type BillAnswer,
 } from './assessment';
 
 describe('assessment mapping', () => {
@@ -60,5 +64,67 @@ describe('panel recommendation', () => {
     expect(offsetPct(100, 25, 0)).toBe(100);
     expect(offsetPct(0, 25, 0)).toBe(0);
     expect(offsetPct(9, 25, 0)).toBeGreaterThan(90);
+  });
+});
+
+const bill = (o: Partial<BillAnswer>): BillAnswer => ({ pagePaths: [], kwhPerDay: 10, ...o });
+
+describe('multi-meter bills', () => {
+  it('upsertBill replaces the same meter (meterNo) in place', () => {
+    const a = bill({ meterNo: 'M1', kwhPerDay: 10 });
+    const b = bill({ meterNo: 'M2', kwhPerDay: 20 });
+    const r = upsertBill([a, b], bill({ meterNo: 'M1', kwhPerDay: 12 }));
+    expect(r.replaced).toBe(true);
+    expect(r.bills).toHaveLength(2);
+    expect(r.bills[0].kwhPerDay).toBe(12);
+    expect(r.bills[1]).toBe(b);
+  });
+  it('upsertBill falls back to serviceNo as the meter key', () => {
+    const r = upsertBill([bill({ serviceNo: 'S1' })], bill({ serviceNo: 'S1', kwhPerDay: 5 }));
+    expect(r.replaced).toBe(true);
+    expect(r.bills).toHaveLength(1);
+    expect(r.bills[0].kwhPerDay).toBe(5);
+  });
+  it('upsertBill appends a new meter, and never merges keyless bills', () => {
+    const r = upsertBill([bill({ meterNo: 'M1' })], bill({ meterNo: 'M2' }));
+    expect(r.replaced).toBe(false);
+    expect(r.bills).toHaveLength(2);
+    const k = upsertBill([bill({})], bill({}));
+    expect(k.replaced).toBe(false);
+    expect(k.bills).toHaveLength(2);
+  });
+  it('upsertBill does not mutate its input', () => {
+    const list = [bill({ meterNo: 'M1' })];
+    upsertBill(list, bill({ meterNo: 'M2' }));
+    expect(list).toHaveLength(1);
+  });
+  it('refuses a 7th meter but still replaces an existing one at the cap', () => {
+    const six = Array.from({ length: MAX_METERS }, (_, i) => bill({ meterNo: `M${i}` }));
+    expect(MAX_METERS).toBe(6);
+    const r = upsertBill(six, bill({ meterNo: 'M9' }));
+    expect(r.bills).toHaveLength(6);
+    expect(r.replaced).toBe(false);
+    expect(r.bills.some((b) => b.meterNo === 'M9')).toBe(false);
+    const s = upsertBill(six, bill({ meterNo: 'M3', kwhPerDay: 99 }));
+    expect(s.replaced).toBe(true);
+    expect(s.bills[3].kwhPerDay).toBe(99);
+  });
+  it('billsDailyKwh prefers the annual average over the period figure', () => {
+    expect(billsDailyKwh([bill({ kwhPerDay: 10, annualKwh: 7300 })])).toBeCloseTo(20);
+    expect(billsDailyKwh([bill({ kwhPerDay: 10, annualKwh: 0 })])).toBe(10);
+  });
+  it('billsDailyKwh sums two meters', () => {
+    expect(billsDailyKwh([bill({ kwhPerDay: 10 }), bill({ kwhPerDay: 5, annualKwh: 3650 })])).toBeCloseTo(20);
+  });
+  it('billsDailyKwh treats unread bills and empty lists as 0', () => {
+    expect(billsDailyKwh(undefined)).toBe(0);
+    expect(billsDailyKwh([bill({ kwhPerDay: null })])).toBe(0);
+  });
+  it('bills drive consumption + the estimate body', () => {
+    const bills = [bill({ kwhPerDay: 10 }), bill({ kwhPerDay: 15 })];
+    expect(consumptionKnown({ bills })).toBe(true);
+    expect(consumptionKnown({ bills: [bill({ kwhPerDay: null })] })).toBe(false);
+    expect(toEstimateBody({ bills, dailyKwh: 3 }).cfeKwhPerDay).toBe(25);
+    expect(toEstimateBody({ bills: [bill({ kwhPerDay: null })], dailyKwh: 3 }).cfeKwhPerDay).toBe(3);
   });
 });

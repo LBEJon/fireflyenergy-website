@@ -26,11 +26,66 @@ export interface CfeAddress {
   postal_code?: string;
 }
 
+/** Mirrors MAX_METERS_PER_LEAD in the CRM (cfe/upload.ts). */
+export const MAX_METERS = 6;
+
+/**
+ * One CFE meter's bill, as read by the CRM and forwarded by site-lead (`answers.bills`).
+ * `kwhPerDay` is null only for a bill we parked but couldn't read — kept so staff still get
+ * its pages; it contributes nothing to sizing.
+ */
+export interface BillAnswer {
+  pagePaths: string[];
+  kwhPerDay: number | null;
+  annualKwh?: number;
+  meterNo?: string | null;
+  serviceNo?: string | null;
+  tariff?: string | null;
+  kwhTotal?: number;
+  periodDays?: number;
+  address?: CfeAddress | null;
+  extraction?: unknown;
+}
+
+const meterKey = (b: BillAnswer): string | null => b.meterNo || b.serviceNo || null;
+
+/**
+ * Add a bill, replacing an existing one for the same meter (key `meterNo ?? serviceNo`) in
+ * place. Bills with no key never merge. A new meter beyond MAX_METERS is refused (list
+ * returned unchanged, `replaced: false`). Never mutates the input.
+ */
+export function upsertBill(
+  bills: BillAnswer[],
+  bill: BillAnswer,
+): { bills: BillAnswer[]; replaced: boolean } {
+  const key = meterKey(bill);
+  const idx = key ? bills.findIndex((b) => meterKey(b) === key) : -1;
+  if (idx >= 0) {
+    const next = bills.slice();
+    next[idx] = bill;
+    return { bills: next, replaced: true };
+  }
+  if (bills.length >= MAX_METERS) return { bills: bills.slice(), replaced: false };
+  return { bills: [...bills, bill], replaced: false };
+}
+
+/** Daily kWh across all meters: each bill's annual average when known, else its period figure. */
+export function billsDailyKwh(bills: BillAnswer[] | undefined): number {
+  if (!Array.isArray(bills)) return 0;
+  let sum = 0;
+  for (const b of bills) {
+    if (typeof b.annualKwh === 'number' && b.annualKwh > 0) sum += b.annualKwh / 365;
+    else if (typeof b.kwhPerDay === 'number' && b.kwhPerDay > 0) sum += b.kwhPerDay;
+  }
+  return sum;
+}
+
 export interface AssessmentAnswers {
-  billKwhPerDay?: number; // from CFE parse
-  billAddress?: CfeAddress; // service address read from the CFE bill
-  // Bill provenance, forwarded verbatim to the CRM by site-lead so the lead arrives with the
-  // customer's actual bill attached (billFilePath is its storage path in the CRM's bucket).
+  /** One entry per CFE meter (website multi-page flow). Wins over the legacy single-bill fields. */
+  bills?: BillAnswer[];
+  billKwhPerDay?: number; // legacy single-bill parse (no longer written by the UI)
+  billAddress?: CfeAddress; // service address read from the (first) CFE bill
+  // Legacy single-bill provenance, still read by site-lead when `bills` is absent.
   billFilePath?: string;
   billTariff?: string;
   billKwhTotal?: number;
@@ -124,6 +179,7 @@ export function existingSolarKw(count: number, watts: number): number {
  */
 export function consumptionKnown(a: AssessmentAnswers): boolean {
   return (
+    billsDailyKwh(a.bills) > 0 ||
     (typeof a.billKwhPerDay === 'number' && a.billKwhPerDay > 0) ||
     (typeof a.dailyKwh === 'number' && a.dailyKwh > 0)
   );
@@ -136,7 +192,10 @@ export function consumptionKnown(a: AssessmentAnswers): boolean {
  */
 export function toEstimateBody(a: AssessmentAnswers): EstimateBody {
   let cfeKwhPerDay: number | undefined;
-  if (typeof a.billKwhPerDay === 'number' && a.billKwhPerDay > 0) {
+  const fromBills = billsDailyKwh(a.bills);
+  if (fromBills > 0) {
+    cfeKwhPerDay = fromBills;
+  } else if (typeof a.billKwhPerDay === 'number' && a.billKwhPerDay > 0) {
     cfeKwhPerDay = a.billKwhPerDay;
   } else if (typeof a.dailyKwh === 'number' && a.dailyKwh > 0) {
     cfeKwhPerDay = a.dailyKwh;

@@ -78,10 +78,30 @@ const backupOpts = ['4', '8', '12', '24'];
           <div class="ff-as__consume">
             <label class="ff-as__upload">
               <span class="ff-as__upload-label">{t(locale, 'assessment.consumption.upload_label')}</span>
-              <input type="file" accept="image/*,application/pdf" data-cfe-file />
+              <input type="file" multiple accept="image/*,application/pdf" data-cfe-file />
               <span class="ff-as__upload-hint">{t(locale, 'assessment.consumption.upload_hint')}</span>
             </label>
+            <!-- "Add the back" picks extra pages for the bill just read (re-uploaded together). -->
+            <input type="file" multiple accept="image/*" data-cfe-back-file hidden aria-hidden="true" tabindex="-1" />
             <p class="ff-as__cfe-status" data-cfe-status role="status" hidden></p>
+
+            <ul class="ff-as__meters" data-meter-list hidden></ul>
+
+            <div class="ff-as__ask" data-back-prompt hidden>
+              <p class="ff-as__ask-text">{t(locale, 'assessment.consumption.back_prompt')}</p>
+              <div class="ff-as__ask-actions">
+                <button type="button" class="ff-as__ask-btn ff-as__ask-btn--primary" data-back-add>{t(locale, 'assessment.consumption.back_add')}</button>
+                <button type="button" class="ff-as__ask-btn" data-back-skip>{t(locale, 'assessment.consumption.back_skip')}</button>
+              </div>
+            </div>
+
+            <div class="ff-as__ask" data-meters-prompt hidden>
+              <p class="ff-as__ask-text">{t(locale, 'assessment.consumption.meters_prompt')}</p>
+              <div class="ff-as__ask-actions">
+                <button type="button" class="ff-as__ask-btn ff-as__ask-btn--primary" data-meter-add>{t(locale, 'assessment.consumption.meters_add')}</button>
+                <button type="button" class="ff-as__ask-btn" data-meters-done>{t(locale, 'assessment.consumption.meters_done')}</button>
+              </div>
+            </div>
 
             <p class="ff-as__or"><span>{t(locale, 'assessment.consumption.or')}</span></p>
 
@@ -370,6 +390,36 @@ const backupOpts = ['4', '8', '12', '24'];
   .ff-as__upload-label { font-weight: 700; color: var(--ff-ink); }
   .ff-as__upload-hint { color: var(--ff-slate); font-size: var(--fs-small); }
   .ff-as__cfe-status { font-size: var(--fs-small); color: var(--ff-accent-dk); font-weight: 700; margin: 0; }
+  .ff-as__meters { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sp-1); }
+  /* Meter rows are built in JS (no Astro scope attribute) — hence :global(). */
+  .ff-as__meters :global(.ff-as__meter) {
+    display: flex; justify-content: space-between; align-items: center; gap: var(--sp-2);
+    background: var(--ff-paper); border: 1px solid var(--ff-line); border-radius: var(--r-md);
+    padding: 0.5rem 0.85rem;
+  }
+  .ff-as__meters :global(.ff-as__meter-label) { color: var(--ff-ink); font-size: var(--fs-small); }
+  .ff-as__meters :global(.ff-as__meter.is-unread .ff-as__meter-label) { color: var(--ff-slate); }
+  .ff-as__meters :global(.ff-as__meter-remove) {
+    flex: 0 0 auto; background: none; border: none; padding: 0; color: var(--ff-accent-dk);
+    font-family: var(--ff-sans); font-weight: 600; text-decoration: underline; cursor: pointer;
+  }
+  .ff-as__meters :global(.ff-as__meter-remove:focus-visible) { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__ask {
+    background: var(--ff-accent-tint); border: 1px solid var(--ff-line); border-radius: var(--r-md);
+    padding: var(--sp-3); display: grid; gap: var(--sp-2);
+  }
+  .ff-as__ask-text { margin: 0; color: var(--ff-ink); font-size: var(--fs-body); }
+  .ff-as__ask-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+  .ff-as__ask-btn {
+    background: var(--ff-white); border: 2px solid var(--ff-line); border-radius: var(--r-pill);
+    padding: 0.5rem 1.2rem; font-weight: 700; font-family: var(--ff-sans); color: var(--ff-ink); cursor: pointer;
+  }
+  .ff-as__ask-btn:hover { border-color: var(--ff-green); }
+  .ff-as__ask-btn--primary { background: var(--ff-accent); border-color: var(--ff-accent); color: var(--ff-white); }
+  .ff-as__ask-btn--primary:hover { background: var(--ff-accent-dk); border-color: var(--ff-accent-dk); }
+  .ff-as__ask-btn:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__ask-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .ff-as__meters[hidden], .ff-as__ask[hidden] { display: none; }
   .ff-as__unknown {
     background: transparent; border: 0; color: var(--ff-slate); font-family: var(--ff-sans);
     font-size: var(--fs-small); text-decoration: underline; cursor: pointer; padding: 0; justify-self: center;
