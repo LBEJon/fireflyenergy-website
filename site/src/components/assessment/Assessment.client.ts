@@ -4,12 +4,17 @@ import {
   existingSolarKw,
   recommendPanels,
   offsetPct,
+  upsertBill,
+  billsDailyKwh,
+  billsPending,
+  MAX_METERS,
   type AssessmentAnswers,
+  type BillAnswer,
   type CoverageTier,
   type OtherLoad,
 } from '../../lib/assessment';
 import { fetchEstimate, type EstimateResult } from '../../lib/estimateClient';
-import { parseCfe, fileToB64 } from '../../lib/cfeUploadClient';
+import { uploadCfePages, cfeFailureNoticeKey, MAX_BILL_PAGES, type CfePagesResult } from '../../lib/cfeUploadClient';
 import { submitLead, type LeadPayload } from '../../lib/leadClient';
 import { t, type Locale } from '../../lib/i18n';
 import { buildWaSuccessHref } from '../../lib/waLink';
@@ -143,51 +148,267 @@ export function initAssessment(root: HTMLElement): void {
     if (manualWrap) manualWrap.hidden = false;
   }
 
-  fileInput?.addEventListener('change', async () => {
-    const file = fileInput.files?.[0];
-    if (!file) return;
-    // Clear any prior parsed value; new attempt.
-    answers.billKwhPerDay = undefined;
-    answers.billFilePath = undefined;
-    syncNext();
-    if (file.size > MAX_FILE_BYTES) {
-      setCfeStatus(tr('assessment.consumption.too_large'));
+  const backInput = root.querySelector<HTMLInputElement>('[data-cfe-back-file]');
+  const meterList = root.querySelector<HTMLElement>('[data-meter-list]');
+  const backPrompt = root.querySelector<HTMLElement>('[data-back-prompt]');
+  const metersPrompt = root.querySelector<HTMLElement>('[data-meters-prompt]');
+  const meterAddBtn = root.querySelector<HTMLButtonElement>('[data-meter-add]');
+
+  // One entry per meter, aligned by position with `answers.bills`: the original File objects,
+  // kept so "Add the back" can re-upload the WHOLE bill (front + back) in one read.
+  const billFiles: File[][] = [];
+  // Position of the bill the back prompt is about (replace by position — never by meter key,
+  // which may be missing on a front-only read).
+  let backIndex = -1;
+  let busy = false;
+
+  const bills = (): BillAnswer[] => (answers.bills ??= []);
+
+  // A PDF is uploaded as-is, so it must fit the per-file cap; images are downscaled first.
+  const pdfTooLarge = (files: File[]) =>
+    files.some((f) => !f.type.startsWith('image/') && f.size > MAX_FILE_BYTES);
+
+  function toBill(res: Extract<CfePagesResult, { ok: true }>): BillAnswer {
+    return {
+      pagePaths: res.pagePaths,
+      kwhPerDay: res.kwhPerDay,
+      annualKwh: res.annualKwh,
+      meterNo: res.meterNo ?? null,
+      serviceNo: res.serviceNo ?? null,
+      tariff: res.tariff ?? null,
+      kwhTotal: res.kwhTotal,
+      periodDays: res.periodDays,
+      address: res.address ?? null,
+      extraction: res.extraction,
+    };
+  }
+
+  // Bills the CRM parked but couldn't read. Their card keeps a "daily kWh" field even after
+  // the customer types a figure into it (which becomes that bill's kwhPerDay).
+  const unreadBills = new WeakSet<BillAnswer>();
+
+  // Everything derived from the bill list: the lead's top-level address (site-lead reads
+  // `billAddress`), the summed reading, the meter rows, and the Next gate.
+  function syncBills(notice = '') {
+    renderMeters();
+    syncSummary(notice);
+  }
+
+  // Status line, manual-field visibility and the Next gate — without rebuilding the meter rows
+  // (so typing in a meter's kWh field keeps focus).
+  function syncSummary(notice = '') {
+    const list = bills();
+    const firstAddr = list.find((b) => b.address)?.address;
+    answers.billAddress = firstAddr ?? undefined;
+    const total = billsDailyKwh(list);
+    const pending = billsPending(list);
+    if (total > 0) {
+      answers.dailyKwh = undefined;
+      if (dailyInput) dailyInput.value = '';
+      if (manualWrap) manualWrap.hidden = true;
+      // Mixed read + unread meters: never show a partial total as if it were the whole home.
+      const line = pending > 0
+        ? tr('assessment.consumption.meter_pending')
+        : tr('assessment.consumption.parsed').replace('{kwh}', String(Math.round(total)));
+      setCfeStatus(notice ? `${notice} ${line}` : line);
+    } else {
       revealManual();
+      if (notice) setCfeStatus(notice);
+    }
+    if (meterAddBtn) meterAddBtn.disabled = list.length >= MAX_METERS;
+    syncNext();
+  }
+
+  function renderMeters() {
+    if (!meterList) return;
+    const list = bills();
+    meterList.innerHTML = '';
+    meterList.hidden = list.length === 0;
+    list.forEach((b, i) => {
+      const li = document.createElement('li');
+      li.className = 'ff-as__meter';
+      const unread = unreadBills.has(b);
+      if (unread) li.classList.add('is-unread');
+      const label = document.createElement('span');
+      label.className = 'ff-as__meter-label';
+      label.textContent = unread
+        ? tr('assessment.consumption.meter_unread').replace('{n}', String(i + 1))
+        : tr('assessment.consumption.meter_item')
+            .replace('{n}', String(i + 1))
+            .replace('{kwh}', String(Math.round(billsDailyKwh([b]))));
+      const rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'ff-as__meter-remove';
+      rm.textContent = tr('assessment.consumption.meter_remove');
+      rm.setAttribute('aria-label', `${tr('assessment.consumption.meter_remove')}: ${label.textContent}`);
+      rm.addEventListener('click', () => removeMeter(i));
+      li.appendChild(label);
+      li.appendChild(rm);
+      if (unread) {
+        const field = document.createElement('label');
+        field.className = 'ff-as__meter-kwh';
+        const cap = document.createElement('span');
+        cap.textContent = tr('assessment.consumption.meter_kwh_label');
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.inputMode = 'decimal';
+        input.min = '0';
+        input.step = 'any';
+        input.dataset.meterKwh = String(i);
+        if (typeof b.kwhPerDay === 'number' && b.kwhPerDay > 0) input.value = String(b.kwhPerDay);
+        input.addEventListener('input', () => {
+          const v = Number(input.value);
+          b.kwhPerDay = v > 0 ? v : null; // sent as this meter's kwhPerDay; pages kept
+          syncSummary();
+        });
+        field.appendChild(cap);
+        field.appendChild(input);
+        li.appendChild(field);
+      }
+      meterList.appendChild(li);
+    });
+  }
+
+  function removeMeter(i: number) {
+    bills().splice(i, 1);
+    billFiles.splice(i, 1);
+    if (backIndex === i) {
+      backIndex = -1;
+      if (backPrompt) backPrompt.hidden = true;
+    } else if (backIndex > i) {
+      backIndex -= 1;
+    }
+    if (bills().length === 0) {
+      if (metersPrompt) metersPrompt.hidden = true;
+      setCfeStatus('', false);
+    }
+    syncBills();
+  }
+
+  // After a meter is settled (read, back added or skipped): offer another meter, if room.
+  function askForMoreMeters() {
+    if (backPrompt) backPrompt.hidden = true;
+    backIndex = -1;
+    if (metersPrompt) metersPrompt.hidden = bills().length >= MAX_METERS;
+  }
+
+  // A fresh bill (first meter or "Add another meter"): same-meter re-upload replaces it.
+  fileInput?.addEventListener('change', async () => {
+    const files = Array.from(fileInput.files ?? []);
+    fileInput.value = ''; // let the same file be picked again
+    if (files.length === 0 || busy) return;
+    if (files.length > MAX_BILL_PAGES) {
+      setCfeStatus(tr('assessment.consumption.too_many_pages'));
       return;
     }
-    setCfeStatus(tr('assessment.consumption.reading'));
-    try {
-      const payload = await fileToB64(file);
-      const res = await parseCfe(baseUrl, payload);
-      // The bill file is parked in the CRM either way — keep its path even when the read
-      // failed, so staff still receive the bill they can read by hand.
-      answers.billFilePath = res.filePath ?? undefined;
-      if ('fallback' in res) {
-        setCfeStatus(tr('assessment.consumption.parse_failed'));
+    if (pdfTooLarge(files)) {
+      // With meters already read, the global manual field is ignored — don't offer it.
+      if (billsDailyKwh(bills()) > 0) {
+        setCfeStatus(tr('assessment.consumption.meter_too_large'));
+      } else {
+        setCfeStatus(tr('assessment.consumption.too_large'));
         revealManual();
-        return;
       }
-      answers.billKwhPerDay = res.kwhPerDay;
-      answers.billTariff = res.tariff ?? undefined;
-      answers.billKwhTotal = res.kwhTotal;
-      answers.billPeriodDays = res.periodDays;
-      answers.billAddress = res.address ?? undefined;
-      answers.dailyKwh = undefined;
-      setCfeStatus(
-        tr('assessment.consumption.parsed').replace('{kwh}', String(Math.round(res.kwhPerDay))),
-      );
-    } catch {
-      setCfeStatus(tr('assessment.consumption.parse_failed'));
-      revealManual();
+      return;
     }
-    syncNext();
+    busy = true;
+    if (backPrompt) backPrompt.hidden = true;
+    if (metersPrompt) metersPrompt.hidden = true;
+    setCfeStatus(tr('assessment.consumption.reading'));
+    const res = await uploadCfePages(files, baseUrl);
+    busy = false;
+
+    if (!('ok' in res)) {
+      // Unreadable, but if the CRM parked the pages keep them, so staff still get the bill.
+      if (res.pagePaths?.length && bills().length < MAX_METERS) {
+        const unread: BillAnswer = { pagePaths: res.pagePaths, kwhPerDay: null };
+        unreadBills.add(unread);
+        bills().push(unread);
+        billFiles.push(files);
+      }
+      // With other meters already read, the manual field stays hidden — just say this one failed.
+      // A "busy" answer (CRM read limit) says so and to retry; with no reading the manual field
+      // is still revealed by syncBills, so the visitor can type their kWh instead.
+      const haveReading = billsDailyKwh(bills()) > 0;
+      syncBills(tr(cfeFailureNoticeKey(res, haveReading)));
+      if (haveReading) askForMoreMeters();
+      return;
+    }
+
+    const before = bills().length;
+    const bill = toBill(res);
+    const { bills: next, replaced } = upsertBill(bills(), bill);
+    if (!replaced && next.length === before) {
+      setCfeStatus(tr('assessment.consumption.meters_max'));
+      return;
+    }
+    answers.bills = next;
+    const idx = next.indexOf(bill);
+    if (replaced) billFiles[idx] = files;
+    else billFiles.push(files);
+    syncBills(replaced ? tr('assessment.consumption.meter_replaced') : '');
+
+    if (!res.hasHistory && res.allImages) {
+      backIndex = idx;
+      if (backPrompt) backPrompt.hidden = false;
+      // The prompt itself opens with "Got it." — don't say it twice.
+      if (!replaced) setCfeStatus('', false);
+    } else {
+      askForMoreMeters();
+    }
+  });
+
+  // "Add the back": re-read the whole bill (its original pages + the new ones) and replace
+  // that bill by position.
+  root.querySelector<HTMLButtonElement>('[data-back-add]')?.addEventListener('click', () => {
+    if (backIndex >= 0) backInput?.click();
+  });
+  root.querySelector<HTMLButtonElement>('[data-back-skip]')?.addEventListener('click', () => {
+    syncBills(); // bring back the reading line the prompt stood in for
+    askForMoreMeters();
+  });
+  backInput?.addEventListener('change', async () => {
+    const extra = Array.from(backInput.files ?? []);
+    backInput.value = '';
+    const idx = backIndex;
+    if (extra.length === 0 || idx < 0 || busy) return;
+    const pages = [...(billFiles[idx] ?? []), ...extra];
+    if (pages.length > MAX_BILL_PAGES) {
+      setCfeStatus(tr('assessment.consumption.too_many_pages'));
+      return;
+    }
+    busy = true;
+    setCfeStatus(tr('assessment.consumption.reading'));
+    const res = await uploadCfePages(pages, baseUrl);
+    busy = false;
+    if (backIndex !== idx) {
+      // Skipped or removed while reading: drop the result, but don't leave "Reading…" up.
+      setCfeStatus('', false);
+      syncSummary();
+      return;
+    }
+    if ('ok' in res) {
+      bills()[idx] = toBill(res);
+      billFiles[idx] = pages;
+      syncBills();
+    } else {
+      syncBills(tr('assessment.consumption.back_failed'));
+    }
+    askForMoreMeters();
+  });
+
+  meterAddBtn?.addEventListener('click', () => {
+    if (bills().length < MAX_METERS) fileInput?.click();
+  });
+  root.querySelector<HTMLButtonElement>('[data-meters-done]')?.addEventListener('click', () => {
+    if (metersPrompt) metersPrompt.hidden = true;
   });
 
   dailyInput?.addEventListener('input', () => {
     const v = Number(dailyInput.value);
     answers.dailyKwh = v > 0 ? v : undefined;
-    // Manual entry supersedes any prior (failed) bill parse.
-    if (answers.dailyKwh) answers.billKwhPerDay = undefined;
+    // Manual entry is the fallback when no meter was read (the field is hidden once one is);
+    // the estimate prefers the read meters whenever any exist.
     syncNext();
   });
 
@@ -248,8 +469,9 @@ export function initAssessment(root: HTMLElement): void {
   bindNum('[data-refrigerators]', 'refrigerators');
 
   // −/＋ steppers: adjust the sibling number input, clamp at 0, and fire `input`
-  // so the bindings above stay in sync. Delegated so it covers every stepper.
-  root.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((btn) => {
+  // so the bindings above stay in sync. Buttons only: the wizard's step containers are
+  // `<div data-step="N">` too, and binding those bumped the manual kWh field on every click.
+  root.querySelectorAll<HTMLButtonElement>('button[data-step]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const input = btn.parentElement?.querySelector<HTMLInputElement>('input[type="number"]');
       if (!input) return;
@@ -359,9 +581,8 @@ export function initAssessment(root: HTMLElement): void {
 
   // Current consumption (kWh/day) from a parsed bill or manual monthly entry.
   function currentCfeKwhPerDay(): number {
-    if (typeof answers.billKwhPerDay === 'number' && answers.billKwhPerDay > 0) {
-      return answers.billKwhPerDay;
-    }
+    const fromBills = billsDailyKwh(answers.bills);
+    if (fromBills > 0) return fromBills;
     if (typeof answers.dailyKwh === 'number' && answers.dailyKwh > 0) {
       return answers.dailyKwh;
     }
