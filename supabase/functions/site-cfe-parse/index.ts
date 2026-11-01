@@ -1,60 +1,25 @@
-// site-cfe-parse — Supabase Edge Function (Deno). PUBLIC, stateless CFE-bill reader.
+// site-cfe-parse — Supabase Edge Function (Deno). PUBLIC thin proxy to the CRM's shared bill reader.
 //
-// POST { mime, dataB64 } -> sends the bill to the Anthropic Messages API with a FORCED
-// tool-call ("read_cfe_usage") so the model returns structured JSON -> computes daily
-// usage (kWh per day) and returns { kwhPerDay, kwhTotal, periodDays, tariff }.
+// POST { pages: [{ mime, dataB64 }] } (<= 4 pages; legacy { mime, dataB64 } = one page) ->
+// cheap checks (type, size, count) -> POST FIREFLY_CRM_BILL_URL with the intake bearer secret and
+// X-Client-Ip. The CRM stores the pages, reads them, and rate-limits per client IP; its answer is
+// passed straight through. This function holds no model key, no limiter, no storage logic.
 //
-// Public counterpart to the CRM's extract-cfe-bill. The website calculator calls this directly
-// with a base64 upload. Fails safe — any error returns { fallback: "manual" } so the site drops
-// the user to manual kWh entry and the flow never blocks. Inert by design: if ANTHROPIC_API_KEY
-// is unset it returns fallback.
-//
-// It ALSO parks the bill in the CRM (POST /api/intake/lead/cfe) and returns the resulting
-// storage path as `filePath`, which the browser carries into site-lead so the lead arrives with
-// its bill attached. Before this, the bytes lived for exactly one request and the bill never
-// reached the CRM at all. Two rules for that leg: it is entirely best-effort (a failure only
-// costs the attachment, never the parse or the lead), and it runs REGARDLESS of whether the
-// model could read the bill — an unreadable bill is precisely the one staff most need to see.
+// Fails safe: unset URL/secret, CRM error, non-ok outcome, or a 25 s timeout all return
+// { fallback: "manual" } (carrying pagePaths when the CRM stored the pages) so the site drops the
+// user to manual kWh entry and the flow never blocks.
 import { corsFor } from "./cors.mjs";
-import { kwhPerDayFrom } from "./usage.mjs";
 
 const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") ??
   "https://fireflyenergy.mx,https://www.fireflyenergy.mx")
   .split(",").map((s) => s.trim()).filter(Boolean);
 
-const MODEL = Deno.env.get("CFE_BILL_MODEL") || "claude-sonnet-4-6";
-const MAX_B64_BYTES = 12 * 1024 * 1024; // ~8 MB file -> ~10.7 MB base64; 12 MB headroom
+const MAX_PAGES = 4; // mirrors MAX_BILL_PAGES in the CRM (cfe/upload.ts)
+const MAX_B64_BYTES = 12 * 1024 * 1024; // per page: ~8 MB file -> ~10.7 MB base64; 12 MB headroom
+const TIMEOUT_MS = 25_000;
 
-// Mirrors ALLOWED_BILL_MIME_TYPES in the CRM (src/server/services/crm/cfe/upload.ts) — the set
-// the Anthropic API accepts AND the set the park endpoint will store. Previously the client's
-// `mime` string was passed straight into mediaBlock (which silently coerced anything unknown to
-// image/jpeg, so junk reached the model) and, since the park was added, into the CRM.
+// Mirrors ALLOWED_BILL_MIME_TYPES in the CRM (src/server/services/crm/cfe/upload.ts).
 const ALLOWED_MIME = ["application/pdf", "image/jpeg", "image/png", "image/webp"];
-
-// In-memory per-IP throttle. This function is PUBLIC and unauthenticated, and now has a side
-// effect that outlives the request (a stored object in the CRM's bucket) on top of the Anthropic
-// spend it always had — so an unbounded caller could fill the bucket with junk. Same shape as the
-// CRM's own public-endpoint limiter (server/services/crm/lead/partner-link.ts).
-// ponytail: per-isolate and therefore leaky across regions/cold starts — it caps a naive flood,
-// not a distributed one. The CRM's park endpoint applies the authoritative limit (one long-lived
-// process, keyed on the same client IP we forward); move to a DB-backed counter like site-lead's
-// only if abuse actually gets past both.
-const RATE_LIMIT = 10;
-const RATE_WINDOW_MS = 60_000;
-const hits = new Map<string, { count: number; resetAt: number }>();
-
-function rateLimit(ip: string): boolean {
-  const now = Date.now();
-  const b = hits.get(ip);
-  if (!b || now >= b.resetAt) {
-    if (hits.size > 5_000) hits.clear(); // crude bound; the window makes staleness self-healing
-    hits.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
-    return true;
-  }
-  if (b.count >= RATE_LIMIT) return false;
-  b.count += 1;
-  return true;
-}
 
 function json(body: unknown, status: number, cors: Record<string, string>): Response {
   return new Response(JSON.stringify(body), {
@@ -62,62 +27,10 @@ function json(body: unknown, status: number, cors: Record<string, string>): Resp
   });
 }
 
-const READ_CFE_USAGE_TOOL = {
-  name: "read_cfe_usage",
-  description: "Read the consumption figures from this CFE (Comisión Federal de Electricidad) electricity bill / recibo.",
-  input_schema: {
-    type: "object",
-    properties: {
-      tariff: { type: "string", description: "Tarifa code exactly as printed, e.g. 01, 1C, DAC, PDBT, GDMTH" },
-      bill_class: { type: "string", enum: ["residential", "commercial"], description: "residential for 01/1A-1F/DAC; commercial for PDBT/GDMTH/GDMTO/etc." },
-      billing_days: { type: "number", description: "Días of the billing period (~60 for residential bimonthly, ~30 for commercial monthly)" },
-      current_period_kwh: { type: "number", description: "kWh consumed THIS billing period (total for the whole period, not per day)" },
-      address_line: { type: "string", description: "Street + number of the service address (calle y número), from the Domicilio block" },
-      address2: { type: "string", description: "Secondary line (interior, depto, building) if present; else omit" },
-      colonia: { type: "string", description: "Colonia / neighborhood from the Domicilio block" },
-      city: { type: "string", description: "City / municipio from the Domicilio block" },
-      state: { type: "string", description: "State / entidad federativa (e.g. Guanajuato)" },
-      postal_code: { type: "string", description: "Código postal (CP)" },
-    },
-    required: ["current_period_kwh"],
-  },
-} as const;
-
-/** Park the bill bytes in the CRM's private cfe-bills bucket; returns the storage path or null.
- *  Best-effort by contract: any failure (unconfigured, non-2xx, network, timeout) returns null
- *  and the flow continues without an attachment. Authenticated with the same intake secret the
- *  site already uses for the lead mirror — no new secret, no CRM service-role key over here. */
-async function parkBillInCrm(mime: string, dataB64: string, ip: string): Promise<string | null> {
-  const url = Deno.env.get("FIREFLY_CRM_BILL_URL");
-  const secret = Deno.env.get("FIREFLY_CRM_INTAKE_SECRET");
-  if (!url || !secret) return null;
-  try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${secret}`,
-        // The CRM keys its own rate limit on this; every call reaches it from this one function,
-        // so without it the whole public site shares a single bucket.
-        "X-Client-Ip": ip,
-      },
-      body: JSON.stringify({ mime, dataB64 }),
-      signal: AbortSignal.timeout(20_000), // never let the customer wait on our storage leg
-    });
-    if (!res.ok) return null;
-    const body = await res.json();
-    return typeof body?.file_path === "string" ? body.file_path : null;
-  } catch {
-    return null;
-  }
-}
-
-function mediaBlock(mime: string, b64: string) {
-  if (mime === "application/pdf") {
-    return { type: "document", source: { type: "base64", media_type: "application/pdf", data: b64 } };
-  }
-  const m = ["image/png", "image/webp", "image/gif", "image/jpeg"].includes(mime) ? mime : "image/jpeg";
-  return { type: "image", source: { type: "base64", media_type: m, data: b64 } };
+/** Legacy single-file clients read `filePath`; keep it populated from the first stored page. */
+function withLegacyPath<T extends { pagePaths?: unknown }>(body: T): T & { filePath?: string } {
+  const first = Array.isArray(body.pagePaths) ? body.pagePaths[0] : undefined;
+  return typeof first === "string" ? { ...body, filePath: first } : body;
 }
 
 Deno.serve(async (req: Request): Promise<Response> => {
@@ -125,63 +38,56 @@ Deno.serve(async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ fallback: "manual" }, 405, cors);
 
-  let mime: string, dataB64: string;
+  // Unset => behave exactly as the manual-kWh fallback, before touching the body.
+  const url = Deno.env.get("FIREFLY_CRM_BILL_URL");
+  const secret = Deno.env.get("FIREFLY_CRM_INTAKE_SECRET");
+  if (!url || !secret) return json({ fallback: "manual" }, 200, cors);
+
+  let pages: { mime: string; dataB64: string }[];
   try {
     const body = await req.json();
-    mime = String(body?.mime ?? "");
-    dataB64 = String(body?.dataB64 ?? "");
+    const raw = Array.isArray(body?.pages) ? body.pages : [{ mime: body?.mime, dataB64: body?.dataB64 }];
+    pages = raw.map((p: { mime?: unknown; dataB64?: unknown }) => ({
+      mime: String(p?.mime ?? ""),
+      dataB64: String(p?.dataB64 ?? ""),
+    }));
   } catch {
     return json({ fallback: "manual" }, 400, cors);
   }
-  if (!dataB64 || dataB64.length > MAX_B64_BYTES) return json({ fallback: "manual" }, 400, cors);
-  if (!ALLOWED_MIME.includes(mime)) return json({ fallback: "manual" }, 400, cors);
+  if (pages.length < 1 || pages.length > MAX_PAGES) return json({ fallback: "manual" }, 400, cors);
+  for (const p of pages) {
+    if (!p.dataB64 || p.dataB64.length > MAX_B64_BYTES) return json({ fallback: "manual" }, 400, cors);
+    if (!ALLOWED_MIME.includes(p.mime)) return json({ fallback: "manual" }, 400, cors);
+  }
 
   // cf-connecting-ip is set by Cloudflare in front of Supabase and can't be forged (a forged one is
   // rejected at the edge); the gateway also rewrites x-forwarded-for, kept only as a fallback.
   const ip = req.headers.get("cf-connecting-ip")?.trim() ||
     (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
-  if (!rateLimit(ip)) return json({ fallback: "manual" }, 429, cors);
-
-  // Kick the storage leg off in parallel with the model call — it must not add latency, and it
-  // must happen even on the fallback paths below, so it is started before the first `return`.
-  const parked = parkBillInCrm(mime, dataB64, ip);
-
-  // Reading is optional; PARKING the bill is not, so the not-configured path returns only after
-  // the storage leg has had its turn (it used to return before the body was even parsed).
-  const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
-  if (!apiKey) return json({ fallback: "manual", filePath: await parked }, 200, cors);
 
   try {
-    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+    const res = await fetch(url, {
       method: "POST",
       headers: {
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${secret}`,
+        // The CRM keys its rate limit on this; every call reaches it from this one function, so
+        // without it the whole public site would share a single bucket.
+        "X-Client-Ip": ip,
       },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 1024,
-        tools: [READ_CFE_USAGE_TOOL],
-        tool_choice: { type: "tool", name: "read_cfe_usage" },
-        messages: [{
-          role: "user",
-          content: [
-            mediaBlock(mime, dataB64),
-            { type: "text", text: "Read this CFE electricity bill into the read_cfe_usage tool. current_period_kwh is the kWh for the WHOLE current billing period (residential bills are bimonthly ~60 days). Copy the tarifa exactly and set bill_class from it (residential: 01/1A-1F/DAC; commercial: PDBT/GDMTH/GDMTO/etc.). Read billing_days from the period if printed. Also read the service address (Domicilio block) into address_line (street + number), address2 (interior/depto, else omit), colonia, city (municipio), state (entidad federativa), and postal_code (CP). Omit any field that is not printed." },
-          ],
-        }],
-      }),
+      body: JSON.stringify({ pages }),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-    if (!resp.ok) return json({ fallback: "manual", filePath: await parked }, 200, cors);
-    const payload = await resp.json();
-    const toolUse = (payload?.content ?? []).find(
-      (b: { type: string; name?: string }) => b.type === "tool_use" && b.name === "read_cfe_usage",
-    );
-    const out = kwhPerDayFrom(toolUse?.input);
-    if (!out) return json({ fallback: "manual", filePath: await parked }, 200, cors);
-    return json({ ...out, filePath: await parked }, 200, cors);
+    if (!res.ok) return json({ fallback: "manual" }, 200, cors);
+    const data = await res.json();
+    if (data?.ok === true) {
+      const { ok: _ok, ...rest } = data;
+      return json(withLegacyPath({ ok: true, ...rest }), 200, cors);
+    }
+    const fb: { fallback: "manual"; pagePaths?: string[] } = { fallback: "manual" };
+    if (Array.isArray(data?.pagePaths)) fb.pagePaths = data.pagePaths;
+    return json(withLegacyPath(fb), 200, cors);
   } catch {
-    return json({ fallback: "manual", filePath: await parked }, 200, cors);
+    return json({ fallback: "manual" }, 200, cors);
   }
 });
