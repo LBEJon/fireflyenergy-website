@@ -5,18 +5,19 @@
 // X-Client-Ip. The CRM stores the pages, reads them, and rate-limits per client IP; its answer is
 // passed straight through. This function holds no model key, no limiter, no storage logic.
 //
-// Fails safe: unset URL/secret, CRM error, non-ok outcome, or a 25 s timeout all return
-// { fallback: "manual" } (carrying pagePaths when the CRM stored the pages) so the site drops the
-// user to manual kWh entry and the flow never blocks.
+// Fails safe: unset URL/secret, an oversize body (Content-Length > 4 × 12 MB + 64 KB, checked
+// before parsing), CRM error, non-ok outcome, or a 55 s timeout all return { fallback: "manual" }
+// (carrying pagePaths when the CRM stored the pages) so the site drops the user to manual kWh
+// entry and the flow never blocks. A CRM 429 (per-IP read limit) adds reason: "busy".
+// The 55 s timeout leaves room for a 4-page vision read; the Supabase wall clock is longer.
 import { corsFor } from "./cors.mjs";
+import { MAX_PAGES, MAX_B64_BYTES, bodyTooLarge, crmFailureBody } from "./proxy.mjs";
 
 const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") ??
   "https://fireflyenergy.mx,https://www.fireflyenergy.mx")
   .split(",").map((s) => s.trim()).filter(Boolean);
 
-const MAX_PAGES = 4; // mirrors MAX_BILL_PAGES in the CRM (cfe/upload.ts)
-const MAX_B64_BYTES = 12 * 1024 * 1024; // per page: ~8 MB file -> ~10.7 MB base64; 12 MB headroom
-const TIMEOUT_MS = 25_000;
+const TIMEOUT_MS = 55_000;
 
 // Mirrors ALLOWED_BILL_MIME_TYPES in the CRM (src/server/services/crm/cfe/upload.ts).
 const ALLOWED_MIME = ["application/pdf", "image/jpeg", "image/png", "image/webp"];
@@ -42,6 +43,9 @@ Deno.serve(async (req: Request): Promise<Response> => {
   const url = Deno.env.get("FIREFLY_CRM_BILL_URL");
   const secret = Deno.env.get("FIREFLY_CRM_INTAKE_SECRET");
   if (!url || !secret) return json({ fallback: "manual" }, 200, cors);
+
+  // Cheap total-body guard before req.json() buffers it: same manual fallback, 200.
+  if (bodyTooLarge(req.headers.get("content-length"))) return json({ fallback: "manual" }, 200, cors);
 
   let pages: { mime: string; dataB64: string }[];
   try {
@@ -78,7 +82,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
       body: JSON.stringify({ pages }),
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-    if (!res.ok) return json({ fallback: "manual" }, 200, cors);
+    if (!res.ok) return json(crmFailureBody(res.status), 200, cors);
     const data = await res.json();
     if (data?.ok === true) {
       const { ok: _ok, ...rest } = data;
