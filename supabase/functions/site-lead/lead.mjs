@@ -75,3 +75,83 @@ const BILL_PATH_RE =
 export function validBillFilePath(v) {
   return typeof v === "string" && BILL_PATH_RE.test(v) ? v : undefined;
 }
+
+// Per-page key minted by the CRM park endpoint (multi-page bills): `site-lead/<uuid v4>/<n>.<ext>`,
+// n 1-4. Same shape the CRM's intake_promote_v1 (migration 0101) re-validates.
+const BILL_PAGE_PATH_RE =
+  /^site-lead\/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/[1-4]\.(pdf|jpg|png|webp)$/;
+
+export function validBillPagePath(v) {
+  return typeof v === "string" && BILL_PAGE_PATH_RE.test(v) ? v : undefined;
+}
+
+const MAX_BILLS = 6;
+const ADDR_KEYS = ["address_line", "address2", "colonia", "city", "state", "postal_code"];
+
+function addressFields(addr) {
+  const out = {};
+  if (addr && typeof addr === "object") {
+    for (const k of ADDR_KEYS) if (addr[k] !== undefined && addr[k] !== null) out[k] = addr[k];
+  }
+  return out;
+}
+
+function pagePathOk(v) {
+  return validBillPagePath(v) ?? validBillFilePath(v);
+}
+
+/**
+ * Build the `cfe` array the CRM intake reads: one entry per meter/bill. Page paths round-trip
+ * through the browser, so every one is re-validated; a bad path is dropped but the bill keeps its
+ * figures. Falls back to the legacy single-bill answers when `answers.bills` is absent.
+ */
+export function buildCfeBills(a) {
+  const answers = a ?? {};
+  if (Array.isArray(answers.bills)) {
+    const out = [];
+    for (const b of answers.bills.slice(0, MAX_BILLS)) {
+      if (!b || typeof b !== "object") continue;
+      const pagePaths = (Array.isArray(b.pagePaths) ? b.pagePaths : [])
+        .slice(0, 4)
+        .map(pagePathOk)
+        .filter(Boolean);
+      const extraction = b.extraction && typeof b.extraction === "object"
+        ? b.extraction
+        : {
+          tariff: b.tariff,
+          current_period_kwh: b.kwhTotal,
+          billing_days: b.periodDays,
+          ...addressFields(b.address),
+        };
+      out.push({
+        page_paths: pagePaths,
+        file_path: pagePaths[0],
+        extraction,
+        tariff: b.tariff,
+        current_period_kwh: b.kwhTotal,
+        billing_days: b.periodDays,
+        avg_daily_kwh: b.kwhPerDay,
+        annual_kwh: b.annualKwh,
+        meter_no: b.meterNo,
+        service_no: b.serviceNo,
+      });
+    }
+    return out.length ? out : undefined;
+  }
+  const filePath = pagePathOk(answers.billFilePath);
+  if (!filePath && !answers.billKwhPerDay) return undefined;
+  return [{
+    page_paths: filePath ? [filePath] : [],
+    file_path: filePath,
+    extraction: {
+      tariff: answers.billTariff,
+      current_period_kwh: answers.billKwhTotal,
+      billing_days: answers.billPeriodDays,
+      ...addressFields(answers.billAddress),
+    },
+    tariff: answers.billTariff,
+    current_period_kwh: answers.billKwhTotal,
+    billing_days: answers.billPeriodDays,
+    avg_daily_kwh: answers.billKwhPerDay,
+  }];
+}
