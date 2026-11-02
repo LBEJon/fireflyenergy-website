@@ -49,7 +49,6 @@ const en = {
     essentials: 'Essentials only',
     normal: 'Normal use',
     hrs: '~{h} hrs',
-    imgNote: 'Shown: Firefly hybrid inverter. Appearance varies by model.',
     warranty: 'Every Firefly inverter and battery carries an 8-year warranty, including installation and support.',
     fine: 'Approximate runtime on battery alone, based on ~25 kWh/day of normal use. With solar, most outages are ridden out entirely. Your proposal is sized from your real usage.',
     cta: 'Get my recommendation',
@@ -60,9 +59,9 @@ const en = {
       { key: 'k12p', chip: '12 kW Plus', name: 'Firefly 12 kW Plus Hybrid Inverter', fit: 'Large solar arrays, or homes that already have solar panels.', specs: ['12 kW continuous', 'Up to 24 kW of solar panels', 'Works alongside existing grid-tied solar (up to 8 kW)'] },
     ],
     batteries: [
-      { key: 'b5', chip: '5 kWh', kwh: 5, name: 'Firefly 5 kWh Battery', note: 'Compact and outdoor-rated. Stack several to grow.', img: 'b5' },
+      { key: 'b5', chip: '5 kWh', kwh: 5, name: 'Firefly 5 kWh Battery', note: 'Compact and outdoor-rated (IP65). Stack several to grow.', img: 'b5' },
       { key: 'b15', chip: '15 kWh', kwh: 15, name: 'Firefly 15 kWh Battery', note: 'Built-in display, on wheels for easy placement.', img: 'b15' },
-      { key: 'b16', chip: '16 kWh', kwh: 16, name: 'Firefly 16 kWh Battery', note: 'Our largest single battery. Also available outdoor-rated.', img: 'b16' },
+      { key: 'b16', chip: '16 kWh', kwh: 16, name: 'Firefly 16 kWh Battery', note: 'Our largest single battery, outdoor-rated (IP65) for patios and carports.', img: 'b16' },
     ],
   },
   installs: {
@@ -179,7 +178,6 @@ const es: HomeCopy = {
     essentials: 'Solo esenciales',
     normal: 'Uso normal',
     hrs: '~{h} h',
-    imgNote: 'Se muestra: inversor híbrido Firefly. La apariencia varía según el modelo.',
     warranty: 'Cada inversor y batería Firefly tiene garantía de 8 años, incluida instalación y soporte.',
     fine: 'Autonomía aproximada solo con batería, con base en ~25 kWh/día de uso normal. Con paneles solares, la mayoría de los apagones se superan por completo. Tu propuesta se dimensiona con tu consumo real.',
     cta: 'Quiero mi recomendación',
@@ -190,9 +188,9 @@ const es: HomeCopy = {
       { key: 'k12p', chip: '12 kW Plus', name: 'Inversor Híbrido Firefly 12 kW Plus', fit: 'Sistemas solares grandes, o casas que ya tienen paneles.', specs: ['12 kW continuos', 'Hasta 24 kW de paneles solares', 'Trabaja junto a paneles solares existentes (hasta 8 kW)'] },
     ],
     batteries: [
-      { key: 'b5', chip: '5 kWh', kwh: 5, name: 'Batería Firefly 5 kWh', note: 'Compacta y apta para exterior. Suma varias para crecer.', img: 'b5' },
+      { key: 'b5', chip: '5 kWh', kwh: 5, name: 'Batería Firefly 5 kWh', note: 'Compacta y apta para exterior (IP65). Suma varias para crecer.', img: 'b5' },
       { key: 'b15', chip: '15 kWh', kwh: 15, name: 'Batería Firefly 15 kWh', note: 'Pantalla integrada y ruedas para ubicarla fácilmente.', img: 'b15' },
-      { key: 'b16', chip: '16 kWh', kwh: 16, name: 'Batería Firefly 16 kWh', note: 'Nuestra batería individual más grande. También disponible para exterior.', img: 'b16' },
+      { key: 'b16', chip: '16 kWh', kwh: 16, name: 'Batería Firefly 16 kWh', note: 'Nuestra batería individual más grande, apta para exterior (IP65): terrazas y cocheras.', img: 'b16' },
     ],
   },
   installs: {
