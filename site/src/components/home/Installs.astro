@@ -31,13 +31,17 @@ const photos = [1, 2, 3, 4, 5].map((n) => `/assets/equipment/installs/install-${
   .in .lede { color: var(--ff-slate); }
   .in__head { display: grid; grid-template-columns: 1.1fr 1fr; gap: 3rem; align-items: end; }
   .in__head .lede { margin: 0; }
-  .in__strip { list-style: none; margin: clamp(2.5rem, 6vh, 4rem) 0 0; padding: 0 var(--gutter); display: grid; grid-auto-flow: column;
-    grid-auto-columns: clamp(210px, 19vw, 290px); gap: 1rem; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: var(--gutter);
-    scrollbar-width: thin; padding-bottom: 1rem; }
-  .in__strip li { scroll-snap-align: start; }
-  .in__strip img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 14px; display: block;
-    transition: transform .8s var(--ease), filter .8s var(--ease); filter: saturate(.92); }
-  .in__strip li:hover img { transform: scale(1.015); filter: saturate(1.05); }
+  .in__strip { list-style: none; width: min(100% - 2 * var(--gutter), var(--wide)); margin: clamp(2.5rem, 6vh, 4rem) auto 0; padding: 0;
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: clamp(.6rem, 1vw, 1rem); }
+  .in__strip img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 30%; border-radius: 12px; display: block;
+    filter: saturate(.94) contrast(1.04) brightness(1.02); transition: transform .7s var(--ease), filter .7s var(--ease); }
+  .in__strip li { overflow: hidden; border-radius: 12px; background: var(--ff-mist); }
+  .in__strip li:hover img { transform: scale(1.03); filter: saturate(1) contrast(1.04) brightness(1.04); }
+  @media (max-width: 900px) {
+    .in__strip { width: auto; padding: 0 var(--gutter) .75rem; grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 62vw;
+      overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: var(--gutter); scrollbar-width: none; }
+    .in__strip li { scroll-snap-align: start; }
+  }
   .in__specs { margin: clamp(3rem, 7vh, 5rem) auto 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
   .in__specs div { border-top: 2px solid var(--ff-ink); padding-top: 1rem; transition-delay: calc(var(--i) * 100ms); }
   .in__specs dt { font-family: var(--ff-display); font-weight: 700; font-size: clamp(1.5rem, 2.2vw, 2rem); line-height: 1.05; }

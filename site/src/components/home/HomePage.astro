@@ -33,6 +33,6 @@ const c = homeCopy[locale];
   document.documentElement.classList.add('rv-ready');
   const io = new IntersectionObserver((entries) => {
     for (const e of entries) if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
-  }, { rootMargin: '0px 0px -12% 0px' });
+  }, { rootMargin: '0px 0px -4% 0px' });
   document.querySelectorAll('[data-rv]').forEach((el) => io.observe(el));
 </script>

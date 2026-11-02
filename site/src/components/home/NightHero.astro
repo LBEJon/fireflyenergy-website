@@ -19,8 +19,8 @@ const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
 
     <div class="nh__tag" aria-hidden="true"><span class="nh__tag-dot"></span>{c.fireflyHome}</div>
 
-    <figure class="nh__inside" aria-hidden="true">
-      <img src="/assets/equipment/system-installed.webp" alt="" width="1600" height="1062" loading="lazy" decoding="async" />
+    <figure class="nh__reveal">
+      <img src="/assets/equipment/installs/install-4.webp" alt={c.insideAlt} width="900" height="1200" loading="lazy" decoding="async" />
       <figcaption>
         <strong>{c.insideA}</strong>
         <span>{c.insideB}</span>
@@ -49,7 +49,7 @@ const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
 </section>
 
 <style>
-  .nh { position: relative; height: 340vh; background: var(--night); color: var(--on-night); }
+  .nh { position: relative; height: 260vh; background: var(--night); color: var(--on-night); }
   .nh__stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; isolation: isolate; }
   .nh__photo, .nh__canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .nh__photo { object-position: 49% 55%; }
@@ -99,14 +99,16 @@ const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
   }
   .nh__tag-dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--ff-green); box-shadow: 0 0 10px var(--ff-green); }
 
-  .nh__inside { position: absolute; inset: 0; z-index: 2; margin: 0; opacity: 0; pointer-events: none; }
-  .nh__inside img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.12); }
-  .nh__inside figcaption {
-    position: absolute; right: var(--gutter); bottom: clamp(2rem, 7vh, 4.5rem); max-width: 22rem;
-    display: grid; gap: .4rem; padding: 1.1rem 1.25rem; border-radius: 14px;
-    background: rgb(9 10 12 / 0.72); backdrop-filter: blur(10px); color: var(--on-night); line-height: 1.45;
-  }
-  .nh__inside figcaption strong { font-family: var(--ff-display); font-size: 1.5rem; line-height: 1.05; color: var(--ff-green); }
+  .nh__reveal { --rv: 0; position: absolute; inset: 0; z-index: 2; margin: 0; visibility: hidden; opacity: 0;
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(2rem, 6vw, 6rem);
+    padding: calc(var(--nav-h) + 2rem) var(--gutter) 2.5rem;
+    background: radial-gradient(ellipse at 70% 50%, #1d2016, var(--night) 70%); }
+  .nh__reveal img { justify-self: center; height: min(74vh, 720px); width: auto; max-width: 100%; aspect-ratio: 3 / 4; object-fit: cover;
+    border-radius: 18px; box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(255 255 255 / 0.06);
+    transform: translateY(calc(24px - 24px * var(--rv))) scale(calc(1.04 - 0.04 * var(--rv))); }
+  .nh__reveal figcaption { order: -1; display: grid; gap: 1rem; max-width: 30rem; justify-self: end; transform: translateY(calc(16px - 16px * var(--rv))); }
+  .nh__reveal strong { font-family: var(--ff-display); font-weight: 700; font-size: clamp(2.2rem, 4.6vw, 4rem); line-height: .98; letter-spacing: -0.02em; color: var(--ff-green); text-wrap: balance; }
+  .nh__reveal span { font-size: clamp(1.02rem, 1.25vw, 1.2rem); line-height: 1.55; color: var(--on-night-2); }
 
   .nh__cue {
     position: absolute; z-index: 3; left: 50%; bottom: 1rem; transform: translateX(-50%);
@@ -118,11 +120,14 @@ const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
   @media (max-width: 700px) {
     .nh__stage::after { background: linear-gradient(to top, rgb(9 10 12 / 0.96) 0%, rgb(9 10 12 / 0.82) 45%, rgb(9 10 12 / 0.2) 75%, transparent); }
     .nh__status { top: auto; bottom: auto; top: calc(var(--nav-h) + .75rem); right: .75rem; font-size: .72rem; }
-    .nh__inside figcaption { left: var(--gutter); right: var(--gutter); max-width: none; bottom: 1.25rem; }
+    .nh__reveal { grid-template-columns: 1fr; align-content: center; gap: 1.5rem; }
+    .nh__reveal img { height: 52vh; }
+    .nh__reveal figcaption { order: 1; justify-self: start; }
     .nh__cue { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     .nh { height: auto; }
+    .nh__reveal { display: none; }
     .nh__stage { position: relative; }
     .nh__cue::after { animation: none; }
   }
