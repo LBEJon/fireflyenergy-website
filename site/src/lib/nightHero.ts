@@ -1,82 +1,31 @@
 /**
- * Night hero: San Miguel at night. On scroll, houses lose power neighborhood by
- * neighborhood (each house = a small cluster of windows that flickers and dies
- * together), a scattering of houses stay lit, the camera drifts toward the
- * Firefly home, and the scene dissolves into a real install.
+ * Night hero: two pixel-aligned photographs of the same San Miguel view — the
+ * town with power (grid-on) and the same town in an outage where only a few
+ * homes stay lit. On scroll, neighborhoods switch from the first photo to the
+ * second one at a time (with a short flicker), the camera drifts toward the
+ * Firefly home, then the scene dissolves into a real install.
  *
- * ponytail: 2D canvas over the real photo. The push is capped at 1.3x so the
- * 1920px source never pixelates. Replace with the Higgsfield flyover video.
+ * ponytail: 2D canvas + soft radial masks. Push capped at 1.25x so the 2200px
+ * photos stay sharp. Replace with the Higgsfield flyover video when it exists.
  */
 
-const SRC = '/assets/photos/hero-dusk.webp';
-const HOUSE = { x: 0.49, y: 0.553, r: 0.05 }; // the lit house in hero-dusk, normalized
-// Neighborhood seeds in the order they lose power: far city, across the hill, then the foreground.
-const SEEDS = [
-  [0.12, 0.26], [0.3, 0.27], [0.2, 0.42], [0.42, 0.34], [0.62, 0.24],
-  [0.86, 0.16], [0.83, 0.42], [0.65, 0.62], [0.3, 0.64], [0.12, 0.84], [0.55, 0.88], [0.88, 0.82],
+const LIT = '/assets/photos/sma-grid-on.webp';
+const OUT = '/assets/photos/sma-outage.webp';
+const HOUSE = { x: 0.49, y: 0.553 }; // the Firefly home, normalized
+// Neighborhoods in the order they lose power: far city + cathedral, across the hill, then the foreground.
+const ZONES: [number, number, number][] = [
+  [0.1, 0.22, 0.12], [0.3, 0.2, 0.12], [0.44, 0.22, 0.1], [0.62, 0.14, 0.11], [0.82, 0.1, 0.12], [0.95, 0.28, 0.1],
+  [0.12, 0.4, 0.12], [0.3, 0.38, 0.11], [0.7, 0.34, 0.12], [0.88, 0.48, 0.12],
+  [0.2, 0.6, 0.13], [0.38, 0.52, 0.09], [0.66, 0.56, 0.11], [0.8, 0.7, 0.13],
+  [0.1, 0.84, 0.14], [0.35, 0.8, 0.13], [0.6, 0.82, 0.13], [0.9, 0.9, 0.13],
 ];
-const MAX_PUSH = 0.3;
-
-type Win = { x: number; y: number; w: number; h: number; warm: number };
-type House = { wins: Win[]; offAt: number; survivor: boolean; phase: number };
+const START = 0.04, END = 0.5, FLICKER = 0.025, MAX_PUSH = 0.25;
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const smooth = (a: number, b: number, v: number) => { const t = clamp01((v - a) / (b - a)); return t * t * (3 - 2 * t); };
-function rng(seed = 7) { return () => ((seed = (seed * 16807) % 2147483647) / 2147483647); }
-
-/** Sample the photo once: per-column skyline and a luminance lookup, both normalized. */
-function analyze(img: HTMLImageElement) {
-  const w = 320, h = Math.round((img.naturalHeight / img.naturalWidth) * w);
-  const c = document.createElement('canvas');
-  c.width = w; c.height = h;
-  const g = c.getContext('2d', { willReadFrequently: true })!;
-  g.drawImage(img, 0, 0, w, h);
-  const d = g.getImageData(0, 0, w, h).data;
-  const lum = (x: number, y: number) => { const i = (y * w + x) * 4; return (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) / 255; };
-  const sky: number[] = [];
-  for (let x = 0; x < w; x++) {
-    let s = h * 0.6;
-    for (let y = 4; y < h * 0.6; y++) {
-      if (Math.abs(lum(x, y) - lum(x, y - 3)) > 0.05 && Math.abs(lum(x, y + 1) - lum(x, y - 3)) > 0.05) { s = y; break; }
-    }
-    sky.push(s / h);
-  }
-  const skyline = sky.map((_, i) => { const s = sky.slice(Math.max(0, i - 4), i + 5).sort((a, b) => a - b); return s[s.length >> 1]; });
-  return {
-    skyAt: (nx: number) => skyline[Math.min(w - 1, Math.floor(nx * w))],
-    lumAt: (nx: number, ny: number) => lum(Math.min(w - 1, Math.floor(nx * w)), Math.min(h - 1, Math.floor(ny * h))),
-  };
-}
-
-function makeHouses(img: HTMLImageElement, count: number): House[] {
-  const { skyAt, lumAt } = analyze(img);
-  const rand = rng(23);
-  const houses: House[] = [];
-  let guard = 0;
-  while (houses.length < count && guard++ < count * 40) {
-    const x = rand();
-    const sky = skyAt(x) + 0.015;
-    const y = sky + rand() * (0.97 - sky);
-    if (Math.hypot((x - HOUSE.x) * 1.77, y - HOUSE.y) < HOUSE.r * 1.8) continue; // the real lit house stays photographic
-    const L = lumAt(x, y);
-    if (L < 0.07 || L > 0.5) continue; // skip trees/shadow and bright sky
-    const depth = clamp01((y - sky) / 0.7); // 0 = far, 1 = foreground
-    // Window size and spacing in image-width units; far houses are tiny.
-    const ww = 0.0012 + depth * 0.0026;
-    const wh = ww * (1.3 + rand() * 0.4);
-    const cols = 1 + Math.floor(rand() * 3), rows = rand() < 0.35 ? 2 : 1;
-    const wins: Win[] = [];
-    for (let r = 0; r < rows; r++) for (let k = 0; k < cols; k++) {
-      if (rand() < 0.25) continue; // not every window is lit
-      wins.push({ x: x + k * ww * 2.4, y: y + r * wh * 1.9, w: ww, h: wh, warm: rand() });
-    }
-    if (!wins.length) continue;
-    let region = 0, best = Infinity;
-    SEEDS.forEach(([sx, sy], i) => { const dd = Math.hypot((x - sx) * 1.77, y - sy); if (dd < best) { best = dd; region = i; } });
-    houses.push({ wins, offAt: 0.08 + (region / SEEDS.length) * 0.32 + rand() * 0.03, survivor: rand() < 0.06, phase: rand() * 1000 });
-  }
-  return houses;
-}
+const loadImg = (src: string) => new Promise<HTMLImageElement>((res, rej) => {
+  const i = new Image(); i.decoding = 'async'; i.onload = () => res(i); i.onerror = rej; i.src = src;
+});
 
 export function mountNightHero(root: HTMLElement) {
   const canvas = root.querySelector<HTMLCanvasElement>('.nh__canvas');
@@ -91,19 +40,18 @@ export function mountNightHero(root: HTMLElement) {
   const homeEl = root.querySelector<HTMLElement>('[data-home]');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const img = new Image();
-  img.decoding = 'async';
-  img.src = SRC;
-
-  let houses: House[] = [];
-  let W = 0, H = 0;
+  const mask = document.createElement('canvas');
+  const mctx = mask.getContext('2d')!;
+  let lit: HTMLImageElement, out: HTMLImageElement;
+  let W = 0, H = 0, dpr = 1;
   let target = 0, current = 0, visible = true, raf = 0, gridOff = false;
 
   function resize() {
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    dpr = Math.min(2, window.devicePixelRatio || 1);
     W = stage.clientWidth; H = stage.clientHeight;
-    canvas!.width = Math.round(W * dpr); canvas!.height = Math.round(H * dpr);
+    for (const c of [canvas!, mask]) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
     ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+    mctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
   const progress = () => {
     const r = root.getBoundingClientRect();
@@ -118,81 +66,70 @@ export function mountNightHero(root: HTMLElement) {
     homeEl.classList.toggle('is-batt', off);
     homeEl.lastChild!.textContent = off ? homeEl.dataset.batt! : homeEl.dataset.on!;
   }
+  /** How "on" a neighborhood is: 1 = lit photo, 0 = outage photo, with a brownout flicker on the way down. */
+  function zoneOn(i: number, p: number, now: number) {
+    const offAt = START + (i / ZONES.length) * (END - START);
+    if (p >= offAt + 0.02) return 0;
+    if (p < offAt - FLICKER) return 1;
+    if (p < offAt) return Math.sin(now / 55 + i * 7.3) > -0.2 ? 1 : 0.25;
+    return 1 - (p - offAt) / 0.02;
+  }
 
   function draw(p: number, now: number) {
-    const iw = img.naturalWidth, ih = img.naturalHeight;
+    const iw = out.naturalWidth, ih = out.naturalHeight;
     const s = Math.max(W / iw, H / ih);
     const ox = Math.min(0, Math.max(W - iw * s, W / 2 - HOUSE.x * iw * s));
     const oy = Math.min(0, Math.max(H - ih * s, H * 0.5 - HOUSE.y * ih * s));
     const hx = ox + HOUSE.x * iw * s, hy = oy + HOUSE.y * ih * s;
-    // Slow drift toward the Firefly home while the town goes dark.
-    const z = 1 + MAX_PUSH * smooth(0.25, 0.7, p);
-    const X = (nx: number) => hx + (ox + nx * iw * s - hx) * z;
-    const Y = (ny: number) => hy + (oy + ny * ih * s - hy) * z;
-    const unit = iw * s * z;
+    const z = 1 + MAX_PUSH * smooth(0.3, 0.75, p);
+    const dx = hx + (ox - hx) * z, dy = hy + (oy - hy) * z, dw = iw * s * z, dh = ih * s * z;
 
     ctx!.globalCompositeOperation = 'source-over';
-    ctx!.globalAlpha = 1;
-    ctx!.drawImage(img, X(0), Y(0), iw * s * z, ih * s * z);
+    ctx!.drawImage(out, dx, dy, dw, dh);
 
-    // Grid on: a faint warm lift over the whole town; it drains as neighborhoods fail.
-    const dark = smooth(0.08, 0.42, p);
-    ctx!.fillStyle = `rgba(255,170,90,${0.07 * (1 - dark)})`;
-    ctx!.globalCompositeOperation = 'soft-light';
-    ctx!.fillRect(0, 0, W, H);
-
-    // Blackout deepens everything except a pool around the Firefly home.
-    ctx!.globalCompositeOperation = 'source-over';
-    const hr = HOUSE.r * unit;
-    const shade = ctx!.createRadialGradient(hx, hy, hr, hx, hy, hr * 4);
-    shade.addColorStop(0, 'rgba(4,7,16,0)');
-    shade.addColorStop(1, `rgba(4,7,16,${0.08 + 0.4 * dark})`);
-    ctx!.fillStyle = shade;
-    ctx!.fillRect(0, 0, W, H);
-
-    // Windows: crisp warm rectangles with a soft bloom, a house at a time.
-    for (const hs of houses) {
-      let a: number;
-      if (hs.survivor) a = 1;
-      else {
-        const t = p - hs.offAt;
-        if (t < -0.025) a = 1;
-        else if (t < 0) a = Math.sin(now / 45 + hs.phase) > 0 ? 1 : 0.2; // brownout flicker
-        else continue;
-      }
-      for (const w of hs.wins) {
-        const x = X(w.x), y = Y(w.y), ww = Math.max(1, w.w * unit), wh = Math.max(1.2, w.h * unit);
-        if (x < -10 || y < -10 || x > W + 10 || y > H + 10) continue;
-        ctx!.globalCompositeOperation = 'lighter';
-        ctx!.globalAlpha = 0.18 * a;
-        ctx!.fillStyle = '#ff9a3c';
-        ctx!.fillRect(x - ww, y - wh * 0.6, ww * 3, wh * 2.2); // bloom
-        ctx!.globalCompositeOperation = 'source-over';
-        ctx!.globalAlpha = (0.75 + 0.25 * w.warm) * a;
-        ctx!.fillStyle = w.warm > 0.5 ? '#ffc46b' : '#ffdca0';
-        ctx!.fillRect(x, y, ww, wh);
-      }
+    // Start from the fully lit town and cut each failed neighborhood out of it, then fade any remainder.
+    const litAlpha = 1 - smooth(END - 0.04, END + 0.04, p);
+    if (litAlpha > 0) {
+      mctx.globalCompositeOperation = 'source-over';
+      mctx.clearRect(0, 0, W, H);
+      mctx.fillStyle = '#000';
+      mctx.fillRect(0, 0, W, H);
+      mctx.globalCompositeOperation = 'destination-out';
+      ZONES.forEach(([zx, zy, zr], i) => {
+        const off = 1 - zoneOn(i, p, now);
+        if (off <= 0) return;
+        const x = dx + zx * dw, y = dy + zy * dh, r = zr * dw;
+        const g = mctx.createRadialGradient(x, y, r * 0.3, x, y, r);
+        g.addColorStop(0, `rgba(0,0,0,${off})`);
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        mctx.fillStyle = g;
+        mctx.fillRect(x - r, y - r, r * 2, r * 2);
+      });
+      mctx.globalCompositeOperation = 'source-in';
+      mctx.drawImage(lit, dx, dy, dw, dh);
+      ctx!.setTransform(1, 0, 0, 1, 0, 0);
+      ctx!.globalAlpha = litAlpha;
+      ctx!.drawImage(mask, 0, 0);
+      ctx!.globalAlpha = 1;
+      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
-    ctx!.globalCompositeOperation = 'source-over';
-    ctx!.globalAlpha = 1;
 
-    setStatus(p > 0.1);
+    setStatus(p > START);
     if (reduced) return;
     if (copy) {
-      const f = smooth(0.5, 0.6, p);
+      const f = smooth(0.56, 0.64, p);
       copy.style.opacity = String(1 - f);
       copy.style.transform = `translateY(${-16 * f}px)`;
       copy.style.visibility = f > 0.99 ? 'hidden' : '';
     }
     if (cue) cue.style.opacity = String(1 - smooth(0.02, 0.08, p));
     if (tag) {
-      tag.style.opacity = String(smooth(0.42, 0.5, p) * (1 - smooth(0.62, 0.68, p)));
+      tag.style.opacity = String(smooth(0.5, 0.56, p) * (1 - smooth(0.66, 0.7, p)));
       tag.style.left = `${hx}px`;
-      tag.style.top = `${Y(HOUSE.y - HOUSE.r * 0.7)}px`;
+      tag.style.top = `${hy - 0.035 * dh}px`;
     }
     if (reveal) {
-      // Night town dissolves into the install it was all about.
-      const rv = smooth(0.66, 0.86, p);
+      const rv = smooth(0.7, 0.88, p);
       reveal.style.opacity = String(rv);
       reveal.style.visibility = rv > 0 ? 'visible' : 'hidden';
       reveal.style.setProperty('--rv', rv.toFixed(3));
@@ -204,20 +141,20 @@ export function mountNightHero(root: HTMLElement) {
     current += (target - current) * 0.16;
     if (Math.abs(target - current) < 0.0005) current = target;
     draw(current, now);
-    const flickering = houses.some((h) => !h.survivor && current - h.offAt > -0.025 && current - h.offAt < 0);
+    const flickering = current > START - FLICKER - 0.01 && current < END + 0.02;
     if (visible && (current !== target || flickering)) raf = requestAnimationFrame(frame);
   }
   const kick = () => { if (!raf && visible) raf = requestAnimationFrame(frame); };
 
-  img.addEventListener('load', () => {
-    houses = makeHouses(img, window.innerWidth < 700 ? 240 : 420);
+  Promise.all([loadImg(LIT), loadImg(OUT)]).then(([a, b]) => {
+    lit = a; out = b;
     resize();
     root.classList.add('is-live');
-    if (reduced) { draw(0.5, 0); return; }
+    if (reduced) { draw(1, 0); return; }
     target = current = progress();
     kick();
     window.addEventListener('scroll', () => { target = progress(); kick(); }, { passive: true });
     window.addEventListener('resize', () => { resize(); target = progress(); kick(); });
     new IntersectionObserver(([e]) => { visible = e.isIntersecting; kick(); }).observe(root);
-  });
+  }).catch(() => { /* static photo stays visible */ });
 }

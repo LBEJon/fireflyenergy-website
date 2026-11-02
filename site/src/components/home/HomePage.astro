@@ -9,7 +9,7 @@ import HomeClose from './HomeClose.astro';
 import WhatsAppBubble from '../WhatsAppBubble.astro';
 import { homeCopy } from '../../content/home';
 import { homeGraph } from '../../lib/jsonld';
-import type { Locale } from '../../lib/i18n';
+import { altUrl, t, type Locale } from '../../lib/i18n';
 import '../../styles/v2.css';
 
 interface Props { locale: Locale }
@@ -26,7 +26,26 @@ const c = homeCopy[locale];
     <HomeClose locale={locale} />
   </main>
   <WhatsAppBubble locale={locale} />
+  <div class="mbar" data-mbar aria-hidden="true">
+    <a class="btn btn--coral" href={altUrl(locale, 'calculator')} data-track="begin_assessment" tabindex="-1">{c.nav.cta}</a>
+    <a class="mbar__wa" href={`https://wa.me/${t(locale, 'common.whatsapp')}`} target="_blank" rel="noopener" data-track="contact_whatsapp" aria-label={t(locale, 'common.whatsapp_label')} tabindex="-1">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22c5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm4.52 11.97c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.23.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74 1.47.64 2.06.69 2.8.58.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg>
+    </a>
+  </div>
 </Base>
+
+<style>
+  .mbar { display: none; }
+  @media (max-width: 700px) {
+    :global(.ff-wa) { display: none !important; }
+    .mbar { position: fixed; z-index: 55; left: .75rem; right: .75rem; bottom: calc(.75rem + env(safe-area-inset-bottom)); display: flex; gap: .5rem;
+      padding: .5rem; border-radius: 999px; background: rgb(11 13 16 / 0.88); backdrop-filter: blur(12px); border: 1px solid var(--night-line);
+      box-shadow: 0 12px 30px -10px rgb(0 0 0 / 0.5); transform: translateY(140%); transition: transform .45s var(--ease); }
+    .mbar.is-on { transform: none; }
+    .mbar .btn { flex: 1; }
+    .mbar__wa { flex: none; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: #25d366; color: #fff; }
+  }
+</style>
 
 <script>
   // Section entrances: opt in only when JS runs, reveal once.
@@ -35,4 +54,22 @@ const c = homeCopy[locale];
     for (const e of entries) if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
   }, { rootMargin: '0px 0px -4% 0px' });
   document.querySelectorAll('[data-rv]').forEach((el) => io.observe(el));
+
+  // Mobile action bar: shows once the hero (with its own buttons) has scrolled away, steps aside for the closing call to action.
+  const bar = document.querySelector<HTMLElement>('[data-mbar]');
+  const closing = document.querySelector('#cl-title');
+  if (bar) {
+    let nearEnd = false;
+    if (closing) new IntersectionObserver(([e]) => { nearEnd = e.isIntersecting; update(); }).observe(closing);
+    function update() {
+      const hero = document.querySelector<HTMLElement>('[data-nh]');
+      const past = hero ? hero.getBoundingClientRect().bottom < window.innerHeight * 0.6 : window.scrollY > window.innerHeight;
+      const on = past && !nearEnd;
+      bar!.classList.toggle('is-on', on);
+      bar!.setAttribute('aria-hidden', String(!on));
+      bar!.querySelectorAll('a').forEach((a) => (on ? a.removeAttribute('tabindex') : a.setAttribute('tabindex', '-1')));
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  }
 </script>

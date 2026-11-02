@@ -11,9 +11,9 @@ const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
   <div class="nh__stage">
     <!-- Static fallback (no-JS / reduced motion) and the canvas source. -->
     <picture>
-      <source srcset="/assets/photos/hero-dusk-mobile.webp" media="(max-width: 700px)" type="image/webp" />
-      <source srcset="/assets/photos/hero-dusk.webp" type="image/webp" />
-      <img class="nh__photo" src="/assets/photos/hero-dusk.jpg" alt={c.imgAlt} width="1920" height="1085" fetchpriority="high" decoding="async" />
+      <source srcset="/assets/photos/sma-grid-on-mobile.webp" media="(max-width: 700px)" type="image/webp" />
+      <source srcset="/assets/photos/sma-grid-on.webp" type="image/webp" />
+      <img class="nh__photo" src="/assets/photos/sma-grid-on.jpg" alt={c.imgAlt} width="2200" height="1228" fetchpriority="high" decoding="async" />
     </picture>
     <canvas class="nh__canvas" aria-hidden="true"></canvas>
 
@@ -42,6 +42,9 @@ const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
         <a class="btn btn--coral" href={altUrl(locale, 'calculator')} data-track="begin_assessment">{c.cta}</a>
         <a class="btn btn--ghost-dark" href={wa} target="_blank" rel="noopener" data-track="contact_whatsapp">{c.wa}</a>
       </div>
+      <ul class="nh__trust">
+        {c.trust.map((x) => <li>{x}</li>)}
+      </ul>
     </div>
 
     <span class="nh__cue" aria-hidden="true">{c.scroll}</span>
@@ -49,10 +52,11 @@ const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
 </section>
 
 <style>
-  .nh { position: relative; height: 260vh; background: var(--night); color: var(--on-night); }
+  .nh { position: relative; height: 300vh; background: var(--night); color: var(--on-night); }
   .nh__stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; isolation: isolate; }
   .nh__photo, .nh__canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .nh__photo { object-position: 49% 55%; }
+  @media (prefers-reduced-motion: reduce) { .nh__photo { content: url('/assets/photos/sma-outage.webp'); } }
   .nh.is-live .nh__photo { visibility: hidden; }
   .nh__stage::after { /* legibility scrim, bottom-left where the copy sits */
     content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
@@ -74,6 +78,9 @@ const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
   .nh__title-b { color: var(--ff-green); }
   .nh__sub { margin: 1.25rem 0 0; max-width: 36rem; font-size: clamp(1.02rem, 1.25vw, 1.2rem); line-height: 1.55; color: var(--on-night-2); }
   .nh__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.75rem; }
+  .nh__trust { list-style: none; display: flex; flex-wrap: wrap; gap: .4rem 1.25rem; margin: 1.25rem 0 0; padding: 0; font-size: .88rem; color: var(--on-night-2); }
+  .nh__trust li { display: inline-flex; align-items: center; gap: .45rem; }
+  .nh__trust li::before { content: ''; width: .4rem; height: .4rem; border-radius: 50%; background: var(--ff-green); }
 
   .nh__status {
     position: absolute; z-index: 3; top: calc(var(--nav-h) + 1.25rem); right: var(--gutter); margin: 0;
