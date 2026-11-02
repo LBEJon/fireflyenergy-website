@@ -1,4 +1,5 @@
 ---
+import Dealers from './Dealers.astro';
 import { homeCopy } from '../../content/home';
 import { altUrl, t, type Locale } from '../../lib/i18n';
 
@@ -35,6 +36,8 @@ const email = t(locale, 'common.email');
     <img class="bz__img" src="/assets/photos/industrial-hero.webp" alt="" width="1920" height="1085" loading="lazy" decoding="async" />
   </div>
 </section>
+
+<Dealers locale={locale} />
 
 <section class="fq" aria-labelledby="fq-title">
   <div class="wrap fq__in">
@@ -77,6 +80,7 @@ const email = t(locale, 'common.email');
       <a href={`${altUrl(locale, '')}#how`}>{c.nav.how}</a>
       <a href={altUrl(locale, 'calculator')}>{t(locale, 'nav.calculator')}</a>
       <a href={altUrl(locale, 'industrial')}>{c.nav.business}</a>
+      <a href={`${altUrl(locale, '')}#dealers`}>{c.nav.dealers}</a>
       <a href={altUrl(locale, 'faq')}>{c.nav.faq}</a>
     </nav>
     <div>

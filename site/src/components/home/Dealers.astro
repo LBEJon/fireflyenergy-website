@@ -1,0 +1,55 @@
+---
+import { homeCopy } from '../../content/home';
+import { t, type Locale } from '../../lib/i18n';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = homeCopy[locale].dealers;
+const wa = `https://wa.me/${t(locale, 'common.whatsapp')}?text=${encodeURIComponent(c.waMsg)}`;
+const mail = `mailto:${t(locale, 'common.email')}?subject=${encodeURIComponent(c.subject)}`;
+---
+<section class="dl" id="dealers" aria-labelledby="dl-title">
+  <div class="wrap dl__in">
+    <div class="dl__copy" data-rv>
+      <h2 id="dl-title" class="display">{c.title}</h2>
+      <p>{c.p}</p>
+      <ul>{c.points.map((x) => <li>{x}</li>)}</ul>
+      <div class="dl__actions">
+        <a class="btn btn--coral" href={wa} target="_blank" rel="noopener" data-track="contact_dealer">{c.wa}</a>
+        <a class="btn btn--ghost-dark" href={mail} data-track="contact_dealer">{c.email}</a>
+      </div>
+    </div>
+    <div class="dl__lineup" role="img" aria-label={c.imgAlt} data-rv>
+      <img src="/assets/equipment/lineup/inv.webp" alt="" class="dl__inv" loading="lazy" decoding="async" />
+      <img src="/assets/equipment/lineup/b15.webp" alt="" class="dl__b15" loading="lazy" decoding="async" />
+      <img src="/assets/equipment/lineup/b16.webp" alt="" class="dl__b16" loading="lazy" decoding="async" />
+      <img src="/assets/equipment/lineup/b5.webp" alt="" class="dl__b5" loading="lazy" decoding="async" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .dl { position: relative; overflow: hidden; background: var(--night-2); color: var(--on-night); padding: clamp(5rem, 12vh, 8rem) 0;
+    border-top: 1px solid var(--night-line); }
+  .dl::before { content: ''; position: absolute; inset: auto -10% -40% 40%; height: 80%; pointer-events: none;
+    background: radial-gradient(ellipse at center, rgb(158 213 0 / 0.14), transparent 65%); }
+  .dl__in { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: clamp(2.5rem, 6vw, 6rem); align-items: center; }
+  .dl h2 { font-size: clamp(2.2rem, 4.6vw, 3.75rem); }
+  .dl__copy > p { color: var(--on-night-2); font-size: 1.1rem; line-height: 1.6; max-width: 34rem; margin: 1.1rem 0 0; }
+  .dl ul { list-style: none; margin: 1.5rem 0 0; padding: 0; display: grid; gap: .65rem; }
+  .dl li { display: flex; gap: .7rem; align-items: baseline; line-height: 1.45; }
+  .dl li::before { content: ''; flex: none; width: .5rem; height: .5rem; border-radius: 50%; background: var(--ff-green); box-shadow: 0 0 10px rgb(158 213 0 / .6); transform: translateY(-.1rem); }
+  .dl__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
+  .dl__lineup { display: flex; align-items: flex-end; justify-content: center; gap: clamp(.5rem, 1.5vw, 1.25rem); min-height: 360px; }
+  .dl__lineup img { width: auto; filter: drop-shadow(0 24px 28px rgb(0 0 0 / .45)); }
+  .dl__inv { height: clamp(190px, 21vw, 290px); align-self: center; }
+  .dl__b15 { height: clamp(220px, 25vw, 340px); }
+  .dl__b16 { height: clamp(180px, 20vw, 280px); }
+  .dl__b5 { height: clamp(130px, 14vw, 200px); }
+  @media (max-width: 900px) {
+    .dl__in { grid-template-columns: 1fr; }
+    .dl__lineup { min-height: 0; order: -1; }
+    .dl__lineup { gap: .35rem; }
+    .dl__inv { height: 26vw; } .dl__b15 { height: 30vw; } .dl__b16 { height: 24vw; } .dl__b5 { height: 17vw; }
+  }
+</style>
