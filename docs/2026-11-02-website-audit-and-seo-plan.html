@@ -1,0 +1,285 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Firefly website audit & SEO plan</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Archivo+Narrow:wght@700&display=swap');
+body{margin:0;background:#f8f9f4;color:#2a2d34;font:17px/1.65 Archivo,system-ui,sans-serif}
+header{background:#0b0d10;color:#f4f5ef;padding:56px 0 40px}
+.w{max-width:880px;margin:0 auto;padding:0 28px}
+h1{font:700 clamp(2.2rem,5vw,3.4rem)/1 'Archivo Narrow';margin:0}
+header p{color:#a9aeb8;margin:.8rem 0 0}
+h1 em{color:#9ed500;font-style:normal}
+h2{font:700 2rem/1.05 'Archivo Narrow';margin:3rem 0 .8rem;padding-top:1.5rem;border-top:2px solid #2a2d34}
+h3{font-size:1.15rem;margin:2rem 0 .5rem}
+table{border-collapse:collapse;width:100%;font-size:.93rem;margin:1rem 0;background:#fff}
+th,td{text-align:left;padding:.6rem .75rem;border-bottom:1px solid #e2e5da;vertical-align:top}
+th{background:#2a2d34;color:#fff;font-weight:600}
+a{color:#2a2d34;text-decoration-color:#9ed500;text-decoration-thickness:2px;text-underline-offset:3px}
+code{background:#eef0e8;padding:.1em .35em;border-radius:4px;font-size:.88em}
+strong{font-weight:700}
+li{margin:.3rem 0}
+::selection{background:#9ed500}
+</style></head><body>
+<header><div class="w"><h1>Firefly website: <em>audit, redesign &amp; SEO plan</em></h1><p>2 November 2026 · Preview: <a style="color:#9ed500" href="https://redesign-fireflyenergy-website.jondenne.workers.dev">redesign-fireflyenergy-website.jondenne.workers.dev</a></p></div></header>
+<main class="w">
+<p><strong>Date:</strong> 2026-11-02 · <strong>Branch:</strong> <code>feat/redesign-2026</code> · <strong>Preview:</strong> <a href="https://redesign-fireflyenergy-website.jondenne.workers.dev">https://redesign-fireflyenergy-website.jondenne.workers.dev</a> (live site unchanged: <a href="https://fireflyenergy.mx">https://fireflyenergy.mx</a>)</p>
+<h2>1. Summary</h2>
+<ul>
+<li>The new homepage (English + Spanish) is built and running on the private preview link. Scroll through it: San Miguel at night, the grid fails neighborhood by neighborhood, a few homes stay lit, and the camera pushes into one Firefly home and its installed system.</li>
+<li>Google Analytics, Google Ads and Meta Pixel tracking are built in. They stay switched off until you create the accounts and send the IDs (steps in section 4).</li>
+<li>SEO basics are fixed on the new homepage. The bigger SEO wins sit outside the code: a Google Business Profile, customer reviews and Search Console (section 5).</li>
+<li>Still to do after you approve the look: carry the design to the Industrial, Calculator and FAQ pages, then drop in the Higgsfield flyover video (Project 2).</li>
+</ul>
+<h2>2. Audit of the current site</h2>
+<h3>What works</h3>
+<ul>
+<li>Real install photos from San Miguel homes. These are the most persuasive asset on the site.</li>
+<li>Clear lead paths: the assessment with CFE-bill upload, plus WhatsApp.</li>
+<li>Bilingual, with correct <code>hreflang</code>, a sitemap, and structured data already in place.</li>
+<li>No prices on the site, consistent with the 2026-11-01 decision.</li>
+</ul>
+<h3>What hurts trust</h3>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Where</th>
+<th>Fix in redesign</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Contradictory numbers: "20 yrs" vs "19 yrs", "&lt;20ms" vs "&lt;19ms", "96% automatic" vs "100% automatic"</td>
+<td>Hero chips vs stats strip vs "always watching" box</td>
+<td>One set of numbers, used everywhere (PRODUCT.md)</td>
+</tr>
+<tr>
+<td>Placeholder testimonials shown as real customers</td>
+<td>"Real installs" section</td>
+<td>Removed. Add real quotes once collected</td>
+</tr>
+<tr>
+<td>The power-flow diagram is a screenshot with its own logo inside the page</td>
+<td>"How it works"</td>
+<td>Replaced with an animated pure-sine waveform: CFE → battery → solar → CFE</td>
+</tr>
+</tbody>
+</table>
+<h3>What hurts conversion</h3>
+<ul>
+<li><strong>Coral is everywhere.</strong> Every tier card has a coral button, so nothing stands out. The new design uses coral only for the main action.</li>
+<li><strong>Template look.</strong> A stat strip, six identical icon cards, three pricing-style cards: it reads like a generic solar template. The new page tells one story instead: night → outage → your house stays on → how → what stays on → proof → next step.</li>
+<li><strong>The hero doesn't show the product's promise.</strong> It's a still photo with a headline. The new hero shows the promise happening as you scroll.</li>
+</ul>
+<h3>Technical / SEO</h3>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Impact</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No tracking of any kind (no GA4, no Ads tag, no Pixel)</td>
+<td>Can't measure visits, leads or ad spend</td>
+<td><strong>Built</strong>, off until IDs are added</td>
+</tr>
+<tr>
+<td>No social share image (<code>og:image</code>)</td>
+<td>Links shared on WhatsApp/Facebook show no picture</td>
+<td><strong>Fixed</strong> (all pages)</td>
+</tr>
+<tr>
+<td>Page titles are slogans ("Power that never blinks") with no search terms</td>
+<td>Weak ranking for "battery backup San Miguel"</td>
+<td><strong>Fixed</strong> on homepage (EN/ES)</td>
+</tr>
+<tr>
+<td>No <code>robots.txt</code> served</td>
+<td>Crawlers have no sitemap pointer</td>
+<td><strong>Fixed</strong></td>
+</tr>
+<tr>
+<td>Fonts loaded through a CSS <code>@import</code> chain</td>
+<td>Slower first render</td>
+<td><strong>Fixed</strong>: preconnect + direct link</td>
+</tr>
+<tr>
+<td><code>Product</code> schema without price or reviews</td>
+<td>Google flags it as invalid</td>
+<td><strong>Fixed</strong>: now <code>Service</code> + <code>LocalBusiness</code>/<code>Electrician</code> with logo and image</td>
+</tr>
+<tr>
+<td>Install photos are 230–480 KB JPEGs</td>
+<td>Slow on mobile data</td>
+<td><strong>Fixed</strong>: 33–110 KB WebP</td>
+</tr>
+</tbody>
+</table>
+<h2>3. The new homepage</h2>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>What the visitor gets</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Night hero (scroll)</td>
+<td>Sees San Miguel go dark while their home stays on; a live "CFE grid / Your home" readout flips from On to Offline / On battery; ends inside the carport with the equipment</td>
+</tr>
+<tr>
+<td>Twenty milliseconds</td>
+<td>The four moments of an outage, drawn as one unbroken pure sine wave</td>
+</tr>
+<tr>
+<td>Choose what stays on</td>
+<td>Essentials / Comfort / Whole home switch: household items light up or go dark, with runtime hours. No prices</td>
+</tr>
+<tr>
+<td>Already working in San Miguel homes</td>
+<td>Real install photos plus four facts: 20 years, 8-year warranty incl. install + support, 6,000+ cycles, grows with you</td>
+</tr>
+<tr>
+<td>From your CFE bill to a quiet carport</td>
+<td>Three steps, ending in "Start with my CFE bill"</td>
+</tr>
+<tr>
+<td>Business band</td>
+<td>Links to the commercial &amp; industrial page</td>
+</tr>
+<tr>
+<td>Good questions</td>
+<td>Four short FAQs plus a link to the full FAQ</td>
+</tr>
+<tr>
+<td>Always connected. Always prepared.</td>
+<td>Final call to action plus WhatsApp</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Brand note:</strong> the vault's brand guide says "avoid darkness imagery". This page uses darkness on purpose, as you asked. It's framed calmly: the lit home is the hero, and there's no storm, alarm or emergency language.</p>
+<p><strong>Motion &amp; accessibility:</strong> visitors who turn off animations in their phone or computer settings get a still version. All text meets contrast standards. The page works with a keyboard and has a skip-to-content link.</p>
+<h2>4. Google &amp; Meta tracking: what you need to do</h2>
+<p>The code is ready. You need three free accounts, then send me the IDs and I'll switch tracking on.</p>
+<h3>Step 1: Google Analytics 4 (about 5 minutes)</h3>
+<ol>
+<li>Go to <a href="https://analytics.google.com">https://analytics.google.com</a> and sign in with the Google account you want to own the data (ideally a Firefly business account, not a personal one).</li>
+<li>Click <strong>Start measuring</strong>. Account name: <code>Firefly Energy</code>. Click <strong>Next</strong>.</li>
+<li>Property name: <code>fireflyenergy.mx</code>. Time zone: <strong>Mexico – Mexico City</strong>. Currency: <strong>Mexican Peso</strong>. Click <strong>Next</strong>, answer the business questions, click <strong>Create</strong>.</li>
+<li>Choose platform <strong>Web</strong>. Website URL: <code>fireflyenergy.mx</code>. Stream name: <code>Website</code>. Click <strong>Create stream</strong>.</li>
+<li>Copy the <strong>Measurement ID</strong> at the top right. It looks like <code>G-XXXXXXXXXX</code>. Send it to me.</li>
+</ol>
+<h3>Step 2: Google Search Console (about 5 minutes)</h3>
+<ol>
+<li>Go to <a href="https://search.google.com/search-console">https://search.google.com/search-console</a> and click <strong>Add property</strong> → <strong>URL prefix</strong> → <code><a href="https://fireflyenergy.mx/">https://fireflyenergy.mx/</a></code>.</li>
+<li>Choose verification method <strong>Google Analytics</strong> (works once Step 1 is live), then click <strong>Verify</strong>.</li>
+<li>Open <strong>Sitemaps</strong> in the left menu, enter <code>sitemap-index.xml</code>, and click <strong>Submit</strong>.</li>
+</ol>
+<h3>Step 3: Google Ads (only when you're ready to advertise)</h3>
+<ol>
+<li>Go to <a href="https://ads.google.com">https://ads.google.com</a> → <strong>Start now</strong>. Switch to <strong>Expert mode</strong> at the bottom ("Switch to Expert Mode"), then <strong>Create an account without a campaign</strong>. Country: Mexico, currency: MXN.</li>
+<li>Go to <strong>Goals → Conversions → New conversion action → Website</strong>, enter <code>fireflyenergy.mx</code>, and choose <strong>Add a conversion action manually</strong>. Category: <strong>Submit lead form</strong>. Name: <code>Lead</code>. Value: <strong>Don't use a value</strong>. Count: <strong>One</strong>.</li>
+<li>Choose <strong>Use Google tag</strong> and copy two things: the tag ID (<code>AW-XXXXXXXXX</code>) and the conversion label (the part after the <code>/</code>). Send both to me.</li>
+</ol>
+<h3>Step 4: Meta Pixel (for Facebook / Instagram ads)</h3>
+<ol>
+<li>Go to <a href="https://business.facebook.com/events_manager2">https://business.facebook.com/events_manager2</a> → <strong>Connect data sources</strong> → <strong>Web</strong> → <strong>Meta Pixel</strong> → name it <code>Firefly website</code> → <strong>Create pixel</strong>.</li>
+<li>Choose <strong>Install code manually</strong> and copy the <strong>Pixel ID</strong> (15–16 digits). Send it to me.</li>
+</ol>
+<h3>What gets tracked once live</h3>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Fires when</th>
+<th>Google</th>
+<th>Meta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>begin_assessment</code></td>
+<td>Someone clicks any "Get my proposal / Size my system" button</td>
+<td>GA4 event</td>
+<td>custom event</td>
+</tr>
+<tr>
+<td><code>generate_lead</code></td>
+<td>A proposal request is submitted successfully</td>
+<td>GA4 event + Ads conversion</td>
+<td><code>Lead</code></td>
+</tr>
+<tr>
+<td><code>contact_whatsapp</code> / <code>contact_phone</code> / <code>contact_email</code></td>
+<td>WhatsApp, phone or email link clicked</td>
+<td>GA4 event</td>
+<td><code>Contact</code></td>
+</tr>
+</tbody>
+</table>
+<p>No names, phone numbers or emails are ever sent to Google or Meta. The privacy page should get one line saying the site uses analytics and advertising cookies; I can write it.</p>
+<h2>5. SEO plan</h2>
+<h3>Keywords to own (English / Spanish)</h3>
+<table>
+<thead>
+<tr>
+<th>Intent</th>
+<th>English</th>
+<th>Spanish</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Core local</td>
+<td>battery backup San Miguel de Allende · home battery backup Mexico</td>
+<td>respaldo de energía San Miguel de Allende · baterías para casa</td>
+</tr>
+<tr>
+<td>Solar</td>
+<td>solar installer San Miguel de Allende · solar panels SMA</td>
+<td>paneles solares San Miguel de Allende · energía solar Guanajuato</td>
+</tr>
+<tr>
+<td>Problem</td>
+<td>power outages San Miguel de Allende · CFE outage backup</td>
+<td>apagones San Miguel de Allende · se va la luz qué hacer</td>
+</tr>
+<tr>
+<td>Product</td>
+<td>LiFePO4 home battery Mexico · hybrid inverter installation</td>
+<td>inversor híbrido instalación · batería de litio para casa</td>
+</tr>
+<tr>
+<td>Business</td>
+<td>battery storage for business Mexico · reduce CFE demand charges</td>
+<td>almacenamiento de energía para empresas · cargos por demanda CFE</td>
+</tr>
+</tbody>
+</table>
+<h3>Highest-impact actions, in order</h3>
+<ol>
+<li><strong>Google Business Profile</strong> (<a href="https://business.google.com">https://business.google.com</a>). For a local installer, this matters more than anything on the site itself. Category: <em>Solar energy contractor</em>, secondary <em>Electrician</em>. Add the service area (San Miguel de Allende, Querétaro, Guanajuato), hours, WhatsApp number, and the install photos.</li>
+<li><strong>Reviews.</strong> Ask every finished customer for a Google review (I can make a short QR card and WhatsApp message). Reviews also give us the real testimonials the site is missing.</li>
+<li><strong>Search Console + sitemap</strong> (Step 2 above).</li>
+<li><strong>Roll the new design and SEO titles across every page:</strong> Industrial, Calculator, FAQ, EN and ES.</li>
+<li><strong>Add pages people search for:</strong></li>
+<li>"Power outages in San Miguel de Allende: what to do" (EN/ES guide; answers a real question and ranks for problem searches)</li>
+<li>"Battery backup vs. generator" (comparison)</li>
+<li>"Solar + battery in San Miguel" (service page)</li>
+<li>One short page per real install, with photos (local proof; good for long-tail searches)</li>
+<li><strong>FAQ rich results:</strong> the FAQ page already has FAQ schema; keep answers short and specific.</li>
+</ol>
+<h3>Ads readiness</h3>
+<ul>
+<li><strong>Google Search ads:</strong> start with the core-local and problem keywords above, limited to San Miguel de Allende + 30 km, plus Querétaro. Send clicks to the homepage (EN or ES by keyword language) and measure with the <code>Lead</code> conversion.</li>
+<li><strong>Meta ads:</strong> the night-hero visual and the Higgsfield flyover are the creative. Run to homeowners in San Miguel and Querétaro, then retarget site visitors with the Pixel.</li>
+<li>Don't spend on ads until GA4, the Ads conversion and the Pixel are live. Without them we can't tell what works.</li>
+</ul>
+<h2>6. Next steps</h2>
+<ol>
+<li><strong>You:</strong> review the preview link on your phone and computer and tell me what to change.</li>
+<li><strong>You:</strong> create the accounts in section 4 and send me the IDs.</li>
+<li><strong>Me, after approval:</strong> apply the design to Industrial, Calculator and FAQ (EN/ES), write DESIGN.md, run a final quality review, then merge to <code>main</code> to go live.</li>
+<li><strong>Project 2 (new conversation with Higgsfield):</strong> generate the photoreal San Miguel blackout → carport flyover and replace the coded hero animation with it.</li>
+</ol></main></body></html>
