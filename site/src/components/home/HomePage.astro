@@ -1,0 +1,38 @@
+---
+import Base from '../../layouts/Base.astro';
+import SiteNav from './SiteNav.astro';
+import NightHero from './NightHero.astro';
+import Handoff from './Handoff.astro';
+import StaysOn from './StaysOn.astro';
+import Installs from './Installs.astro';
+import HomeClose from './HomeClose.astro';
+import WhatsAppBubble from '../WhatsAppBubble.astro';
+import { homeCopy } from '../../content/home';
+import { homeGraph } from '../../lib/jsonld';
+import type { Locale } from '../../lib/i18n';
+import '../../styles/v2.css';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = homeCopy[locale];
+---
+<Base title={c.metaTitle} description={c.metaDesc} locale={locale} path="" jsonLd={homeGraph(locale, Astro.site)}>
+  <SiteNav locale={locale} />
+  <main id="main">
+    <NightHero locale={locale} />
+    <Handoff locale={locale} />
+    <StaysOn locale={locale} />
+    <Installs locale={locale} />
+    <HomeClose locale={locale} />
+  </main>
+  <WhatsAppBubble locale={locale} />
+</Base>
+
+<script>
+  // Section entrances: opt in only when JS runs, reveal once.
+  document.documentElement.classList.add('rv-ready');
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+  }, { rootMargin: '0px 0px -12% 0px' });
+  document.querySelectorAll('[data-rv]').forEach((el) => io.observe(el));
+</script>

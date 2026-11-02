@@ -1,0 +1,53 @@
+---
+/**
+ * Google tag (GA4 + Google Ads) and Meta Pixel. Each loads only when its ID is
+ * set at build time, so the site ships clean until the accounts exist.
+ *   PUBLIC_GA_ID            G-XXXXXXXXXX   (Google Analytics 4)
+ *   PUBLIC_GADS_ID          AW-XXXXXXXXX   (Google Ads, optional)
+ *   PUBLIC_GADS_LEAD_LABEL  conversion label for "Lead" (optional)
+ *   PUBLIC_META_PIXEL_ID    15-16 digits   (Meta Pixel, optional)
+ * Events: begin_assessment, generate_lead, contact_whatsapp, contact_phone, contact_email.
+ * No names, phones or emails are ever sent.
+ */
+const GA = import.meta.env.PUBLIC_GA_ID ?? '';
+const ADS = import.meta.env.PUBLIC_GADS_ID ?? '';
+const ADS_LABEL = import.meta.env.PUBLIC_GADS_LEAD_LABEL ?? '';
+const PIXEL = import.meta.env.PUBLIC_META_PIXEL_ID ?? '';
+const tagId = GA || ADS;
+const cfg = JSON.stringify({ GA, ADS, ADS_LABEL, PIXEL });
+---
+{tagId && <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${tagId}`}></script>}
+{(tagId || PIXEL) && (
+  <script is:inline define:vars={{ cfg }}>
+    const c = JSON.parse(cfg);
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { dataLayer.push(arguments); };
+    if (c.GA || c.ADS) {
+      gtag('js', new Date());
+      if (c.GA) gtag('config', c.GA);
+      if (c.ADS) gtag('config', c.ADS);
+    }
+    if (c.PIXEL) {
+      !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', c.PIXEL);
+      fbq('track', 'PageView');
+    }
+    const META = { generate_lead: 'Lead', contact_whatsapp: 'Contact', contact_phone: 'Contact', contact_email: 'Contact' };
+    window.ffTrack = function (name, params) {
+      params = params || {};
+      if (c.GA || c.ADS) gtag('event', name, params);
+      if (name === 'generate_lead' && c.ADS && c.ADS_LABEL) gtag('event', 'conversion', { send_to: c.ADS + '/' + c.ADS_LABEL });
+      if (c.PIXEL) META[name] ? fbq('track', META[name], params) : fbq('trackCustom', name, params);
+    };
+    document.addEventListener('click', function (e) {
+      const a = e.target.closest && e.target.closest('a');
+      if (!a) return;
+      const href = a.getAttribute('href') || '';
+      const name = a.dataset.track
+        || (href.startsWith('https://wa.me') ? 'contact_whatsapp'
+        : href.startsWith('tel:') ? 'contact_phone'
+        : href.startsWith('mailto:') ? 'contact_email' : '');
+      if (name) window.ffTrack(name, { link_location: location.pathname });
+    }, { capture: true });
+  </script>
+)}

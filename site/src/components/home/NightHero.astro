@@ -1,0 +1,134 @@
+---
+import { homeCopy } from '../../content/home';
+import { altUrl, t, type Locale } from '../../lib/i18n';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = homeCopy[locale].hero;
+const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
+---
+<section class="nh" data-nh aria-labelledby="nh-title">
+  <div class="nh__stage">
+    <!-- Static fallback (no-JS / reduced motion) and the canvas source. -->
+    <picture>
+      <source srcset="/assets/photos/hero-dusk-mobile.webp" media="(max-width: 700px)" type="image/webp" />
+      <source srcset="/assets/photos/hero-dusk.webp" type="image/webp" />
+      <img class="nh__photo" src="/assets/photos/hero-dusk.jpg" alt={c.imgAlt} width="1920" height="1085" fetchpriority="high" decoding="async" />
+    </picture>
+    <canvas class="nh__canvas" aria-hidden="true"></canvas>
+
+    <div class="nh__tag" aria-hidden="true"><span class="nh__tag-dot"></span>{c.fireflyHome}</div>
+
+    <figure class="nh__inside" aria-hidden="true">
+      <img src="/assets/equipment/system-installed.webp" alt="" width="1600" height="1062" loading="lazy" decoding="async" />
+      <figcaption>
+        <strong>{c.insideA}</strong>
+        <span>{c.insideB}</span>
+      </figcaption>
+    </figure>
+
+    <dl class="nh__status" aria-hidden="true">
+      <div><dt>{c.gridLabel}</dt><dd data-grid data-on={c.on} data-off={c.off}><i></i>{c.on}</dd></div>
+      <div><dt>{c.homeLabel}</dt><dd class="is-home" data-home data-on={c.on} data-batt={c.battery}><i></i>{c.on}</dd></div>
+    </dl>
+
+    <div class="nh__copy">
+      <h1 id="nh-title" class="nh__title">
+        <span>{c.h1a}</span>
+        <span class="nh__title-b">{c.h1b}</span>
+      </h1>
+      <p class="nh__sub">{c.sub}</p>
+      <div class="nh__actions">
+        <a class="btn btn--coral" href={altUrl(locale, 'calculator')} data-track="begin_assessment">{c.cta}</a>
+        <a class="btn btn--ghost-dark" href={wa} target="_blank" rel="noopener" data-track="contact_whatsapp">{c.wa}</a>
+      </div>
+    </div>
+
+    <span class="nh__cue" aria-hidden="true">{c.scroll}</span>
+  </div>
+</section>
+
+<style>
+  .nh { position: relative; height: 340vh; background: var(--night); color: var(--on-night); }
+  .nh__stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; isolation: isolate; }
+  .nh__photo, .nh__canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .nh__photo { object-position: 49% 55%; }
+  .nh.is-live .nh__photo { visibility: hidden; }
+  .nh__stage::after { /* legibility scrim, bottom-left where the copy sits */
+    content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background:
+      linear-gradient(to top, rgb(9 10 12 / 0.92) 0%, rgb(9 10 12 / 0.55) 32%, transparent 62%),
+      linear-gradient(to right, rgb(9 10 12 / 0.55), transparent 55%);
+  }
+
+  .nh__copy {
+    position: absolute; z-index: 3; left: var(--gutter); right: var(--gutter); bottom: clamp(2rem, 7vh, 4.5rem);
+    max-width: 46rem;
+    transition: opacity .4s var(--ease), transform .6s var(--ease);
+  }
+  .nh__title {
+    font-family: var(--ff-display); font-weight: 700; text-wrap: balance;
+    font-size: clamp(2.75rem, 7.2vw, 6rem); line-height: .94; letter-spacing: -0.025em; margin: 0;
+  }
+  .nh__title span { display: block; }
+  .nh__title-b { color: var(--ff-green); }
+  .nh__sub { margin: 1.25rem 0 0; max-width: 36rem; font-size: clamp(1.02rem, 1.25vw, 1.2rem); line-height: 1.55; color: var(--on-night-2); }
+  .nh__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.75rem; }
+
+  .nh__status {
+    position: absolute; z-index: 3; top: calc(var(--nav-h) + 1.25rem); right: var(--gutter); margin: 0;
+    display: grid; gap: .35rem; padding: .85rem 1rem; border-radius: 12px;
+    background: rgb(9 10 12 / 0.5); backdrop-filter: blur(8px); border: 1px solid rgb(255 255 255 / 0.08);
+    font-size: .8rem; font-variant-numeric: tabular-nums;
+  }
+  .nh__status div { display: flex; justify-content: space-between; gap: 1.5rem; }
+  .nh__status dt { color: var(--on-night-2); }
+  .nh__status dd { margin: 0; display: inline-flex; align-items: center; gap: .45rem; font-weight: 600; }
+  .nh__status i { width: .5rem; height: .5rem; border-radius: 50%; background: var(--amber); box-shadow: 0 0 10px var(--amber); }
+  .nh__status dd.is-off { color: var(--on-night-2); }
+  .nh__status dd.is-off i { background: #3a3e46; box-shadow: none; }
+  .nh__status .is-home i { background: var(--ff-green); box-shadow: 0 0 12px var(--ff-green); }
+  .nh__status .is-home.is-batt { color: var(--ff-green); }
+
+  .nh__tag {
+    position: absolute; z-index: 2; left: 0; top: 0; opacity: 0; pointer-events: none;
+    display: inline-flex; align-items: center; gap: .5rem; white-space: nowrap;
+    padding: .4rem .7rem .4rem .55rem; border-radius: 999px; font-size: .8rem; font-weight: 600;
+    background: rgb(9 10 12 / 0.6); border: 1px solid rgb(158 213 0 / 0.5); color: var(--ff-green);
+    transform: translate(-50%, calc(-100% - 2.2rem));
+  }
+  .nh__tag-dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--ff-green); box-shadow: 0 0 10px var(--ff-green); }
+
+  .nh__inside { position: absolute; inset: 0; z-index: 2; margin: 0; opacity: 0; pointer-events: none; }
+  .nh__inside img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.12); }
+  .nh__inside figcaption {
+    position: absolute; right: var(--gutter); bottom: clamp(2rem, 7vh, 4.5rem); max-width: 22rem;
+    display: grid; gap: .4rem; padding: 1.1rem 1.25rem; border-radius: 14px;
+    background: rgb(9 10 12 / 0.72); backdrop-filter: blur(10px); color: var(--on-night); line-height: 1.45;
+  }
+  .nh__inside figcaption strong { font-family: var(--ff-display); font-size: 1.5rem; line-height: 1.05; color: var(--ff-green); }
+
+  .nh__cue {
+    position: absolute; z-index: 3; left: 50%; bottom: 1rem; transform: translateX(-50%);
+    font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--on-night-2);
+  }
+  .nh__cue::after { content: ''; display: block; width: 1px; height: 2rem; margin: .5rem auto 0; background: linear-gradient(var(--on-night-2), transparent); animation: cue 2s var(--ease) infinite; }
+  @keyframes cue { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+
+  @media (max-width: 700px) {
+    .nh__stage::after { background: linear-gradient(to top, rgb(9 10 12 / 0.96) 0%, rgb(9 10 12 / 0.82) 45%, rgb(9 10 12 / 0.2) 75%, transparent); }
+    .nh__status { top: auto; bottom: auto; top: calc(var(--nav-h) + .75rem); right: .75rem; font-size: .72rem; }
+    .nh__inside figcaption { left: var(--gutter); right: var(--gutter); max-width: none; bottom: 1.25rem; }
+    .nh__cue { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nh { height: auto; }
+    .nh__stage { position: relative; }
+    .nh__cue::after { animation: none; }
+  }
+</style>
+
+<script>
+  import { mountNightHero } from '../../lib/nightHero';
+  document.querySelectorAll<HTMLElement>('[data-nh]').forEach(mountNightHero);
+</script>

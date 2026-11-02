@@ -1,0 +1,47 @@
+---
+import { homeCopy } from '../../content/home';
+import type { Locale } from '../../lib/i18n';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = homeCopy[locale].installs;
+const photos = [1, 2, 3, 4, 5].map((n) => `/assets/equipment/installs/install-${n}.webp`);
+---
+<section class="in" id="installs" aria-labelledby="in-title">
+  <div class="wrap in__head">
+    <h2 id="in-title" class="display h2" data-rv>{c.title}</h2>
+    <p class="lede" data-rv>{c.lede}</p>
+  </div>
+
+  <ul class="in__strip" tabindex="0" aria-label={c.title}>
+    {photos.map((src) => (
+      <li><img src={src} alt={c.alt} width="900" height="1200" loading="lazy" decoding="async" /></li>
+    ))}
+  </ul>
+
+  <dl class="wrap in__specs">
+    {c.specs.map(([k, v], i) => (
+      <div data-rv style={`--i:${i}`}><dt>{k}</dt><dd>{v}</dd></div>
+    ))}
+  </dl>
+</section>
+
+<style>
+  .in { background: var(--ff-paper); padding: 0 0 clamp(6rem, 14vh, 10rem); }
+  .in .lede { color: var(--ff-slate); }
+  .in__head { display: grid; grid-template-columns: 1.1fr 1fr; gap: 3rem; align-items: end; }
+  .in__head .lede { margin: 0; }
+  .in__strip { list-style: none; margin: clamp(2.5rem, 6vh, 4rem) 0 0; padding: 0 var(--gutter); display: grid; grid-auto-flow: column;
+    grid-auto-columns: clamp(210px, 19vw, 290px); gap: 1rem; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: var(--gutter);
+    scrollbar-width: thin; padding-bottom: 1rem; }
+  .in__strip li { scroll-snap-align: start; }
+  .in__strip img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 14px; display: block;
+    transition: transform .8s var(--ease), filter .8s var(--ease); filter: saturate(.92); }
+  .in__strip li:hover img { transform: scale(1.015); filter: saturate(1.05); }
+  .in__specs { margin: clamp(3rem, 7vh, 5rem) auto 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+  .in__specs div { border-top: 2px solid var(--ff-ink); padding-top: 1rem; transition-delay: calc(var(--i) * 100ms); }
+  .in__specs dt { font-family: var(--ff-display); font-weight: 700; font-size: clamp(1.5rem, 2.2vw, 2rem); line-height: 1.05; }
+  .in__specs dd { margin: .5rem 0 0; color: var(--ff-slate); line-height: 1.5; }
+  @media (max-width: 900px) { .in__head { grid-template-columns: 1fr; gap: 0; } .in__head .lede { margin-top: 1rem; } .in__specs { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 480px) { .in__specs { grid-template-columns: 1fr; } }
+</style>

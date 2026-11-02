@@ -1,0 +1,73 @@
+---
+import { homeCopy } from '../../content/home';
+import type { Locale } from '../../lib/i18n';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = homeCopy[locale].handoff;
+
+// One continuous pure sine wave across the four moments: CFE (amber) → battery + solar (lime) → CFE again.
+const W = 1200, H = 90, MID = H / 2, AMP = 26, CYCLES = 22;
+function wave(x0: number, x1: number) {
+  let d = '';
+  for (let x = x0; x <= x1; x += 2) {
+    const y = MID - AMP * Math.sin((x / W) * CYCLES * Math.PI * 2);
+    d += `${d ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`;
+  }
+  return d;
+}
+const gap = 6; // the sub-20 ms handoff, drawn as a hairline break
+const segs = [
+  { d: wave(0, W * 0.25 - gap), cls: 'grid' },
+  { d: wave(W * 0.25 + gap, W * 0.75 - gap), cls: 'batt' },
+  { d: wave(W * 0.75 + gap, W), cls: 'grid' },
+];
+---
+<section class="ho" id="how" aria-labelledby="ho-title">
+  <div class="wrap">
+    <h2 id="ho-title" class="display h2" data-rv>{c.title}</h2>
+    <p class="lede" data-rv>{c.lede}</p>
+
+    <div class="ho__wave" data-rv aria-hidden="true">
+      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none">
+        {segs.map((s) => <path d={s.d} class={`ho__seg ho__seg--${s.cls}`} pathLength="1" />)}
+      </svg>
+    </div>
+
+    <ol class="ho__steps">
+      {c.steps.map((s, i) => (
+        <li class={`ho__step ${i === 1 || i === 2 ? 'is-batt' : ''}`} data-rv style={`--i:${i}`}>
+          <span class="ho__t">{s.t}</span>
+          <h3>{s.h}</h3>
+          <p>{s.p}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .ho { background: var(--night); color: var(--on-night); padding: clamp(6rem, 14vh, 10rem) 0 clamp(5rem, 12vh, 8rem); }
+  .ho .lede { color: var(--on-night-2); }
+  .ho__wave { margin: clamp(3rem, 7vh, 5rem) 0 0; height: clamp(56px, 7vw, 90px); }
+  .ho__wave svg { width: 100%; height: 100%; overflow: visible; }
+  .ho__seg { fill: none; stroke-width: 2.25; vector-effect: non-scaling-stroke; stroke-linecap: round;
+    stroke-dasharray: 1; stroke-dashoffset: 1; }
+  .ho__seg--grid { stroke: var(--amber); filter: drop-shadow(0 0 6px rgb(255 176 74 / 0.5)); }
+  .ho__seg--batt { stroke: var(--ff-green); filter: drop-shadow(0 0 8px rgb(158 213 0 / 0.55)); }
+  .ho__wave.is-in .ho__seg { transition: stroke-dashoffset 1.1s linear; stroke-dashoffset: 0; }
+  .ho__wave.is-in .ho__seg:nth-child(2) { transition-duration: 2.2s; transition-delay: 1.1s; }
+  .ho__wave.is-in .ho__seg:nth-child(3) { transition-delay: 3.3s; }
+  :global(html:not(.rv-ready)) .ho__seg { stroke-dashoffset: 0; }
+
+  .ho__steps { list-style: none; margin: 1.75rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+  .ho__step { border-top: 1px solid var(--night-line); padding-top: 1.25rem; transition-delay: calc(var(--i) * 120ms); }
+  .ho__t { display: block; font-family: var(--ff-display); font-weight: 700; font-size: clamp(2rem, 3.4vw, 3rem); line-height: 1;
+    color: var(--amber); font-variant-numeric: tabular-nums; }
+  .ho__step.is-batt .ho__t { color: var(--ff-green); }
+  .ho__step h3 { margin: .9rem 0 .5rem; font-size: 1.15rem; font-weight: 700; }
+  .ho__step p { margin: 0; color: var(--on-night-2); line-height: 1.55; max-width: 30ch; }
+  @media (max-width: 900px) { .ho__steps { grid-template-columns: 1fr 1fr; row-gap: 2.5rem; } }
+  @media (max-width: 520px) { .ho__steps { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) { .ho__seg { stroke-dashoffset: 0; transition: none !important; } }
+</style>
