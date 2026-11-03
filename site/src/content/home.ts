@@ -30,7 +30,7 @@ const en = {
   },
   flow: {
     title: 'What powers a Firefly system.',
-    lede: 'Three parts work as one. The inverter decides, second by second, where your power comes from.',
+    lede: 'Three parts work as one. Here’s what happens, stage by stage.',
     nodes: {
       solar: ['Solar panels', 'Optional. Free power by day that runs the house and refills the battery.'],
       grid: ['CFE grid', 'Still connected. Used when it makes sense, with its dips and spikes smoothed out.'],
@@ -39,10 +39,10 @@ const en = {
       home: ['Your home', 'Steady power, whatever the source. Nothing to switch, nothing to reset.'],
     },
     modes: [
-      { key: 'day', name: 'Sunny day', p: 'The sun runs the house and charges the battery. You buy less from CFE.' },
-      { key: 'night', name: 'Evening', p: 'After sunset the battery runs the house on the power it stored during the day.' },
-      { key: 'outage', name: 'Outage', p: 'CFE drops. The battery and sun carry the house in under 20 ms. Nobody notices.' },
-      { key: 'grid', name: 'Cloudy week', p: 'CFE powers the house and keeps the battery full and ready.' },
+      { key: 'outage', name: 'Grid fails', h: 'The grid fails.', p: 'CFE drops. In under 20 ms the inverter moves the whole house to Firefly power. Nobody notices.' },
+      { key: 'solar', name: 'Solar', h: 'Solar feeds the home and the battery.', p: 'Panels power the house first and send what’s left into the battery.' },
+      { key: 'battery', name: 'Battery', h: 'The battery kicks in.', p: 'No sun and no grid? The battery runs the house on the power it stored.' },
+      { key: 'export', name: 'Grid feed', h: 'Surplus goes back to CFE.', p: 'With a CFE net-metering contract, power left over after your home is covered flows back to the grid for credit.' },
     ],
     offline: 'Offline',
   },
@@ -180,7 +180,7 @@ const es: HomeCopy = {
   },
   flow: {
     title: 'Qué hace funcionar un sistema Firefly.',
-    lede: 'Tres piezas trabajan como una. El inversor decide, segundo a segundo, de dónde viene tu energía.',
+    lede: 'Tres piezas trabajan como una. Esto es lo que pasa, etapa por etapa.',
     nodes: {
       solar: ['Paneles solares', 'Opcionales. Energía gratis de día que mueve la casa y recarga la batería.'],
       grid: ['Red de CFE', 'Sigues conectado. Se usa cuando conviene, con sus bajas y picos suavizados.'],
@@ -189,10 +189,10 @@ const es: HomeCopy = {
       home: ['Tu casa', 'Energía estable, venga de donde venga. Nada que mover, nada que reiniciar.'],
     },
     modes: [
-      { key: 'day', name: 'Día soleado', p: 'El sol mueve la casa y carga la batería. Le compras menos a CFE.' },
-      { key: 'night', name: 'Noche', p: 'Al anochecer, la batería mueve la casa con la energía que guardó durante el día.' },
-      { key: 'outage', name: 'Apagón', p: 'Se va la CFE. La batería y el sol mueven la casa en menos de 20 ms. Nadie lo nota.' },
-      { key: 'grid', name: 'Semana nublada', p: 'CFE alimenta la casa y mantiene la batería llena y lista.' },
+      { key: 'outage', name: 'Falla la red', h: 'Falla la red.', p: 'Se va la CFE. En menos de 20 ms el inversor pasa toda la casa a energía Firefly. Nadie lo nota.' },
+      { key: 'solar', name: 'Solar', h: 'El sol alimenta la casa y la batería.', p: 'Los paneles mueven primero la casa y mandan lo que sobra a la batería.' },
+      { key: 'battery', name: 'Batería', h: 'Entra la batería.', p: '¿Sin sol y sin red? La batería mueve la casa con la energía que guardó.' },
+      { key: 'export', name: 'Venta a la red', h: 'El excedente regresa a CFE.', p: 'Con contrato de medición neta con CFE, la energía que sobra después de cubrir tu casa se envía a la red como crédito.' },
     ],
     offline: 'Sin servicio',
   },
