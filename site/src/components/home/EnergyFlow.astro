@@ -69,7 +69,7 @@ const paths = {
   .ef { position: relative; color: var(--on-night); overflow: hidden;
     background: radial-gradient(ellipse 70% 60% at 50% 55%, #161a12, var(--night) 70%); padding-bottom: clamp(1rem, 3vh, 2rem); }
   /* The header, stages and diagram share one screen. */
-  .ef__in { min-height: 100svh; display: flex; flex-direction: column; padding-top: calc(var(--nav-h) + clamp(1rem, 3vh, 2rem)); padding-bottom: 1rem; }
+  .ef__in { box-sizing: border-box; min-height: 100svh; display: flex; flex-direction: column; padding-top: calc(var(--nav-h) + clamp(1rem, 3vh, 2rem)); padding-bottom: 1rem; }
   .ef__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 1rem 2rem; }
   .ef__head h2 { font-size: clamp(1.9rem, 3.4vw, 3rem); }
   .ef__head p { margin: .5rem 0 0; color: var(--on-night-2); }

@@ -57,7 +57,7 @@ const en = {
   },
   system: {
     title: 'Designed around your home, not a package.',
-    lede: 'We don’t sell one-size-fits-all kits. We look at your CFE bill and the things you want kept on, then recommend the inverter and battery that fit. This is the equipment we work with.',
+    lede: 'No one-size-fits-all kits. We size the inverter and battery from your CFE bill and what you want kept on. Here’s what we work with.',
     invLabel: 'Inverter',
     invHint: 'How much can run at the same time',
     batLabel: 'Battery',
@@ -70,11 +70,11 @@ const en = {
     normal: 'Normal use',
     hrs: '~{h} hrs',
     warranty: 'Every Firefly inverter and battery carries an 8-year warranty, including installation and support.',
-    fine: 'Approximate runtime on battery alone, based on ~25 kWh/day of normal use. With solar, most outages are ridden out entirely. Your proposal is sized from your real usage.',
+    fine: '8-year warranty incl. installation and support. Runtimes are estimates on battery alone (~25 kWh/day); with solar, most outages are ridden out entirely.',
     cta: 'Get my recommendation',
     inverters: [
-      { key: 'k72', chip: '7.2 kW', name: 'Firefly 7.2 kW Hybrid Inverter', fit: 'Smaller homes, or the essential circuits of a larger one.', specs: ['7.2 kW continuous, 10.8 kW surge', 'Up to 9 kW of solar panels', '120/240 V split-phase: runs pumps and A/C'] },
-      { key: 'k12', chip: '12 kW', name: 'Firefly 12 kW Hybrid Inverter', fit: 'Whole-home backup. Can be paired for larger homes.', specs: ['12 kW continuous, 18 kW surge', 'Up to 12 kW of solar panels', '120/240 V split-phase: runs pumps and A/C'] },
+      { key: 'k72', chip: '7.2 kW', name: 'Firefly 7.2 kW Hybrid Inverter', fit: 'Smaller homes, or the essential circuits of a larger one.', specs: ['7.2 kW continuous, 10.8 kW surge', 'Up to 9 kW of solar panels', '120/240 V: runs pumps and A/C'] },
+      { key: 'k12', chip: '12 kW', name: 'Firefly 12 kW Hybrid Inverter', fit: 'Whole-home backup. Can be paired for larger homes.', specs: ['12 kW continuous, 18 kW surge', 'Up to 12 kW of solar panels', '120/240 V: runs pumps and A/C'] },
       { key: 'k12p', chip: '12 kW Plus', name: 'Firefly 12 kW Plus Hybrid Inverter', fit: 'Large solar arrays, or homes that already have solar panels.', specs: ['12 kW continuous', 'Up to 24 kW of solar panels', 'Works alongside existing grid-tied solar (up to 8 kW)'] },
     ],
     batteries: [
@@ -206,7 +206,7 @@ const es: HomeCopy = {
   },
   system: {
     title: 'Diseñado para tu casa, no un paquete.',
-    lede: 'No vendemos kits iguales para todos. Revisamos tu recibo de CFE y lo que quieres mantener encendido, y te recomendamos el inversor y la batería adecuados. Este es el equipo con el que trabajamos.',
+    lede: 'Nada de kits iguales para todos. Dimensionamos el inversor y la batería con tu recibo de CFE y lo que quieres mantener encendido. Este es nuestro equipo.',
     invLabel: 'Inversor',
     invHint: 'Cuánto puede funcionar al mismo tiempo',
     batLabel: 'Batería',
@@ -219,11 +219,11 @@ const es: HomeCopy = {
     normal: 'Uso normal',
     hrs: '~{h} h',
     warranty: 'Cada inversor y batería Firefly tiene garantía de 8 años, incluida instalación y soporte.',
-    fine: 'Autonomía aproximada solo con batería, con base en ~25 kWh/día de uso normal. Con paneles solares, la mayoría de los apagones se superan por completo. Tu propuesta se dimensiona con tu consumo real.',
+    fine: 'Garantía de 8 años con instalación y soporte. Autonomía estimada solo con batería (~25 kWh/día); con paneles, la mayoría de los apagones se superan por completo.',
     cta: 'Quiero mi recomendación',
     inverters: [
-      { key: 'k72', chip: '7.2 kW', name: 'Inversor Híbrido Firefly 7.2 kW', fit: 'Casas pequeñas, o los circuitos esenciales de una casa grande.', specs: ['7.2 kW continuos, 10.8 kW pico', 'Hasta 9 kW de paneles solares', 'Fase dividida 120/240 V: mueve bombas y aire acondicionado'] },
-      { key: 'k12', chip: '12 kW', name: 'Inversor Híbrido Firefly 12 kW', fit: 'Respaldo para toda la casa. Se puede duplicar para casas grandes.', specs: ['12 kW continuos, 18 kW pico', 'Hasta 12 kW de paneles solares', 'Fase dividida 120/240 V: mueve bombas y aire acondicionado'] },
+      { key: 'k72', chip: '7.2 kW', name: 'Inversor Híbrido Firefly 7.2 kW', fit: 'Casas pequeñas, o los circuitos esenciales de una casa grande.', specs: ['7.2 kW continuos, 10.8 kW pico', 'Hasta 9 kW de paneles solares', '120/240 V: mueve bombas y A/C'] },
+      { key: 'k12', chip: '12 kW', name: 'Inversor Híbrido Firefly 12 kW', fit: 'Respaldo para toda la casa. Se puede duplicar para casas grandes.', specs: ['12 kW continuos, 18 kW pico', 'Hasta 12 kW de paneles solares', '120/240 V: mueve bombas y A/C'] },
       { key: 'k12p', chip: '12 kW Plus', name: 'Inversor Híbrido Firefly 12 kW Plus', fit: 'Sistemas solares grandes, o casas que ya tienen paneles.', specs: ['12 kW continuos', 'Hasta 24 kW de paneles solares', 'Trabaja junto a paneles solares existentes (hasta 8 kW)'] },
     ],
     batteries: [
