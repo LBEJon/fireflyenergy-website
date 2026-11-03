@@ -22,8 +22,8 @@ const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
     <figure class="nh__reveal">
       <div class="nh__shot">
         <img src="/assets/photos/install-entry-wide.webp" srcset="/assets/photos/install-entry-wide-1400.webp 1400w, /assets/photos/install-entry-wide.webp 2200w" sizes="(max-width: 700px) 1400px, 100vw" alt={c.insideAlt} width="2200" height="1228" loading="lazy" decoding="async" />
-        <span class="nh__pin" style="--x:76.7%;--xr:84.5%;--y:29%" aria-hidden="true">{c.pinInv}<i></i></span>
-        <span class="nh__pin" style="--x:75.3%;--xr:84.5%;--y:72%" aria-hidden="true">{c.pinBat}<i></i></span>
+        <span class="nh__pin" style="--x:73.3%;--y:40%" aria-hidden="true">{c.pinInv}<i></i></span>
+        <span class="nh__pin" style="--x:72%;--y:81.5%" aria-hidden="true">{c.pinBat}<i></i></span>
       </div>
       <figcaption>
         <strong>{c.insideA}</strong>
@@ -113,17 +113,17 @@ const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
   .nh__reveal { --rv: 0; position: absolute; inset: 0; z-index: 2; margin: 0; visibility: hidden; opacity: 0; overflow: hidden; background: #c9773f; }
   /* A 16:9 box that always covers the screen, anchored right so the equipment stays in view; pins are % of this box. */
   .nh__shot { position: absolute; right: 0; top: 50%; width: max(100%, calc(100svh * 2200 / 1228)); aspect-ratio: 2200 / 1228;
-    transform: translateY(-50%) scale(calc(1.05 - 0.05 * var(--rv))); transform-origin: 78% 50%; }
+    transform: translateY(-50%) scale(calc(1.05 - 0.05 * var(--rv))); transform-origin: 75% 55%; }
   .nh__shot img { width: 100%; height: 100%; display: block; }
   .nh__pin { position: absolute; z-index: 3; left: var(--x); top: var(--y); display: inline-flex; align-items: center; gap: .6rem; white-space: nowrap;
     padding: .45rem .45rem .45rem .85rem; border-radius: 999px; font-size: .85rem; font-weight: 600; color: var(--on-night);
     background: rgb(23 25 29 / 0.78); backdrop-filter: blur(6px); box-shadow: 0 8px 20px -8px rgb(0 0 0 / .5);
     opacity: calc(var(--rv) * 2 - 1); transform: translate(calc(-100% - .5rem), -50%); }
   .nh__pin i { width: .7rem; height: .7rem; border-radius: 50%; background: var(--ff-green); box-shadow: 0 0 0 4px rgb(158 213 0 / 0.3), 0 0 14px var(--ff-green); }
-  .nh__reveal figcaption { position: absolute; z-index: 3; left: max(var(--gutter), calc((100vw - var(--wide)) / 2)); top: 50%; width: min(30rem, 38vw);
+  .nh__reveal figcaption { position: absolute; z-index: 3; left: max(var(--gutter), calc((100vw - var(--wide)) / 2)); top: 64%; width: min(36rem, 36vw);
     transform: translateY(calc(-50% + 16px - 16px * var(--rv))); display: grid; gap: 1.1rem; color: var(--ff-ink); }
-  .nh__reveal strong { font-family: var(--ff-display); font-weight: 700; font-size: clamp(2.8rem, 5.4vw, 5rem); line-height: .95; letter-spacing: -0.025em; text-wrap: balance; }
-  .nh__reveal figcaption span { font-size: clamp(1.05rem, 1.35vw, 1.3rem); line-height: 1.5; color: #3b2a1f; max-width: 26rem; }
+  .nh__reveal strong { font-family: var(--ff-display); font-weight: 700; font-size: clamp(2.6rem, 4.6vw, 4.6rem); line-height: .95; letter-spacing: -0.025em; text-wrap: balance; }
+  .nh__reveal figcaption span { font-size: clamp(1.02rem, 1.25vw, 1.25rem); line-height: 1.5; color: #3b2a1f; max-width: min(23rem, 27vw); }
 
   .nh__cue {
     position: absolute; z-index: 3; left: 50%; bottom: 1rem; transform: translateX(-50%);
@@ -137,8 +137,9 @@ const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
     .nh__status { top: auto; bottom: auto; top: calc(var(--nav-h) + .75rem); right: .75rem; font-size: .72rem; }
     .nh__reveal::after { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
       background: linear-gradient(to top, rgb(11 13 16 / 0.92) 0%, rgb(11 13 16 / 0.7) 32%, transparent 58%); }
-    /* Phones: labels sit to the right of the equipment, dot first, so they stay on screen. */
-    .nh__pin { left: var(--xr); flex-direction: row-reverse; font-size: .72rem; padding: .3rem .6rem .3rem .3rem; transform: translate(.4rem, -50%); }
+    /* Phones: centre the crop on the equipment; labels shrink to glowing dots. */
+    .nh__shot { right: auto; left: calc(50vw - 0.77 * max(100vw, calc(100svh * 2200 / 1228))); }
+    .nh__pin { font-size: 0; gap: 0; padding: .3rem; background: rgb(11 13 16 / 0.45); transform: translate(-50%, -50%); }
     .nh__reveal figcaption { top: auto; bottom: 1.5rem; left: var(--gutter); right: var(--gutter); width: auto; transform: translateY(calc(16px - 16px * var(--rv))); gap: .6rem; color: var(--on-night); }
     .nh__reveal strong { font-size: 2.3rem; }
     .nh__reveal figcaption span { font-size: .98rem; color: var(--on-night-2); }
