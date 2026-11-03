@@ -24,7 +24,7 @@ Local installer in San Miguel de Allende with 20 years serving Mexico. Whole-hom
 
 ## Capabilities and Constraints
 - **Never show prices on the website** (decision 2026-11-01). Every path ends in "we'll prepare your customized proposal".
-- **No packages or tiers on the website** (Jon, 2026-11-02): each system is recommended after an assessment. Current residential lineup (matches CRM `public.product`): inverters Firefly 7.2 kW, 10 kW, 12 kW, 12 kW Plus (all 120/240 V split-phase); batteries Firefly 5 kWh (outdoor-rated), 15 kWh, 16 kWh (also outdoor-rated). Batteries stack; inverters can be paired; solar can be added any time; generator integration supported. Product cutouts: `site/public/assets/equipment/lineup/`.
+- **No packages or tiers on the website** (Jon, 2026-11-02): each system is recommended after an assessment. Current residential lineup (matches CRM `public.product`): inverters Firefly 7.2 kW, 12 kW, 12 kW Plus (10 kW dropped from the website 2026-11-03: low sales, off-lineup) (all 120/240 V split-phase); batteries Firefly 5 kWh (outdoor-rated), 15 kWh, 16 kWh (also outdoor-rated). Batteries stack; inverters can be paired; solar can be added any time; generator integration supported. Product cutouts: `site/public/assets/equipment/lineup/`.
 - Firefly recruits dealers/installers across Mexico (homepage `#dealers`).
 - Warranty: 8 years on inverter and battery, including installation and after-sales support. Panels: 25-yr materials / 30-yr output.
 - Battery cycles: 6,000+. Switchover: under 20 ms. Pure sine wave output.

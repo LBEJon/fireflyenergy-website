@@ -1,0 +1,146 @@
+---
+import { homeCopy } from '../../content/home';
+import type { Locale } from '../../lib/i18n';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = homeCopy[locale].flow;
+const n = c.nodes;
+// Stage coordinates live in a 1000 x 600 box; nodes are placed by the same numbers as the SVG paths.
+const nodes = [
+  { key: 'solar', x: 175, y: 140, img: '/assets/diagram/solar.webp' },
+  { key: 'grid', x: 835, y: 130, img: '/assets/diagram/grid.webp' },
+  { key: 'inverter', x: 500, y: 300, img: '/assets/equipment/lineup/k12.webp' },
+  { key: 'battery', x: 185, y: 455, img: '/assets/equipment/lineup/b16.webp' },
+  { key: 'home', x: 815, y: 460, img: '/assets/diagram/home.webp' },
+] as const;
+const paths = {
+  solar: 'M 280 160 C 380 160, 400 300, 450 300',
+  grid: 'M 780 160 C 650 160, 600 300, 550 300',
+  battery: 'M 450 330 C 380 330, 330 455, 260 455',
+  home: 'M 550 330 C 640 330, 680 455, 720 455',
+};
+---
+<section class="ef" id="how" aria-labelledby="ef-title" data-ef data-mode="day">
+  <div class="wrap">
+    <header class="ef__head">
+      <h2 id="ef-title" class="display h2" data-rv>{c.title}</h2>
+      <p class="lede" data-rv>{c.lede}</p>
+    </header>
+
+    <div class="ef__modes" role="group" aria-label={c.title}>
+      {c.modes.map((m, i) => (
+        <button type="button" data-mode-btn={m.key} aria-pressed={i === 0 ? 'true' : 'false'}>{m.name}</button>
+      ))}
+    </div>
+    <p class="ef__caption" aria-live="polite">
+      {c.modes.map((m, i) => <span data-mode-text={m.key} hidden={i !== 0}>{m.p}</span>)}
+    </p>
+
+    <div class="ef__stage">
+      <svg viewBox="0 0 1000 600" aria-hidden="true">
+        {Object.entries(paths).map(([k, d]) => <path class="ef__rail" d={d} />)}
+        {Object.entries(paths).map(([k, d]) => <path class={`ef__flow ef__flow--${k}`} d={d} />)}
+      </svg>
+      {nodes.map((nd) => (
+        <figure class={`ef__node ef__node--${nd.key}`} style={`--x:${nd.x / 10}%;--y:${nd.y / 6}%`}>
+          <img src={nd.img} alt="" loading="lazy" decoding="async" />
+          <figcaption>{n[nd.key][0]}{nd.key === 'grid' && <em>{c.offline}</em>}</figcaption>
+        </figure>
+      ))}
+    </div>
+
+    <ul class="ef__parts">
+      {(['inverter', 'battery', 'solar', 'grid', 'home'] as const).map((k) => (
+        <li data-part={k}><h3>{n[k][0]}</h3><p>{n[k][1]}</p></li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .ef { position: relative; background: radial-gradient(ellipse 70% 60% at 50% 55%, #161a12, var(--night) 70%); color: var(--on-night);
+    padding: clamp(6rem, 14vh, 10rem) 0 clamp(4rem, 9vh, 6rem); overflow: hidden; }
+  .ef .lede { color: var(--on-night-2); }
+
+  .ef__modes { display: inline-flex; flex-wrap: wrap; gap: 4px; margin-top: 2.5rem; padding: 4px; border-radius: 999px;
+    background: rgb(255 255 255 / 0.05); border: 1px solid var(--night-line); }
+  .ef__modes button { border: 0; border-radius: 999px; padding: .65rem 1.15rem; background: transparent; color: var(--on-night-2);
+    font: 600 .95rem/1 var(--ff-sans); cursor: pointer; transition: background-color .3s var(--ease), color .3s; }
+  .ef__modes button:hover { color: var(--on-night); }
+  .ef__modes button[aria-pressed='true'] { background: var(--ff-green); color: var(--ff-ink); }
+  .ef__caption { min-height: 3.2em; margin: 1rem 0 0; max-width: 40rem; font-size: 1.08rem; line-height: 1.5; color: var(--on-night); }
+
+  .ef__stage { position: relative; aspect-ratio: 1000 / 600; margin-top: 1rem; }
+  .ef__stage svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .ef__rail { fill: none; stroke: rgb(255 255 255 / 0.1); stroke-width: 3; stroke-linecap: round; }
+  .ef__flow { fill: none; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 2 16; opacity: 0;
+    transition: opacity .5s var(--ease); animation: efFlow .9s linear infinite; }
+  @keyframes efFlow { to { stroke-dashoffset: -18; } }
+  .ef__flow--solar { stroke: var(--ff-gold); filter: drop-shadow(0 0 6px rgb(255 184 28 / .8)); }
+  .ef__flow--grid { stroke: var(--amber); filter: drop-shadow(0 0 6px rgb(255 176 74 / .8)); }
+  .ef__flow--battery, .ef__flow--home { stroke: var(--ff-green); filter: drop-shadow(0 0 7px rgb(158 213 0 / .8)); }
+
+  /* Which lines run in each mode. Battery line is drawn inverter → battery: forward = charging, reverse = discharging. */
+  [data-mode='day'] :is(.ef__flow--solar, .ef__flow--battery, .ef__flow--home),
+  [data-mode='night'] :is(.ef__flow--battery, .ef__flow--home),
+  [data-mode='outage'] :is(.ef__flow--solar, .ef__flow--battery, .ef__flow--home),
+  [data-mode='grid'] :is(.ef__flow--grid, .ef__flow--home) { opacity: 1; }
+  [data-mode='night'] .ef__flow--battery, [data-mode='outage'] .ef__flow--battery { animation-direction: reverse; }
+  [data-mode='day'] .ef__flow--battery { stroke: var(--ff-gold); filter: drop-shadow(0 0 6px rgb(255 184 28 / .8)); }
+
+  .ef__node { position: absolute; left: var(--x); top: var(--y); margin: 0; transform: translate(-50%, -50%);
+    display: grid; justify-items: center; gap: .5rem; transition: opacity .5s var(--ease), filter .5s var(--ease); }
+  .ef__node img { width: auto; filter: drop-shadow(0 18px 24px rgb(0 0 0 / .5)); }
+  .ef__node--solar img { width: clamp(110px, 19vw, 230px); }
+  .ef__node--grid img { height: clamp(90px, 15vw, 190px); }
+  .ef__node--inverter img { height: clamp(110px, 19vw, 240px); }
+  .ef__node--battery img { height: clamp(90px, 15vw, 190px); }
+  .ef__node--home img { width: clamp(120px, 21vw, 260px); }
+  .ef__node--inverter::before { content: ''; position: absolute; inset: -18% -30%; z-index: -1; border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(158 213 0 / 0.22), transparent); }
+  .ef__node figcaption { font-size: .88rem; font-weight: 600; color: var(--on-night); display: inline-flex; gap: .5rem; align-items: center; white-space: nowrap; }
+  .ef__node figcaption em { display: none; font-style: normal; font-size: .72rem; padding: .15rem .45rem; border-radius: 999px; background: #3a3e46; color: var(--on-night-2); }
+  [data-mode='night'] :is(.ef__node--solar, .ef__node--grid),
+  [data-mode='day'] .ef__node--grid,
+  [data-mode='grid'] .ef__node--solar { opacity: .4; filter: grayscale(.6); }
+  [data-mode='outage'] .ef__node--grid { opacity: .3; filter: grayscale(1); }
+  [data-mode='outage'] .ef__node--grid figcaption em { display: inline-block; }
+
+  .ef__parts { list-style: none; margin: clamp(2rem, 5vh, 3.5rem) 0 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.5rem; }
+  .ef__parts li { border-top: 1px solid var(--night-line); padding-top: 1rem; }
+  .ef__parts li[data-part='inverter'] { border-top-color: var(--ff-green); }
+  .ef__parts h3 { margin: 0 0 .4rem; font-size: 1rem; }
+  .ef__parts p { margin: 0; color: var(--on-night-2); font-size: .92rem; line-height: 1.5; }
+
+  @media (max-width: 900px) {
+    .ef__parts { grid-template-columns: 1fr 1fr; }
+    .ef__node figcaption { font-size: .7rem; }
+  }
+  @media (max-width: 520px) {
+    .ef__stage { margin-left: calc(-1 * var(--gutter) + .25rem); margin-right: calc(-1 * var(--gutter) + .25rem); }
+    .ef__node figcaption { display: none; }
+    .ef__parts { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { .ef__flow { animation: none; stroke-dasharray: none; } }
+</style>
+
+<script>
+  // Cycle the four scenarios while the diagram is on screen; a click takes over.
+  document.querySelectorAll<HTMLElement>('[data-ef]').forEach((root) => {
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('[data-mode-btn]')];
+    const keys = btns.map((b) => b.dataset.modeBtn!);
+    let i = 0, timer = 0, manual = false;
+    const set = (k: string) => {
+      root.dataset.mode = k;
+      btns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.modeBtn === k)));
+      root.querySelectorAll<HTMLElement>('[data-mode-text]').forEach((t) => (t.hidden = t.dataset.modeText !== k));
+    };
+    btns.forEach((b) => b.addEventListener('click', () => { manual = true; clearInterval(timer); set(b.dataset.modeBtn!); }));
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    new IntersectionObserver(([e]) => {
+      clearInterval(timer);
+      if (e.isIntersecting && !manual) timer = window.setInterval(() => { i = (i + 1) % keys.length; set(keys[i]); }, 4500);
+    }, { threshold: 0.35 }).observe(root);
+  });
+</script>

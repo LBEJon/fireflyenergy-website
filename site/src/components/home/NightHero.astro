@@ -6,6 +6,7 @@ interface Props { locale: Locale }
 const { locale } = Astro.props;
 const c = homeCopy[locale].hero;
 const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
+const [insideA1, insideA2] = c.insideA.split(/(?<=\.)\s/);
 ---
 <section class="nh" data-nh aria-labelledby="nh-title">
   <div class="nh__stage">
@@ -20,10 +21,15 @@ const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
     <div class="nh__tag" aria-hidden="true"><span class="nh__tag-dot"></span>{c.fireflyHome}</div>
 
     <figure class="nh__reveal">
-      <img src="/assets/equipment/installs/install-4.webp" alt={c.insideAlt} width="900" height="1200" loading="lazy" decoding="async" />
+      <div class="nh__shot">
+        <img src="/assets/photos/install-entry.webp" alt={c.insideAlt} width="1200" height="1607" loading="lazy" decoding="async" />
+        <span class="nh__pin" style="--x:63%;--y:25%" aria-hidden="true"><i></i>{c.pinInv}</span>
+        <span class="nh__pin" style="--x:63%;--y:66%" aria-hidden="true"><i></i>{c.pinBat}</span>
+      </div>
       <figcaption>
-        <strong>{c.insideA}</strong>
+        <strong>{insideA1} <em>{insideA2}</em></strong>
         <span>{c.insideB}</span>
+        <ul>{c.facts.map((f) => <li>{f}</li>)}</ul>
       </figcaption>
     </figure>
 
@@ -107,15 +113,23 @@ const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
   .nh__tag-dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--ff-green); box-shadow: 0 0 10px var(--ff-green); }
 
   .nh__reveal { --rv: 0; position: absolute; inset: 0; z-index: 2; margin: 0; visibility: hidden; opacity: 0;
-    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(2rem, 6vw, 6rem);
-    padding: calc(var(--nav-h) + 2rem) var(--gutter) 2.5rem;
-    background: radial-gradient(ellipse at 70% 50%, #1d2016, var(--night) 70%); }
-  .nh__reveal img { justify-self: center; height: min(74vh, 720px); width: auto; max-width: 100%; aspect-ratio: 3 / 4; object-fit: cover;
-    border-radius: 18px; box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(255 255 255 / 0.06);
-    transform: translateY(calc(24px - 24px * var(--rv))) scale(calc(1.04 - 0.04 * var(--rv))); }
-  .nh__reveal figcaption { order: -1; display: grid; gap: 1rem; max-width: 30rem; justify-self: end; transform: translateY(calc(16px - 16px * var(--rv))); }
-  .nh__reveal strong { font-family: var(--ff-display); font-weight: 700; font-size: clamp(2.2rem, 4.6vw, 4rem); line-height: .98; letter-spacing: -0.02em; color: var(--ff-green); text-wrap: balance; }
-  .nh__reveal span { font-size: clamp(1.02rem, 1.25vw, 1.2rem); line-height: 1.55; color: var(--on-night-2); }
+    background: radial-gradient(ellipse 60% 70% at 30% 55%, #1a1d14, var(--night) 75%); }
+  .nh__shot { position: absolute; top: 0; right: 0; bottom: 0; height: 100%; aspect-ratio: 1200 / 1607; max-width: 58%; overflow: hidden; }
+  .nh__shot img { width: 100%; height: 100%; object-fit: cover; display: block; transform: scale(calc(1.06 - 0.06 * var(--rv))); transform-origin: 60% 40%; }
+  .nh__shot::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(to right, var(--night) 0%, rgb(11 13 16 / 0.55) 14%, transparent 34%), linear-gradient(to top, rgb(11 13 16 / 0.5), transparent 25%); }
+  .nh__pin { position: absolute; z-index: 2; left: var(--x); top: var(--y); display: inline-flex; align-items: center; gap: .6rem; white-space: nowrap;
+    padding: .45rem .8rem .45rem .45rem; border-radius: 999px; font-size: .85rem; font-weight: 600; color: var(--on-night);
+    background: rgb(11 13 16 / 0.72); backdrop-filter: blur(8px); border: 1px solid rgb(158 213 0 / 0.45);
+    opacity: calc(var(--rv) * 2 - 1); transform: translate(-.6rem, -50%); }
+  .nh__pin i { width: .7rem; height: .7rem; border-radius: 50%; background: var(--ff-green); box-shadow: 0 0 0 4px rgb(158 213 0 / 0.25), 0 0 14px var(--ff-green); }
+  .nh__reveal figcaption { position: absolute; z-index: 3; left: var(--gutter); top: 50%; width: min(36rem, 46%);
+    transform: translateY(calc(-50% + 18px - 18px * var(--rv))); display: grid; gap: 1.25rem; }
+  .nh__reveal strong { font-family: var(--ff-display); font-weight: 700; font-size: clamp(2.8rem, 6vw, 5.5rem); line-height: .92; letter-spacing: -0.025em; color: var(--on-night); text-wrap: balance; }
+  .nh__reveal strong em { font-style: normal; color: var(--ff-green); display: block; }
+  .nh__reveal span { font-size: clamp(1.05rem, 1.3vw, 1.25rem); line-height: 1.55; color: var(--on-night-2); max-width: 32rem; }
+  .nh__reveal ul { list-style: none; margin: .5rem 0 0; padding: 1rem 0 0; display: flex; flex-wrap: wrap; gap: .5rem 1.75rem; border-top: 1px solid var(--night-line); }
+  .nh__reveal li { font-family: var(--ff-display); font-weight: 700; font-size: 1.15rem; color: var(--ff-green); }
 
   .nh__cue {
     position: absolute; z-index: 3; left: 50%; bottom: 1rem; transform: translateX(-50%);
@@ -127,9 +141,13 @@ const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
   @media (max-width: 700px) {
     .nh__stage::after { background: linear-gradient(to top, rgb(9 10 12 / 0.96) 0%, rgb(9 10 12 / 0.82) 45%, rgb(9 10 12 / 0.2) 75%, transparent); }
     .nh__status { top: auto; bottom: auto; top: calc(var(--nav-h) + .75rem); right: .75rem; font-size: .72rem; }
-    .nh__reveal { grid-template-columns: 1fr; align-content: center; gap: 1.5rem; }
-    .nh__reveal img { height: 52vh; }
-    .nh__reveal figcaption { order: 1; justify-self: start; }
+    .nh__shot { top: calc(var(--nav-h) + .5rem); left: 50%; right: auto; bottom: auto; height: 50vh; max-width: none; transform: translateX(-50%); border-radius: 16px; }
+    .nh__shot::before { background: linear-gradient(to top, rgb(11 13 16 / 0.6), transparent 30%); }
+    .nh__pin { font-size: 0; gap: 0; padding: .3rem; border-color: transparent; background: rgb(11 13 16 / 0.4); }
+    .nh__reveal figcaption { top: auto; bottom: 1.5rem; width: auto; right: var(--gutter); transform: translateY(calc(18px - 18px * var(--rv))); gap: .75rem; }
+    .nh__reveal strong { font-size: 2.4rem; }
+    .nh__reveal span { font-size: .98rem; }
+    .nh__reveal li { font-size: 1rem; }
     .nh__cue { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {

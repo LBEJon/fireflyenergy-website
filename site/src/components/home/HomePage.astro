@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import SiteNav from './SiteNav.astro';
 import NightHero from './NightHero.astro';
+import EnergyFlow from './EnergyFlow.astro';
 import Handoff from './Handoff.astro';
 import SystemBuilder from './SystemBuilder.astro';
 import Installs from './Installs.astro';
@@ -20,6 +21,7 @@ const c = homeCopy[locale];
   <SiteNav locale={locale} />
   <main id="main">
     <NightHero locale={locale} />
+    <EnergyFlow locale={locale} />
     <Handoff locale={locale} />
     <SystemBuilder locale={locale} />
     <Installs locale={locale} />
