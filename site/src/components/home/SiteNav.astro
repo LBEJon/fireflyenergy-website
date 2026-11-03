@@ -27,12 +27,12 @@ const links = [
     </nav>
     <div class="sn__right">
       <a class="sn__lang" href={altUrl(other, '')} hreflang={other} aria-label={t(locale, 'common.locale_aria')}>{t(locale, 'common.locale_label')}</a>
-      <a class="btn btn--coral sn__cta" href={altUrl(locale, 'calculator')} data-track="begin_assessment">{c.cta}</a>
+      <a class="btn btn--primary sn__cta" href={altUrl(locale, 'calculator')} data-track="begin_assessment">{c.cta}</a>
       <details class="sn__menu">
         <summary aria-label={t(locale, 'common.menu')}><span></span><span></span></summary>
         <div class="sn__sheet">
           {links.map((l) => <a href={l.href}>{l.label}</a>)}
-          <a class="btn btn--coral" href={altUrl(locale, 'calculator')} data-track="begin_assessment">{c.cta}</a>
+          <a class="btn btn--primary" href={altUrl(locale, 'calculator')} data-track="begin_assessment">{c.cta}</a>
         </div>
       </details>
     </div>

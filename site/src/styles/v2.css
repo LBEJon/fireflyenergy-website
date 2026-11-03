@@ -33,8 +33,10 @@ a { text-underline-offset: 0.2em; }
 }
 .btn:hover { transform: translateY(-2px); }
 .btn:active { transform: translateY(0); }
-.btn--coral { background: var(--ff-accent); color: #16181c; box-shadow: 0 8px 24px -8px rgb(255 106 61 / 0.6); }
-.btn--coral:hover { background: #ff7d55; box-shadow: 0 14px 30px -10px rgb(255 106 61 / 0.7); }
+/* Primary action = Firefly lime (Jon, 2026-11-03: coral retired as the accent). */
+.btn--primary { background: var(--ff-green); color: var(--ff-ink); box-shadow: 0 6px 16px -8px rgb(23 25 29 / 0.35); }
+.btn--primary:hover { background: var(--ff-green-soft); box-shadow: 0 10px 22px -10px rgb(23 25 29 / 0.4); }
+.btn--primary:focus-visible { outline-color: var(--ff-ink); }
 .btn--ghost-dark { color: var(--on-night); border-color: rgb(255 255 255 / 0.32); background: rgb(255 255 255 / 0.04); }
 .btn--ghost-dark:hover { border-color: rgb(255 255 255 / 0.7); }
 .btn--ink { background: var(--ff-ink); color: var(--ff-white); }

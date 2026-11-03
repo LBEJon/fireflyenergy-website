@@ -15,7 +15,7 @@ const mail = `mailto:${t(locale, 'common.email')}?subject=${encodeURIComponent(c
       <p>{c.p}</p>
       <ul>{c.points.map((x) => <li>{x}</li>)}</ul>
       <div class="dl__actions">
-        <a class="btn btn--coral" href={wa} target="_blank" rel="noopener" data-track="contact_dealer">{c.wa}</a>
+        <a class="btn btn--primary" href={wa} target="_blank" rel="noopener" data-track="contact_dealer">{c.wa}</a>
         <a class="btn btn--ghost-dark" href={mail} data-track="contact_dealer">{c.email}</a>
       </div>
     </div>

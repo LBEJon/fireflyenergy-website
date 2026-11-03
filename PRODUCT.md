@@ -32,7 +32,7 @@ Local installer in San Miguel de Allende with 20 years serving Mexico. Whole-hom
 
 ## Brand Commitments
 - Name: "Firefly Energy" (footer: by Nordic Electric). Logo files in `site/public/assets/brand/`.
-- Fonts: Archivo Narrow (display) + Archivo (body). Colors: lime #9ED500, ink #2A2D34, coral #FF6A3D (scarce; #1 action only), gold #FFB81C.
+- Fonts: Archivo Narrow (display) + Archivo (body). Colors: lime #9ED500 (brand glow, highlights AND primary buttons with ink text), ink #2A2D34, gold #FFB81C (solar/energy flow only). Coral #FF6A3D retired as the accent on the new site (Jon, 2026-11-03: it looked disjointed next to lime and the terracotta photography).
 - Voice: friendly, confident, calm resilience. Name CFE plainly, never disparage it. Avoid "crisis/disaster/emergency" and fear-driven urgency.
 - Taglines: "Always Connected. Always Prepared." (primary); "Your Power. Your Control. Your Future."
 - Jon's 2026-11-02 brief: contemporary, current, real motion, photorealistic; show San Miguel outages with individual houses still lit among dark neighborhoods, then the Firefly equipment in a carport.

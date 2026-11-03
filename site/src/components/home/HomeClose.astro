@@ -22,7 +22,7 @@ const email = t(locale, 'common.email');
         </li>
       ))}
     </ol>
-    <a class="btn btn--coral" href={altUrl(locale, 'calculator')} data-track="begin_assessment" data-rv>{c.process.cta}</a>
+    <a class="btn btn--primary" href={altUrl(locale, 'calculator')} data-track="begin_assessment" data-rv>{c.process.cta}</a>
   </div>
 </section>
 
@@ -62,7 +62,7 @@ const email = t(locale, 'common.email');
     <h2 id="cl-title" class="display" data-rv>{c.closing.title}</h2>
     <p data-rv>{c.closing.p}</p>
     <div class="cl__actions" data-rv>
-      <a class="btn btn--coral" href={altUrl(locale, 'calculator')} data-track="begin_assessment">{c.closing.cta}</a>
+      <a class="btn btn--primary" href={altUrl(locale, 'calculator')} data-track="begin_assessment">{c.closing.cta}</a>
       <a class="btn btn--ghost-dark" href={wa} target="_blank" rel="noopener" data-track="contact_whatsapp">{c.closing.wa}</a>
     </div>
   </div>
