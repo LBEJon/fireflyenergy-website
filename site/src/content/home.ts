@@ -31,11 +31,11 @@ const en = {
     title: 'What powers a Firefly system.',
     lede: 'Three parts work as one. Here’s what happens, stage by stage.',
     nodes: {
-      solar: ['Solar panels', 'Optional. Free power by day that runs the house and refills the battery.'],
-      grid: ['CFE grid', 'Still connected. Used when it makes sense, with its dips and spikes smoothed out.'],
-      inverter: ['Firefly hybrid inverter', 'The brain. Blends sun, battery and CFE, and switches in under 20 ms.'],
-      battery: ['Firefly battery', 'Stored power for nights and outages. LiFePO₄, built for 6,000+ cycles.'],
-      home: ['Your home', 'Steady power, whatever the source. Nothing to switch, nothing to reset.'],
+      solar: ['Solar panels', 'Free power by day (optional)'],
+      grid: ['CFE grid', 'Still connected, dips smoothed out'],
+      inverter: ['Firefly hybrid inverter', 'The brain: switches in under 20 ms'],
+      battery: ['Firefly battery', 'Stored power for nights and outages'],
+      home: ['Your home', 'Steady power, whatever the source'],
     },
     modes: [
       { key: 'outage', name: 'Grid fails', h: 'The grid fails.', p: 'CFE drops. In under 20 ms the inverter moves the whole house to Firefly power. Nobody notices.' },
@@ -180,11 +180,11 @@ const es: HomeCopy = {
     title: 'Qué hace funcionar un sistema Firefly.',
     lede: 'Tres piezas trabajan como una. Esto es lo que pasa, etapa por etapa.',
     nodes: {
-      solar: ['Paneles solares', 'Opcionales. Energía gratis de día que mueve la casa y recarga la batería.'],
-      grid: ['Red de CFE', 'Sigues conectado. Se usa cuando conviene, con sus bajas y picos suavizados.'],
-      inverter: ['Inversor híbrido Firefly', 'El cerebro. Combina sol, batería y CFE, y cambia en menos de 20 ms.'],
-      battery: ['Batería Firefly', 'Energía guardada para la noche y los apagones. LiFePO₄, hecha para más de 6,000 ciclos.'],
-      home: ['Tu casa', 'Energía estable, venga de donde venga. Nada que mover, nada que reiniciar.'],
+      solar: ['Paneles solares', 'Energía gratis de día (opcional)'],
+      grid: ['Red de CFE', 'Sigues conectado, sin bajas ni picos'],
+      inverter: ['Inversor híbrido Firefly', 'El cerebro: cambia en menos de 20 ms'],
+      battery: ['Batería Firefly', 'Energía guardada para noches y apagones'],
+      home: ['Tu casa', 'Energía estable, venga de donde venga'],
     },
     modes: [
       { key: 'outage', name: 'Falla la red', h: 'Falla la red.', p: 'Se va la CFE. En menos de 20 ms el inversor pasa toda la casa a energía Firefly. Nadie lo nota.' },
