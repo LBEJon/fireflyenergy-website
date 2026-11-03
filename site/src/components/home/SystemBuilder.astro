@@ -103,7 +103,7 @@ const MAX = 4;
   .sb__floor { position: relative; flex: 1; container-type: size; min-height: 300px; display: flex; align-items: flex-end; justify-content: center;
     gap: 4%; padding: 4% 4% 7%; border-radius: 22px; overflow: hidden;
     background: radial-gradient(ellipse 70% 22% at 50% 90%, rgb(42 45 52 / 0.16), transparent 70%), linear-gradient(#fff, var(--ff-mist)); }
-  .sb__invs { display: grid; align-self: flex-end; margin-bottom: 9cqh; }
+  .sb__invs { display: grid; align-self: flex-start; margin-top: 2cqh; } /* wall-mounted: hangs high, battery stands on the floor */
   .sb__inv { grid-area: 1 / 1; display: none; height: min(74cqh, 60cqw); width: auto; filter: drop-shadow(0 18px 24px rgb(42 45 52 / 0.18)); }
   .sb__inv--k72 { height: min(78cqh, 72cqw); }
   .sb:has(input[value='k72']:checked) .sb__inv--k72,
