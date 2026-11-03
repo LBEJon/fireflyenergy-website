@@ -208,28 +208,6 @@ const backupOpts = ['4', '8', '12', '24'];
               </button>
             ))}
           </div>
-
-          <h4 class="ff-as__subhead" data-addsolar-heading>{t(locale, 'assessment.addsolar.heading')}</h4>
-          <p class="ff-as__help" data-addsolar-help>{t(locale, 'assessment.addsolar.help')}</p>
-
-          <!-- Recommendation (text only) + choose: use it / oversize / battery only -->
-          <div class="ff-as__solar-rec" data-solar-rec hidden>
-            <p class="ff-as__rec-line" data-rec-line></p>
-            <p class="ff-as__offset-line" data-offset-line aria-live="polite"></p>
-            <div class="ff-as__solar-actions">
-              <button type="button" class="ff-as__rec-btn" data-panel-rec hidden>{t(locale, 'assessment.solar.use_recommended')}</button>
-              <label class="ff-as__oversize">
-                <span class="ff-as__oversize-label">{t(locale, 'assessment.solar.oversize_label')}</span>
-                <span class="ff-as__oversize-input">
-                  <input type="number" inputmode="numeric" min="0" step="1" class="ff-as__step-input"
-                    data-panel-val aria-label={t(locale, 'assessment.solar.panel_count')}
-                    placeholder={t(locale, 'assessment.solar.oversize_ph')} />
-                  <span class="ff-as__step-unit">{t(locale, 'assessment.solar.panels_unit')}</span>
-                </span>
-              </label>
-              <button type="button" class="ff-as__none-btn" data-panel-none>{t(locale, 'assessment.solar.none')}</button>
-            </div>
-          </div>
         </div>
 
         <!-- STEP 4: Backup goal -->
@@ -513,21 +491,6 @@ const backupOpts = ['4', '8', '12', '24'];
   .ff-as__step-input:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 1px; border-color: var(--ff-accent); }
   .ff-as__step-input:not(:placeholder-shown) { border-color: var(--ff-accent); background: var(--ff-accent-tint); }
   .ff-as__step-unit { font-weight: 700; color: var(--ff-ink); }
-  .ff-as__offset-line { margin: 0 0 var(--sp-1); color: var(--ff-slate); font-size: var(--fs-small); }
-  /* Choose how many panels: use recommended / oversize (type a number) / battery only. */
-  .ff-as__solar-actions { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-2); }
-  .ff-as__oversize { display: flex; flex-direction: column; gap: 0.3rem; }
-  .ff-as__oversize-label { font-size: var(--fs-small); font-weight: 700; color: var(--ff-ink); }
-  .ff-as__oversize-input { display: inline-flex; align-items: baseline; gap: 0.4rem; }
-  /* Both quick-set actions are pills; the one matching the current count is active. */
-  .ff-as__rec-btn, .ff-as__none-btn {
-    background: var(--ff-paper); border: 2px solid var(--ff-line); border-radius: var(--r-pill);
-    padding: 0.5rem 1.2rem; font-weight: 700; font-family: var(--ff-sans); color: var(--ff-ink);
-    cursor: pointer; text-decoration: none;
-  }
-  .ff-as__rec-btn:hover, .ff-as__none-btn:hover { border-color: var(--ff-green); }
-  .ff-as__rec-btn:focus-visible, .ff-as__none-btn:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
-  .ff-as__rec-btn.is-active, .ff-as__none-btn.is-active { border-color: var(--ff-accent); background: var(--ff-accent-tint); }
 
   /* ---- Custom appliance add ---- */
   .ff-as__add-appliance { margin-top: var(--sp-3); }
