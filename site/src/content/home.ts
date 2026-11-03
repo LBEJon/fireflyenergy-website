@@ -121,7 +121,7 @@ const en = {
     imgAlt: 'The Firefly lineup: hybrid inverter and 5, 15 and 16 kWh batteries',
   },
   faq: {
-    title: 'Good questions.',
+    title: 'Got questions?',
     items: [
       { q: 'What happens when the battery runs low?', a: 'It switches back to CFE automatically when the grid is available, and recharges from CFE or solar. You never flip a switch.' },
       { q: 'Can I start small and add more later?', a: 'Yes. Batteries stack up to 16 packs and solar can be added any time without replacing the inverter.' },
@@ -271,7 +271,7 @@ const es: HomeCopy = {
     imgAlt: 'La línea Firefly: inversor híbrido y baterías de 5, 15 y 16 kWh',
   },
   faq: {
-    title: 'Buenas preguntas.',
+    title: '¿Tienes preguntas?',
     items: [
       { q: '¿Qué pasa cuando la batería se agota?', a: 'Regresa a CFE automáticamente cuando hay red, y se recarga con CFE o con el sol. Nunca mueves un interruptor.' },
       { q: '¿Puedo empezar con poco y crecer después?', a: 'Sí. Las baterías se suman hasta 16 módulos y los paneles se agregan cuando quieras, sin cambiar el inversor.' },
