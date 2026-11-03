@@ -6,7 +6,6 @@ interface Props { locale: Locale }
 const { locale } = Astro.props;
 const c = homeCopy[locale].hero;
 const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
-const [insideA1, insideA2] = c.insideA.split(/(?<=\.)\s/);
 ---
 <section class="nh" data-nh aria-labelledby="nh-title">
   <div class="nh__stage">
@@ -22,14 +21,13 @@ const [insideA1, insideA2] = c.insideA.split(/(?<=\.)\s/);
 
     <figure class="nh__reveal">
       <div class="nh__shot">
-        <img src="/assets/photos/install-entry.webp" alt={c.insideAlt} width="1200" height="1607" loading="lazy" decoding="async" />
-        <span class="nh__pin" style="--x:63%;--y:25%" aria-hidden="true"><i></i>{c.pinInv}</span>
-        <span class="nh__pin" style="--x:63%;--y:66%" aria-hidden="true"><i></i>{c.pinBat}</span>
+        <img src="/assets/photos/install-entry-wide.webp" srcset="/assets/photos/install-entry-wide-1400.webp 1400w, /assets/photos/install-entry-wide.webp 2200w" sizes="(max-width: 700px) 1400px, 100vw" alt={c.insideAlt} width="2200" height="1228" loading="lazy" decoding="async" />
+        <span class="nh__pin" style="--x:76.7%;--xr:84.5%;--y:29%" aria-hidden="true">{c.pinInv}<i></i></span>
+        <span class="nh__pin" style="--x:75.3%;--xr:84.5%;--y:72%" aria-hidden="true">{c.pinBat}<i></i></span>
       </div>
       <figcaption>
-        <strong>{insideA1} <em>{insideA2}</em></strong>
+        <strong>{c.insideA}</strong>
         <span>{c.insideB}</span>
-        <ul>{c.facts.map((f) => <li>{f}</li>)}</ul>
       </figcaption>
     </figure>
 
@@ -112,24 +110,20 @@ const [insideA1, insideA2] = c.insideA.split(/(?<=\.)\s/);
   }
   .nh__tag-dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--ff-green); box-shadow: 0 0 10px var(--ff-green); }
 
-  .nh__reveal { --rv: 0; position: absolute; inset: 0; z-index: 2; margin: 0; visibility: hidden; opacity: 0;
-    background: radial-gradient(ellipse 60% 70% at 30% 55%, #1a1d14, var(--night) 75%); }
-  .nh__shot { position: absolute; top: 0; right: 0; bottom: 0; height: 100%; aspect-ratio: 1200 / 1607; max-width: 58%; overflow: hidden; }
-  .nh__shot img { width: 100%; height: 100%; object-fit: cover; display: block; transform: scale(calc(1.06 - 0.06 * var(--rv))); transform-origin: 60% 40%; }
-  .nh__shot::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-    background: linear-gradient(to right, var(--night) 0%, rgb(11 13 16 / 0.55) 14%, transparent 34%), linear-gradient(to top, rgb(11 13 16 / 0.5), transparent 25%); }
-  .nh__pin { position: absolute; z-index: 2; left: var(--x); top: var(--y); display: inline-flex; align-items: center; gap: .6rem; white-space: nowrap;
-    padding: .45rem .8rem .45rem .45rem; border-radius: 999px; font-size: .85rem; font-weight: 600; color: var(--on-night);
-    background: rgb(11 13 16 / 0.72); backdrop-filter: blur(8px); border: 1px solid rgb(158 213 0 / 0.45);
-    opacity: calc(var(--rv) * 2 - 1); transform: translate(-.6rem, -50%); }
-  .nh__pin i { width: .7rem; height: .7rem; border-radius: 50%; background: var(--ff-green); box-shadow: 0 0 0 4px rgb(158 213 0 / 0.25), 0 0 14px var(--ff-green); }
-  .nh__reveal figcaption { position: absolute; z-index: 3; left: var(--gutter); top: 50%; width: min(36rem, 46%);
-    transform: translateY(calc(-50% + 18px - 18px * var(--rv))); display: grid; gap: 1.25rem; }
-  .nh__reveal strong { font-family: var(--ff-display); font-weight: 700; font-size: clamp(2.8rem, 6vw, 5.5rem); line-height: .92; letter-spacing: -0.025em; color: var(--on-night); text-wrap: balance; }
-  .nh__reveal strong em { font-style: normal; color: var(--ff-green); display: block; }
-  .nh__reveal span { font-size: clamp(1.05rem, 1.3vw, 1.25rem); line-height: 1.55; color: var(--on-night-2); max-width: 32rem; }
-  .nh__reveal ul { list-style: none; margin: .5rem 0 0; padding: 1rem 0 0; display: flex; flex-wrap: wrap; gap: .5rem 1.75rem; border-top: 1px solid var(--night-line); }
-  .nh__reveal li { font-family: var(--ff-display); font-weight: 700; font-size: 1.15rem; color: var(--ff-green); }
+  .nh__reveal { --rv: 0; position: absolute; inset: 0; z-index: 2; margin: 0; visibility: hidden; opacity: 0; overflow: hidden; background: #c9773f; }
+  /* A 16:9 box that always covers the screen, anchored right so the equipment stays in view; pins are % of this box. */
+  .nh__shot { position: absolute; right: 0; top: 50%; width: max(100%, calc(100svh * 2200 / 1228)); aspect-ratio: 2200 / 1228;
+    transform: translateY(-50%) scale(calc(1.05 - 0.05 * var(--rv))); transform-origin: 78% 50%; }
+  .nh__shot img { width: 100%; height: 100%; display: block; }
+  .nh__pin { position: absolute; z-index: 3; left: var(--x); top: var(--y); display: inline-flex; align-items: center; gap: .6rem; white-space: nowrap;
+    padding: .45rem .45rem .45rem .85rem; border-radius: 999px; font-size: .85rem; font-weight: 600; color: var(--on-night);
+    background: rgb(23 25 29 / 0.78); backdrop-filter: blur(6px); box-shadow: 0 8px 20px -8px rgb(0 0 0 / .5);
+    opacity: calc(var(--rv) * 2 - 1); transform: translate(calc(-100% - .5rem), -50%); }
+  .nh__pin i { width: .7rem; height: .7rem; border-radius: 50%; background: var(--ff-green); box-shadow: 0 0 0 4px rgb(158 213 0 / 0.3), 0 0 14px var(--ff-green); }
+  .nh__reveal figcaption { position: absolute; z-index: 3; left: max(var(--gutter), calc((100vw - var(--wide)) / 2)); top: 50%; width: min(30rem, 38vw);
+    transform: translateY(calc(-50% + 16px - 16px * var(--rv))); display: grid; gap: 1.1rem; color: var(--ff-ink); }
+  .nh__reveal strong { font-family: var(--ff-display); font-weight: 700; font-size: clamp(2.8rem, 5.4vw, 5rem); line-height: .95; letter-spacing: -0.025em; text-wrap: balance; }
+  .nh__reveal figcaption span { font-size: clamp(1.05rem, 1.35vw, 1.3rem); line-height: 1.5; color: #3b2a1f; max-width: 26rem; }
 
   .nh__cue {
     position: absolute; z-index: 3; left: 50%; bottom: 1rem; transform: translateX(-50%);
@@ -141,13 +135,13 @@ const [insideA1, insideA2] = c.insideA.split(/(?<=\.)\s/);
   @media (max-width: 700px) {
     .nh__stage::after { background: linear-gradient(to top, rgb(9 10 12 / 0.96) 0%, rgb(9 10 12 / 0.82) 45%, rgb(9 10 12 / 0.2) 75%, transparent); }
     .nh__status { top: auto; bottom: auto; top: calc(var(--nav-h) + .75rem); right: .75rem; font-size: .72rem; }
-    .nh__shot { top: calc(var(--nav-h) + .5rem); left: 50%; right: auto; bottom: auto; height: 50vh; max-width: none; transform: translateX(-50%); border-radius: 16px; }
-    .nh__shot::before { background: linear-gradient(to top, rgb(11 13 16 / 0.6), transparent 30%); }
-    .nh__pin { font-size: 0; gap: 0; padding: .3rem; border-color: transparent; background: rgb(11 13 16 / 0.4); }
-    .nh__reveal figcaption { top: auto; bottom: 1.5rem; width: auto; right: var(--gutter); transform: translateY(calc(18px - 18px * var(--rv))); gap: .75rem; }
-    .nh__reveal strong { font-size: 2.4rem; }
-    .nh__reveal span { font-size: .98rem; }
-    .nh__reveal li { font-size: 1rem; }
+    .nh__reveal::after { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+      background: linear-gradient(to top, rgb(11 13 16 / 0.92) 0%, rgb(11 13 16 / 0.7) 32%, transparent 58%); }
+    /* Phones: labels sit to the right of the equipment, dot first, so they stay on screen. */
+    .nh__pin { left: var(--xr); flex-direction: row-reverse; font-size: .72rem; padding: .3rem .6rem .3rem .3rem; transform: translate(.4rem, -50%); }
+    .nh__reveal figcaption { top: auto; bottom: 1.5rem; left: var(--gutter); right: var(--gutter); width: auto; transform: translateY(calc(16px - 16px * var(--rv))); gap: .6rem; color: var(--on-night); }
+    .nh__reveal strong { font-size: 2.3rem; }
+    .nh__reveal figcaption span { font-size: .98rem; color: var(--on-night-2); }
     .nh__cue { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
