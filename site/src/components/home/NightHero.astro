@@ -19,11 +19,13 @@ const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
 
     <div class="nh__tag" aria-hidden="true"><span class="nh__tag-dot"></span>{c.fireflyHome}</div>
 
+    <div class="nh__near" aria-hidden="true"><img src="/assets/photos/house-night.webp" alt="" width="2400" height="1340" loading="lazy" decoding="async" /></div>
+
     <figure class="nh__reveal">
       <div class="nh__shot">
-        <img src="/assets/photos/install-door.webp" srcset="/assets/photos/install-door-1400.webp 1400w, /assets/photos/install-door.webp 2200w" sizes="(max-width: 700px) 1400px, 100vw" alt={c.insideAlt} width="2200" height="1228" loading="lazy" decoding="async" />
-        <span class="nh__pin" style="--x:73.3%;--y:40%" aria-hidden="true">{c.pinInv}<i></i></span>
-        <span class="nh__pin" style="--x:72%;--y:81.5%" aria-hidden="true">{c.pinBat}<i></i></span>
+        <img src="/assets/photos/install-door-dusk.webp" srcset="/assets/photos/install-door-dusk-1400.webp 1400w, /assets/photos/install-door-dusk.webp 2200w" sizes="(max-width: 700px) 1400px, 100vw" alt={c.insideAlt} width="2200" height="1228" loading="lazy" decoding="async" />
+        <span class="nh__pin" style="--x:73.6%;--y:39.5%" aria-hidden="true">{c.pinInv}<i></i></span>
+        <span class="nh__pin" style="--x:72.4%;--y:80%" aria-hidden="true">{c.pinBat}<i></i></span>
       </div>
       <figcaption>
         <strong>{c.insideA}</strong>
@@ -52,7 +54,7 @@ const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
 </section>
 
 <style>
-  .nh { position: relative; height: 330vh; background: var(--night); color: var(--on-night); }
+  .nh { position: relative; height: 420vh; background: var(--night); color: var(--on-night); }
   .nh__stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; isolation: isolate; }
   .nh__photo, .nh__canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .nh__photo { object-position: 49% 55%; }
@@ -92,7 +94,12 @@ const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
   }
   .nh__tag-dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--ff-green); box-shadow: 0 0 10px var(--ff-green); }
 
-  .nh__reveal { --rv: 0; position: absolute; inset: 0; z-index: 2; margin: 0; visibility: hidden; opacity: 0; overflow: hidden; background: #c9773f; }
+  .nh__near { --nz: 1; position: absolute; inset: 0; z-index: 2; visibility: hidden; opacity: 0; overflow: hidden; background: #0b0d10; }
+  /* 16:9 box covering the screen, kept centred on the front door where possible; zooms into the door. */
+  .nh__near img { position: absolute; top: 50%; width: max(100%, calc(100svh * 2400 / 1340)); aspect-ratio: 2400 / 1340; display: block;
+    left: clamp(calc(100vw - max(100vw, 100svh * 2400 / 1340)), calc(50vw - 0.467 * max(100vw, 100svh * 2400 / 1340)), 0px);
+    transform: translateY(-50%) scale(var(--nz)); transform-origin: 46.7% 61%; }
+  .nh__reveal { --rv: 0; position: absolute; inset: 0; z-index: 2; margin: 0; visibility: hidden; opacity: 0; overflow: hidden; background: #5a2f1a; }
   /* A 16:9 box that always covers the screen, anchored right so the equipment stays in view; pins are % of this box. */
   .nh__shot { position: absolute; right: 0; top: 50%; width: max(100%, calc(100svh * 2200 / 1228)); aspect-ratio: 2200 / 1228;
     transform: translateY(-50%) scale(calc(1.05 - 0.05 * var(--rv))); transform-origin: 75% 55%; }
@@ -103,9 +110,9 @@ const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
     opacity: calc(var(--rv) * 2 - 1); transform: translate(calc(-100% - .5rem), -50%); }
   .nh__pin i { width: .7rem; height: .7rem; border-radius: 50%; background: var(--ff-green); box-shadow: 0 0 0 4px rgb(158 213 0 / 0.3), 0 0 14px var(--ff-green); }
   .nh__reveal figcaption { position: absolute; z-index: 3; left: max(var(--gutter), calc((100vw - var(--wide)) / 2)); top: 64%; width: min(36rem, 36vw);
-    transform: translateY(calc(-50% + 16px - 16px * var(--rv))); display: grid; gap: 1.1rem; color: var(--ff-ink); }
+    transform: translateY(calc(-50% + 16px - 16px * var(--rv))); display: grid; gap: 1.1rem; color: #fff8ef; text-shadow: 0 2px 18px rgb(40 18 6 / 0.55); }
   .nh__reveal strong { font-family: var(--ff-display); font-weight: 700; font-size: clamp(2.6rem, 4.6vw, 4.6rem); line-height: .95; letter-spacing: -0.025em; text-wrap: balance; }
-  .nh__reveal figcaption span { font-size: clamp(1.02rem, 1.25vw, 1.25rem); line-height: 1.5; color: #3b2a1f; max-width: min(23rem, 27vw); }
+  .nh__reveal figcaption span { font-size: clamp(1.02rem, 1.25vw, 1.25rem); line-height: 1.5; color: rgb(255 240 225 / 0.9); max-width: min(23rem, 27vw); }
 
   .nh__cue {
     position: absolute; z-index: 3; left: 50%; bottom: 1rem; transform: translateX(-50%);
