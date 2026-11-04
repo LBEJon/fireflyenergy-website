@@ -29,7 +29,7 @@ export async function submitLead(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    // Analytics: segment only, never contact details. ffTrack exists only when a tracking ID is configured.
+    // Analytics: segment only, never contact details. ffTrack exists only on production with an ID set.
     if (res.ok) (globalThis as { ffTrack?: (n: string, p: object) => void }).ffTrack?.('generate_lead', { segment: payload.segment });
     return { ok: res.ok };
   } catch {
