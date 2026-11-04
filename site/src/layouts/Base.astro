@@ -10,9 +10,12 @@ interface Props {
   /** Locale-agnostic logical path, e.g. '' (home), 'compare', 'faq'. */
   path: string;
   jsonLd?: unknown;
+  /** Social share image, site-relative. */
+  ogImage?: string;
 }
 
-const { title, description, locale, path, jsonLd } = Astro.props;
+const { title, description, locale, path, jsonLd, ogImage = '/og/firefly-og.jpg' } = Astro.props;
+const ogImageUrl = new URL(ogImage, Astro.site).href;
 
 const ogLocale = locale === 'es' ? 'es_MX' : 'en_US';
 const canonical = new URL(altUrl(locale, path), Astro.site).href;
@@ -37,12 +40,23 @@ const esHref = new URL(altUrl('es', path), Astro.site).href;
     <meta property="og:type" content="website" />
     <meta property="og:locale" content={ogLocale} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="Firefly Energy" />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="theme-color" content="#0b0d10" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Narrow:wght@600;700&display=swap" />
 
     <link rel="icon" type="image/svg+xml" href="/assets/brand/firefly-icon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
     <Analytics />
 
     {jsonLd && (

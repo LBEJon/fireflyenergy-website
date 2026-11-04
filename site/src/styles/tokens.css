@@ -25,10 +25,10 @@
   --ff-storm:        #9498A1; /* captions, fine print */
 
   /* ---- Accent (use rarely — credibility comes from restraint) ---- */
-  --ff-accent:       #FF6A3D; /* SUNSET CORAL — the "look here" accent. Warm complement to lime; max attention.
-                                 SCARCITY RULE: only the #1 action per view (primary CTA, savings figure, "featured" badge). */
-  --ff-accent-dk:    #E24A1E; /* coral text-on-white / hover */
-  --ff-accent-tint:  #FFE7DF; /* soft coral wash for badges */
+  --ff-accent:       #9ED500; /* Firefly lime: primary actions (Jon, 2026-11-03: coral retired). Always ink text on it. */
+  --ff-accent-dk:    #4F6B00; /* deep lime: accent text, links and focus rings on light backgrounds (passes contrast) */
+  --ff-accent-tint:  #F2F8E0; /* soft lime wash for selected states */
+  --ff-error:        #B3261E; /* errors only */
   --ff-gold:         #FFB81C; /* pricing / savings highlight only */
 
   /* ---- Type ---- */

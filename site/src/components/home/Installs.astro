@@ -1,0 +1,61 @@
+---
+import { homeCopy } from '../../content/home';
+import type { Locale } from '../../lib/i18n';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = homeCopy[locale].installs;
+// Full, uncropped install photos (all shot 3:4). #5 is an inverter close-up, so it stays out.
+const photos = [4, 1, 2, 3].map((n) => ({ src: `/assets/equipment/installs/install-${n}.webp`, full: `/assets/equipment/installs/install-${n}.jpg` }));
+---
+<section class="in" id="installs" aria-labelledby="in-title">
+  <div class="wrap in__layout">
+    <figure class="in__feature" data-rv>
+      <img src="/assets/photos/install-exterior.webp" alt={c.featureAlt} width="1200" height="1607" loading="lazy" decoding="async" />
+    </figure>
+    <div class="in__side">
+      <h2 id="in-title" class="display h2" data-rv>{c.title}</h2>
+      <p class="lede" data-rv>{c.lede}</p>
+      <ul class="in__strip" aria-label={c.title}>
+        {photos.map((p) => (
+          <li><a href={p.full} target="_blank" rel="noopener"><img src={p.src} alt={c.alt} width="900" height="1200" loading="lazy" decoding="async" /></a></li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <dl class="wrap in__specs">
+    {c.specs.map(([k, v], i) => (
+      <div data-rv style={`--i:${i}`}><dt>{k}</dt><dd>{v}</dd></div>
+    ))}
+  </dl>
+</section>
+
+<style>
+  .in { background: var(--ff-paper); padding: clamp(2rem, 6vh, 4rem) 0 clamp(6rem, 14vh, 10rem); }
+  .in .lede { color: var(--ff-slate); }
+  .in__layout { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(2rem, 5vw, 5rem); align-items: start; }
+  .in__feature { margin: 0; position: sticky; top: calc(var(--nav-h) + 1.5rem); }
+  .in__feature img { width: 100%; height: auto; aspect-ratio: 1200 / 1607; object-fit: cover; display: block; border-radius: 20px;
+    box-shadow: 0 2px 4px rgb(42 45 52 / .08), 0 30px 60px -24px rgb(42 45 52 / .4); }
+  .in__side { min-width: 0; }
+  .in__side .lede { margin-top: 1rem; }
+  .in__strip { list-style: none; margin: clamp(2rem, 4vh, 3rem) 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: clamp(.75rem, 1.2vw, 1.1rem); }
+  .in__strip a { display: block; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgb(42 45 52 / .06), 0 12px 30px -12px rgb(42 45 52 / .25);
+    transition: transform .5s var(--ease), box-shadow .5s var(--ease); }
+  .in__strip a:hover { transform: translateY(-4px); box-shadow: 0 2px 4px rgb(42 45 52 / .08), 0 22px 44px -16px rgb(42 45 52 / .35); }
+  .in__strip img { width: 100%; height: auto; aspect-ratio: 3 / 4; display: block; filter: saturate(.96) contrast(1.03); }
+  @media (max-width: 900px) {
+    .in__layout { grid-template-columns: 1fr; }
+    .in__feature { position: static; order: 2; }
+    .in__strip { grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 62vw; overflow-x: auto; scroll-snap-type: x mandatory;
+      margin-left: calc(-1 * var(--gutter)); margin-right: calc(-1 * var(--gutter)); padding: 0 var(--gutter) .75rem; scroll-padding: var(--gutter); scrollbar-width: none; }
+    .in__strip li { scroll-snap-align: start; }
+  }
+  .in__specs { margin: clamp(3rem, 7vh, 5rem) auto 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+  .in__specs div { border-top: 2px solid var(--ff-ink); padding-top: 1rem; transition-delay: calc(var(--i) * 100ms); }
+  .in__specs dt { font-family: var(--ff-display); font-weight: 700; font-size: clamp(1.5rem, 2.2vw, 2rem); line-height: 1.05; }
+  .in__specs dd { margin: .5rem 0 0; color: var(--ff-slate); line-height: 1.5; }
+  @media (max-width: 900px) { .in__specs { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 480px) { .in__specs { grid-template-columns: 1fr; } }
+</style>

@@ -105,7 +105,7 @@ const waHref = `https://wa.me/${waNumber}`;
     resize: vertical;
   }
   .ff-sv__field input:focus-visible, .ff-sv__field textarea:focus-visible {
-    outline: 3px solid var(--ff-accent); outline-offset: 1px; border-color: var(--ff-accent);
+    outline: 3px solid var(--ff-accent-dk); outline-offset: 1px; border-color: var(--ff-accent);
   }
   .ff-sv__phone-row { display: flex; gap: 0.5rem; }
   .ff-sv__cc {
@@ -113,7 +113,7 @@ const waHref = `https://wa.me/${waNumber}`;
     border: 2px solid var(--ff-line); border-radius: var(--r-md);
     font-family: var(--ff-sans); font-size: var(--fs-body); background: var(--ff-paper); cursor: pointer;
   }
-  .ff-sv__cc:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 1px; border-color: var(--ff-accent); }
+  .ff-sv__cc:focus-visible { outline: 3px solid var(--ff-accent-dk); outline-offset: 1px; border-color: var(--ff-accent); }
   .ff-sv__phone-row input { flex: 1 1 auto; }
   .ff-sv__check {
     display: flex; align-items: center; gap: 0.5rem; margin: -0.25rem 0 var(--sp-2);
@@ -123,13 +123,13 @@ const waHref = `https://wa.me/${waNumber}`;
   .ff-sv__hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
   .ff-sv__submit, .ff-sv__wa-btn {
     display: inline-block; width: 100%; box-sizing: border-box; text-align: center;
-    background: var(--ff-accent); color: var(--ff-white); border: 0;
+    background: var(--ff-accent); color: var(--ff-ink); border: 0;
     font-weight: 700; font-size: var(--fs-body); padding: 0.85rem 1.5rem;
-    border-radius: var(--r-pill); cursor: pointer; margin-top: var(--sp-2);
+    border-radius: 10px; cursor: pointer; margin-top: var(--sp-2);
     font-family: var(--ff-sans); text-decoration: none;
     transition: background var(--dur) var(--ease), transform var(--dur) var(--ease);
   }
-  .ff-sv__submit:hover:not(:disabled), .ff-sv__wa-btn:hover { background: var(--ff-accent-dk); transform: translateY(-2px); }
+  .ff-sv__submit:hover:not(:disabled), .ff-sv__wa-btn:hover { background: var(--ff-green-soft); transform: translateY(-2px); }
   .ff-sv__submit:disabled { background: var(--ff-storm); cursor: not-allowed; }
   .ff-sv__submit:focus-visible, .ff-sv__wa-btn:focus-visible { outline: 3px solid var(--ff-ink); outline-offset: 2px; }
   .ff-sv__softnets { display: flex; flex-direction: column; gap: 0.4rem; margin-top: var(--sp-3); text-align: center; }

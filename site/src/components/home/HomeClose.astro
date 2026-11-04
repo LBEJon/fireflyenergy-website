@@ -1,0 +1,118 @@
+---
+import Dealers from './Dealers.astro';
+import SiteFooter from './SiteFooter.astro';
+import { homeCopy } from '../../content/home';
+import { altUrl, t, type Locale } from '../../lib/i18n';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = homeCopy[locale];
+const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
+const phone = t(locale, 'common.phone');
+const email = t(locale, 'common.email');
+---
+<section class="pr" aria-labelledby="pr-title">
+  <div class="wrap">
+    <h2 id="pr-title" class="display h2" data-rv>{c.process.title}</h2>
+    <ol class="pr__steps">
+      {c.process.steps.map((s, i) => (
+        <li data-rv style={`--i:${i}`}>
+          <span class="pr__n" aria-hidden="true">{i + 1}</span>
+          <h3>{s.h}</h3>
+          <p>{s.p}</p>
+        </li>
+      ))}
+    </ol>
+    <a class="btn btn--primary" href={altUrl(locale, 'calculator')} data-track="begin_assessment" data-rv>{c.process.cta}</a>
+  </div>
+</section>
+
+<section class="bz" aria-labelledby="bz-title">
+  <div class="wrap bz__in">
+    <div class="bz__copy" data-rv>
+      <h2 id="bz-title" class="display">{c.business.title}</h2>
+      <p>{c.business.p}</p>
+      <a class="btn btn--ghost-dark" href={altUrl(locale, 'industrial')}>{c.business.cta}</a>
+    </div>
+    <img class="bz__img" src="/assets/photos/industrial-hero.webp" alt="" width="1920" height="1085" loading="lazy" decoding="async" />
+  </div>
+</section>
+
+<Dealers locale={locale} />
+
+<section class="fq" aria-labelledby="fq-title">
+  <div class="wrap fq__in">
+    <div>
+      <h2 id="fq-title" class="display h2" data-rv>{c.faq.title}</h2>
+      <a class="fq__more" href={altUrl(locale, 'faq')}>{c.faq.more} →</a>
+    </div>
+    <div class="fq__list">
+      {c.faq.items.map((it) => (
+        <details>
+          <summary>{it.q}</summary>
+          <p>{it.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="cl" aria-labelledby="cl-title">
+  <img class="cl__bg" src="/assets/photos/hero-dusk.webp" alt="" width="1920" height="1085" loading="lazy" decoding="async" />
+  <div class="wrap cl__in">
+    <h2 id="cl-title" class="display" data-rv>{c.closing.title}</h2>
+    <p data-rv>{c.closing.p}</p>
+    <div class="cl__actions" data-rv>
+      <a class="btn btn--primary" href={altUrl(locale, 'calculator')} data-track="begin_assessment">{c.closing.cta}</a>
+      <a class="btn btn--ghost-dark" href={wa} target="_blank" rel="noopener" data-track="contact_whatsapp">{c.closing.wa}</a>
+    </div>
+  </div>
+</section>
+
+<SiteFooter locale={locale} />
+
+<style>
+  .pr { background: var(--ff-white); padding: clamp(6rem, 14vh, 10rem) 0; border-top: 1px solid var(--ff-line); }
+  .pr__steps { list-style: none; margin: clamp(2.5rem, 6vh, 4rem) 0 3rem; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.5rem, 4vw, 4rem); }
+  .pr__steps li { transition-delay: calc(var(--i) * 120ms); }
+  .pr__n { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--ff-green); color: var(--ff-ink);
+    font: 700 1.1rem/1 var(--ff-display); }
+  .pr__steps h3 { margin: 1.25rem 0 .5rem; font-size: 1.3rem; line-height: 1.2; }
+  .pr__steps p { margin: 0; color: var(--ff-slate); line-height: 1.6; max-width: 34ch; }
+
+  .bz { position: relative; background: var(--ff-ink); color: var(--on-night); overflow: hidden; }
+  .bz__in { display: flex; align-items: center; min-height: 440px; }
+  .bz__copy { position: relative; z-index: 1; padding: 4rem 0; max-width: 34rem; }
+  .bz__copy h2 { font-size: clamp(2rem, 4vw, 3.25rem); }
+  .bz__copy p { color: #c3c7cf; line-height: 1.6; max-width: 32rem; margin: 1rem 0 2rem; }
+  .bz__img { position: absolute; top: 0; right: 0; width: 58%; height: 100%; object-fit: cover;
+    mask-image: linear-gradient(to right, transparent, #000 35%); }
+
+  .fq { background: var(--ff-paper); padding: clamp(6rem, 14vh, 10rem) 0; }
+  .fq__in { display: grid; grid-template-columns: 1fr 1.5fr; gap: clamp(2rem, 6vw, 6rem); }
+  .fq__more { display: inline-block; margin-top: 1.5rem; color: var(--ff-ink); font-weight: 600; }
+  .fq__list details { border-bottom: 1px solid var(--ff-line); }
+  .fq__list details:first-child { border-top: 1px solid var(--ff-line); }
+  .fq__list summary { list-style: none; cursor: pointer; padding: 1.4rem 2.5rem 1.4rem 0; position: relative; font-weight: 600; font-size: 1.15rem; line-height: 1.35; }
+  .fq__list summary::-webkit-details-marker { display: none; }
+  .fq__list summary::after { content: ''; position: absolute; right: .25rem; top: 50%; width: 12px; height: 12px; margin-top: -8px;
+    border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform .3s var(--ease); }
+  .fq__list details[open] summary::after { transform: rotate(-135deg); margin-top: -2px; }
+  .fq__list p { margin: 0 0 1.5rem; color: var(--ff-slate); line-height: 1.65; max-width: 60ch; }
+
+  .cl { position: relative; background: var(--night); color: var(--on-night); padding: clamp(8rem, 22vh, 14rem) 0; overflow: hidden; isolation: isolate; }
+  .cl__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 49% 55%; z-index: -1;
+    filter: brightness(.55) saturate(.9); }
+  .cl::before { content: ''; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at 30% 60%, rgb(11 13 16 / 0.85), rgb(11 13 16 / 0.35) 70%); }
+  .cl h2 { font-size: clamp(2.6rem, 6.5vw, 5.5rem); max-width: 14ch; }
+  .cl p { color: var(--on-night-2); font-size: 1.15rem; line-height: 1.55; max-width: 34rem; margin: 1.25rem 0 2rem; }
+  .cl__actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+
+
+  @media (max-width: 900px) {
+    .pr__steps, .fq__in { grid-template-columns: 1fr; }
+    .bz__in { display: block; min-height: 0; }
+    .bz__copy { padding: 4rem 0 2rem; }
+    .bz__img { position: static; width: 100%; height: 260px; mask-image: linear-gradient(transparent, #000 35%); }
+  }
+</style>

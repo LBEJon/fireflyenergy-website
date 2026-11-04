@@ -1,11 +1,8 @@
 import {
   existingSolarKw,
-  recommendPanels,
-  offsetPct,
   upsertBill,
   billsDailyKwh,
   billsPending,
-  usageKwhPerDay,
   MAX_METERS,
   type AssessmentAnswers,
   type BillAnswer,
@@ -106,7 +103,6 @@ export function initAssessment(root: HTMLElement): void {
       ?.querySelector<HTMLElement>('.ff-as__legend, .ff-as__capture-title');
     heading?.setAttribute('tabindex', '-1');
     heading?.focus({ preventScroll: false });
-    if (n === 3) prepareSolarStep();
   }
 
   // No step gates Next: usage helps size the proposal but is optional (a customer who can't
@@ -550,89 +546,8 @@ export function initAssessment(root: HTMLElement): void {
         .forEach((b) => b.setAttribute('aria-checked', String(b === btn)));
     });
   });
-  // ---- Add-solar: recommendation-anchored stepper ----
-  const solarRec = root.querySelector<HTMLElement>('[data-solar-rec]');
-  const recLine = root.querySelector<HTMLElement>('[data-rec-line]');
-  const recBtn = root.querySelector<HTMLButtonElement>('[data-panel-rec]');
-  const noneBtn = root.querySelector<HTMLButtonElement>('[data-panel-none]');
-  const addSolarHeading = root.querySelector<HTMLElement>('[data-addsolar-heading]');
-  const addSolarHelp = root.querySelector<HTMLElement>('[data-addsolar-help]');
-  const panelVal = root.querySelector<HTMLInputElement>('[data-panel-val]');
-  const offsetLine = root.querySelector<HTMLElement>('[data-offset-line]');
-  let solarTouched = false; // once the user adjusts, stop auto-resetting to rec
-  let lastRec = 0; // most recent recommendation, for the "Use recommended" button
-
-  // Current consumption (kWh/day) from the meters or manual entry; 0 when unknown.
-  const currentCfeKwhPerDay = () => usageKwhPerDay(answers);
-  function currentExistingKw(): number {
-    return answers.hasExistingSolar
-      ? existingSolarKw(answers.panelCount ?? 0, answers.panelWatts ?? 0)
-      : 0;
-  }
-
-  function renderSolarReadout() {
-    const cfe = currentCfeKwhPerDay();
-    const existing = currentExistingKw();
-    const n = answers.addSolarPanels ?? 0;
-    // The oversize field shows a number ONLY when oversizing (a custom count that
-    // isn't the recommendation or battery-only); otherwise it stays blank.
-    const isCustom = n > 0 && n !== lastRec;
-    if (panelVal && document.activeElement !== panelVal) panelVal.value = isCustom ? String(n) : '';
-    if (offsetLine) {
-      offsetLine.textContent = tr('assessment.solar.offset').replace(
-        '{pct}',
-        String(offsetPct(n, cfe, existing)),
-      );
-    }
-    // Highlight whichever quick-set action matches the current count.
-    noneBtn?.classList.toggle('is-active', n === 0);
-    recBtn?.classList.toggle('is-active', n > 0 && n === lastRec);
-  }
-
-  // Bounded panel change: 0 allowed; first positive snaps to the 4-panel min.
-  function setPanels(n: number) {
-    let v = Math.max(0, Math.round(n));
-    if (v > 0 && v < 4) v = 4;
-    answers.addSolarPanels = v;
-    solarTouched = true;
-    renderSolarReadout();
-  }
-  noneBtn?.addEventListener('click', () => setPanels(0));
-  recBtn?.addEventListener('click', () => setPanels(lastRec));
-  // Oversize: typing a number sets the panel count directly. Clamp on commit
-  // (blur/Enter); an empty field falls back to the recommendation.
-  panelVal?.addEventListener('change', () => {
-    const v = panelVal.value.trim();
-    setPanels(v === '' ? lastRec : Number(v) || 0);
-  });
-
-  // Recompute + default-select the recommendation when entering the solar step.
-  function prepareSolarStep() {
-    const cfe = currentCfeKwhPerDay();
-    if (solarRec) solarRec.hidden = false;
-    // If they already have solar (entered existing panels), this step is about
-    // *additional* panels — and "none" means keep the panels they already have.
-    const hasExisting = currentExistingKw() > 0;
-    if (addSolarHeading)
-      addSolarHeading.textContent = tr(hasExisting ? 'assessment.addsolar.heading_existing' : 'assessment.addsolar.heading');
-    if (addSolarHelp)
-      addSolarHelp.textContent = tr(hasExisting ? 'assessment.addsolar.help_existing' : 'assessment.addsolar.help');
-    if (noneBtn)
-      noneBtn.textContent = tr(hasExisting ? 'assessment.solar.none_existing' : 'assessment.solar.none');
-    // No recommendation without consumption (usage is optional): keep the
-    // stepper for free entry, hide the rec line + "Use recommended" button.
-    lastRec = cfe > 0 ? recommendPanels(cfe, currentExistingKw()) : 0;
-    if (recLine) {
-      recLine.hidden = lastRec <= 0;
-      if (lastRec > 0) {
-        recLine.innerHTML = tr('assessment.solar.recommend').replace('{rec}', `<strong>${lastRec}</strong>`);
-      }
-    }
-    if (recBtn) recBtn.hidden = lastRec <= 0;
-    // Default-select the recommendation until the user adjusts the stepper.
-    if (!solarTouched && lastRec > 0) answers.addSolarPanels = lastRec;
-    renderSolarReadout();
-  }
+  // Panel sizing is not part of the website assessment (Jon, 2026-11-03): Firefly
+  // discusses solar, including connecting existing panels, at the assessment visit.
 
   // ====================================================================
   // STEP 4 — BACKUP GOAL

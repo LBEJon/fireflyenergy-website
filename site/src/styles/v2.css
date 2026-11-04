@@ -1,0 +1,53 @@
+/* Redesign 2026-11 — night → morning. Brand tokens stay in tokens.css; these extend them. */
+:root {
+  --night: #0b0d10;
+  --night-2: #14171c;
+  --night-line: rgb(255 255 255 / 0.1);
+  --on-night: #f4f5ef;
+  --on-night-2: #a9aeb8;
+  --amber: #ffb04a;
+  --gutter: clamp(1.25rem, 5vw, 4.5rem);
+  --nav-h: 68px;
+  --wide: 1320px;
+  color-scheme: light;
+}
+
+html { scroll-behavior: smooth; scrollbar-color: #5b606b transparent; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { background: var(--ff-paper); color: var(--ff-ink); font-family: var(--ff-sans); -webkit-font-smoothing: antialiased; }
+::selection { background: var(--ff-green); color: var(--ff-ink); }
+:focus-visible { outline: 2px solid var(--ff-green); outline-offset: 3px; border-radius: 4px; }
+a { text-underline-offset: 0.2em; }
+
+.wrap { width: min(100% - 2 * var(--gutter), var(--wide)); margin-inline: auto; }
+.display { font-family: var(--ff-display); font-weight: 700; letter-spacing: -0.02em; line-height: 0.98; text-wrap: balance; margin: 0; }
+.h2 { font-size: clamp(2.2rem, 5vw, 4.25rem); }
+.lede { font-size: clamp(1.05rem, 1.3vw, 1.25rem); line-height: 1.55; max-width: 38rem; margin: 1rem 0 0; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  box-sizing: border-box; min-height: 44px; padding: 0.6rem 1.15rem; border-radius: 10px;
+  font: 600 0.95rem/1.1 var(--ff-sans); text-decoration: none; white-space: nowrap;
+  border: 1px solid transparent; cursor: pointer;
+  transition: transform 0.35s var(--ease), background-color 0.25s, border-color 0.25s, box-shadow 0.35s var(--ease);
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+/* Primary action = Firefly lime (Jon, 2026-11-03: coral retired as the accent). */
+.btn--primary { background: var(--ff-green); color: var(--ff-ink); box-shadow: 0 6px 16px -8px rgb(23 25 29 / 0.35); }
+.btn--primary:hover { background: var(--ff-green-soft); box-shadow: 0 10px 22px -10px rgb(23 25 29 / 0.4); }
+.btn--primary:focus-visible { outline-color: var(--ff-ink); }
+.btn--ghost-dark { color: var(--on-night); border-color: rgb(255 255 255 / 0.32); background: rgb(255 255 255 / 0.04); }
+.btn--ghost-dark:hover { border-color: rgb(255 255 255 / 0.7); }
+.btn--ink { background: var(--ff-ink); color: var(--ff-white); }
+.btn--ink:hover { background: #1c1f24; }
+.btn--line { color: var(--ff-ink); border-color: rgb(42 45 52 / 0.3); }
+.btn--line:hover { border-color: var(--ff-ink); }
+
+/* Section entrance: content is visible by default; JS adds .rv-ready to opt in. */
+.rv-ready [data-rv] { opacity: 0; transform: translateY(12px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+.rv-ready [data-rv].is-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .rv-ready [data-rv] { opacity: 1; transform: none; transition: none; } }
+
+/* Inner pages sit below the fixed dark nav. */
+.page-main { padding-top: var(--nav-h); }

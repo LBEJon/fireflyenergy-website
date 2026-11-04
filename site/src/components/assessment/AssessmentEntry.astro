@@ -208,28 +208,6 @@ const backupOpts = ['4', '8', '12', '24'];
               </button>
             ))}
           </div>
-
-          <h4 class="ff-as__subhead" data-addsolar-heading>{t(locale, 'assessment.addsolar.heading')}</h4>
-          <p class="ff-as__help" data-addsolar-help>{t(locale, 'assessment.addsolar.help')}</p>
-
-          <!-- Recommendation (text only) + choose: use it / oversize / battery only -->
-          <div class="ff-as__solar-rec" data-solar-rec hidden>
-            <p class="ff-as__rec-line" data-rec-line></p>
-            <p class="ff-as__offset-line" data-offset-line aria-live="polite"></p>
-            <div class="ff-as__solar-actions">
-              <button type="button" class="ff-as__rec-btn" data-panel-rec hidden>{t(locale, 'assessment.solar.use_recommended')}</button>
-              <label class="ff-as__oversize">
-                <span class="ff-as__oversize-label">{t(locale, 'assessment.solar.oversize_label')}</span>
-                <span class="ff-as__oversize-input">
-                  <input type="number" inputmode="numeric" min="0" step="1" class="ff-as__step-input"
-                    data-panel-val aria-label={t(locale, 'assessment.solar.panel_count')}
-                    placeholder={t(locale, 'assessment.solar.oversize_ph')} />
-                  <span class="ff-as__step-unit">{t(locale, 'assessment.solar.panels_unit')}</span>
-                </span>
-              </label>
-              <button type="button" class="ff-as__none-btn" data-panel-none>{t(locale, 'assessment.solar.none')}</button>
-            </div>
-          </div>
         </div>
 
         <!-- STEP 4: Backup goal -->
@@ -350,15 +328,15 @@ const backupOpts = ['4', '8', '12', '24'];
     transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
   }
   .ff-as__door:hover { transform: translateY(-3px); border-color: var(--ff-green); box-shadow: var(--shadow-md); }
-  .ff-as__door:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__door:focus-visible { outline: 3px solid var(--ff-accent-dk); outline-offset: 2px; }
   .ff-as__door--a { border-color: var(--ff-accent); }
   .ff-as__door-title { font-weight: 700; font-size: var(--fs-h3); color: var(--ff-ink); }
   .ff-as__door-desc { color: var(--ff-slate); font-size: var(--fs-small); }
   .ff-as__door-cta {
-    margin-top: var(--sp-2); align-self: flex-start; background: var(--ff-accent); color: var(--ff-white);
-    font-weight: 700; font-size: var(--fs-small); padding: 0.5rem 1.1rem; border-radius: var(--r-pill);
+    margin-top: var(--sp-2); align-self: flex-start; background: var(--ff-accent); color: var(--ff-ink);
+    font-weight: 700; font-size: var(--fs-small); padding: 0.5rem 1.1rem; border-radius: 10px;
   }
-  .ff-as__door--b .ff-as__door-cta { background: var(--ff-ink); }
+  .ff-as__door--b .ff-as__door-cta { background: var(--ff-ink); color: var(--ff-white); }
 
   /* ---- Wizard shell ---- */
   .ff-as__exit {
@@ -403,14 +381,14 @@ const backupOpts = ['4', '8', '12', '24'];
     width: 6rem; box-sizing: border-box; padding: 0.45rem 0.6rem; border: 2px solid var(--ff-line);
     border-radius: var(--r-md); font-family: var(--ff-sans); font-size: var(--fs-body); background: var(--ff-white);
   }
-  .ff-as__meters :global(.ff-as__meter-kwh input:focus-visible) { outline: 3px solid var(--ff-accent); outline-offset: 1px; border-color: var(--ff-accent); }
+  .ff-as__meters :global(.ff-as__meter-kwh input:focus-visible) { outline: 3px solid var(--ff-accent-dk); outline-offset: 1px; border-color: var(--ff-accent); }
   .ff-as__meters :global(.ff-as__meter-label) { color: var(--ff-ink); font-size: var(--fs-small); }
   .ff-as__meters :global(.ff-as__meter.is-unread .ff-as__meter-label) { color: var(--ff-slate); }
   .ff-as__meters :global(.ff-as__meter-remove) {
     flex: 0 0 auto; background: none; border: none; padding: 0; color: var(--ff-accent-dk);
     font-family: var(--ff-sans); font-weight: 600; text-decoration: underline; cursor: pointer;
   }
-  .ff-as__meters :global(.ff-as__meter-remove:focus-visible) { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__meters :global(.ff-as__meter-remove:focus-visible) { outline: 3px solid var(--ff-accent-dk); outline-offset: 2px; }
   .ff-as__ask {
     background: var(--ff-accent-tint); border: 1px solid var(--ff-line); border-radius: var(--r-md);
     padding: var(--sp-3); display: grid; gap: var(--sp-2);
@@ -418,13 +396,13 @@ const backupOpts = ['4', '8', '12', '24'];
   .ff-as__ask-text { margin: 0; color: var(--ff-ink); font-size: var(--fs-body); }
   .ff-as__ask-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
   .ff-as__ask-btn {
-    background: var(--ff-white); border: 2px solid var(--ff-line); border-radius: var(--r-pill);
+    background: var(--ff-white); border: 2px solid var(--ff-line); border-radius: 10px;
     padding: 0.5rem 1.2rem; font-weight: 700; font-family: var(--ff-sans); color: var(--ff-ink); cursor: pointer;
   }
   .ff-as__ask-btn:hover { border-color: var(--ff-green); }
-  .ff-as__ask-btn--primary { background: var(--ff-accent); border-color: var(--ff-accent); color: var(--ff-white); }
-  .ff-as__ask-btn--primary:hover { background: var(--ff-accent-dk); border-color: var(--ff-accent-dk); }
-  .ff-as__ask-btn:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__ask-btn--primary { background: var(--ff-accent); border-color: var(--ff-accent); color: var(--ff-ink); }
+  .ff-as__ask-btn--primary:hover { background: var(--ff-green-soft); border-color: var(--ff-green-soft); }
+  .ff-as__ask-btn:focus-visible { outline: 3px solid var(--ff-accent-dk); outline-offset: 2px; }
   .ff-as__ask-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .ff-as__meters[hidden], .ff-as__ask[hidden] { display: none; }
   .ff-as__unknown {
@@ -443,7 +421,7 @@ const backupOpts = ['4', '8', '12', '24'];
     border: 2px solid var(--ff-line); border-radius: var(--r-md);
     font-family: var(--ff-sans); font-size: var(--fs-body); background: var(--ff-paper);
   }
-  .ff-as__field input:focus-visible, .ff-as__field select:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 1px; border-color: var(--ff-accent); }
+  .ff-as__field input:focus-visible, .ff-as__field select:focus-visible { outline: 3px solid var(--ff-accent-dk); outline-offset: 1px; border-color: var(--ff-accent); }
 
   /* ---- Yes / No ---- */
   .ff-as__yesno { display: flex; gap: var(--sp-2); justify-content: center; }
@@ -452,7 +430,7 @@ const backupOpts = ['4', '8', '12', '24'];
     padding: 0.6rem 1.6rem; font-weight: 700; font-family: var(--ff-sans); color: var(--ff-ink); cursor: pointer;
   }
   .ff-as__yn[aria-checked='true'] { border-color: var(--ff-accent); background: var(--ff-accent-tint); }
-  .ff-as__yn:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__yn:focus-visible { outline: 3px solid var(--ff-accent-dk); outline-offset: 2px; }
   .ff-as__solar-detail { margin-top: var(--sp-3); }
   .ff-as__kwp { color: var(--ff-accent-dk); font-weight: 700; font-size: var(--fs-small); margin: 0; }
 
@@ -481,7 +459,7 @@ const backupOpts = ['4', '8', '12', '24'];
   }
   .ff-as__choice:hover { border-color: var(--ff-green); }
   .ff-as__choice[aria-checked='true'] { border-color: var(--ff-accent); background: var(--ff-accent-tint); }
-  .ff-as__choice:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__choice:focus-visible { outline: 3px solid var(--ff-accent-dk); outline-offset: 2px; }
   .ff-as__choice-title { font-weight: 700; color: var(--ff-ink); font-size: var(--fs-body); }
   .ff-as__choice-note { color: var(--ff-slate); font-size: var(--fs-small); }
 
@@ -492,7 +470,7 @@ const backupOpts = ['4', '8', '12', '24'];
     padding: 0.55rem 1.3rem; font-weight: 700; font-family: var(--ff-sans); color: var(--ff-ink); cursor: pointer;
   }
   .ff-as__pill.is-active { border-color: var(--ff-accent); background: var(--ff-accent-tint); }
-  .ff-as__pill:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__pill:focus-visible { outline: 3px solid var(--ff-accent-dk); outline-offset: 2px; }
 
   /* ---- Solar recommendation + stepper ---- */
   .ff-as__solar-rec { display: flex; flex-direction: column; gap: var(--sp-2); align-items: flex-start; }
@@ -500,34 +478,19 @@ const backupOpts = ['4', '8', '12', '24'];
   .ff-as__rec-line strong { color: var(--ff-accent-dk); }
   .ff-as__stepper { display: inline-flex; align-items: center; gap: var(--sp-2); }
   .ff-as__step-btn {
-    width: 2.5rem; height: 2.5rem; border-radius: var(--r-pill); border: 2px solid var(--ff-line);
+    width: 2.5rem; height: 2.5rem; border-radius: 10px; border: 2px solid var(--ff-line);
     background: var(--ff-paper); font-size: 1.4rem; font-weight: 700; line-height: 1; color: var(--ff-ink); cursor: pointer;
   }
   .ff-as__step-btn:hover { border-color: var(--ff-green); }
-  .ff-as__step-btn:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__step-btn:focus-visible { outline: 3px solid var(--ff-accent-dk); outline-offset: 2px; }
   .ff-as__step-input {
     width: 4rem; text-align: center; font-weight: 700; color: var(--ff-ink); font-size: var(--fs-body);
     border: 2px solid var(--ff-line); border-radius: var(--r-md); padding: 0.45rem 0.3rem;
     font-family: var(--ff-sans); background: var(--ff-paper);
   }
-  .ff-as__step-input:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 1px; border-color: var(--ff-accent); }
+  .ff-as__step-input:focus-visible { outline: 3px solid var(--ff-accent-dk); outline-offset: 1px; border-color: var(--ff-accent); }
   .ff-as__step-input:not(:placeholder-shown) { border-color: var(--ff-accent); background: var(--ff-accent-tint); }
   .ff-as__step-unit { font-weight: 700; color: var(--ff-ink); }
-  .ff-as__offset-line { margin: 0 0 var(--sp-1); color: var(--ff-slate); font-size: var(--fs-small); }
-  /* Choose how many panels: use recommended / oversize (type a number) / battery only. */
-  .ff-as__solar-actions { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-2); }
-  .ff-as__oversize { display: flex; flex-direction: column; gap: 0.3rem; }
-  .ff-as__oversize-label { font-size: var(--fs-small); font-weight: 700; color: var(--ff-ink); }
-  .ff-as__oversize-input { display: inline-flex; align-items: baseline; gap: 0.4rem; }
-  /* Both quick-set actions are pills; the one matching the current count is active. */
-  .ff-as__rec-btn, .ff-as__none-btn {
-    background: var(--ff-paper); border: 2px solid var(--ff-line); border-radius: var(--r-pill);
-    padding: 0.5rem 1.2rem; font-weight: 700; font-family: var(--ff-sans); color: var(--ff-ink);
-    cursor: pointer; text-decoration: none;
-  }
-  .ff-as__rec-btn:hover, .ff-as__none-btn:hover { border-color: var(--ff-green); }
-  .ff-as__rec-btn:focus-visible, .ff-as__none-btn:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
-  .ff-as__rec-btn.is-active, .ff-as__none-btn.is-active { border-color: var(--ff-accent); background: var(--ff-accent-tint); }
 
   /* ---- Custom appliance add ---- */
   .ff-as__add-appliance { margin-top: var(--sp-3); }
@@ -536,11 +499,11 @@ const backupOpts = ['4', '8', '12', '24'];
   .ff-as__add-row .ff-as__field { flex: 1 1 140px; margin-bottom: 0; }
   .ff-as__add-row .ff-as__check-row { flex: 0 0 auto; }
   .ff-as__add-btn {
-    background: var(--ff-accent); border: none; border-radius: var(--r-pill); color: var(--ff-white);
+    background: var(--ff-accent); border: none; border-radius: 10px; color: var(--ff-ink);
     padding: 0.55rem 1.2rem; font-weight: 700; font-family: var(--ff-sans); cursor: pointer;
   }
   .ff-as__add-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-  .ff-as__add-btn:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__add-btn:focus-visible { outline: 3px solid var(--ff-accent-dk); outline-offset: 2px; }
   .ff-as__added-list { list-style: none; margin: var(--sp-2) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--sp-1); }
   .ff-as__added-item {
     display: flex; justify-content: space-between; align-items: center; gap: var(--sp-2);
@@ -552,7 +515,7 @@ const backupOpts = ['4', '8', '12', '24'];
     background: none; border: none; padding: 0; color: var(--ff-accent-dk);
     font-family: var(--ff-sans); font-weight: 600; text-decoration: underline; cursor: pointer;
   }
-  .ff-as__added-remove:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__added-remove:focus-visible { outline: 3px solid var(--ff-accent-dk); outline-offset: 2px; }
 
   /* ---- Final step ---- */
 
@@ -570,18 +533,18 @@ const backupOpts = ['4', '8', '12', '24'];
     border: 2px solid var(--ff-line); border-radius: var(--r-md);
     font-family: var(--ff-sans); font-size: var(--fs-body); background: var(--ff-paper); cursor: pointer;
   }
-  .ff-as__cc:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 1px; border-color: var(--ff-accent); }
+  .ff-as__cc:focus-visible { outline: 3px solid var(--ff-accent-dk); outline-offset: 1px; border-color: var(--ff-accent); }
   .ff-as__phone-row input { flex: 1 1 0; min-width: 0; }
   .ff-as__hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
   .ff-as__submit, .ff-as__wa-btn {
     display: inline-block; width: 100%; box-sizing: border-box; text-align: center;
-    background: var(--ff-accent); color: var(--ff-white); border: 0;
+    background: var(--ff-accent); color: var(--ff-ink); border: 0;
     font-weight: 700; font-size: var(--fs-body); padding: 0.85rem 1.5rem;
-    border-radius: var(--r-pill); cursor: pointer; margin-top: var(--sp-2);
+    border-radius: 10px; cursor: pointer; margin-top: var(--sp-2);
     font-family: var(--ff-sans); text-decoration: none;
     transition: background var(--dur) var(--ease), transform var(--dur) var(--ease);
   }
-  .ff-as__submit:hover:not(:disabled), .ff-as__wa-btn:hover { background: var(--ff-accent-dk); transform: translateY(-2px); }
+  .ff-as__submit:hover:not(:disabled), .ff-as__wa-btn:hover { background: var(--ff-green-soft); transform: translateY(-2px); }
   .ff-as__submit:disabled { background: var(--ff-storm); cursor: not-allowed; }
   .ff-as__submit:focus-visible, .ff-as__wa-btn:focus-visible { outline: 3px solid var(--ff-ink); outline-offset: 2px; }
   .ff-as__softnets { display: flex; flex-direction: column; gap: 0.4rem; margin-top: var(--sp-3); text-align: center; }
@@ -589,21 +552,21 @@ const backupOpts = ['4', '8', '12', '24'];
   .ff-as__soft:hover { color: var(--ff-accent-dk); }
   .ff-as__state { text-align: center; padding: var(--sp-3) 0; }
   .ff-as__state-title { font-size: var(--fs-h3); margin: 0 0 0.5rem; color: var(--ff-ink); }
-  .ff-as__state--err .ff-as__state-title { color: var(--ff-accent-dk); }
+  .ff-as__state--err .ff-as__state-title { color: var(--ff-error); }
   .ff-as__wa-btn { max-width: 320px; margin: var(--sp-2) auto 0; }
 
   /* ---- Nav / disclaimer ---- */
   .ff-as__nav { display: flex; justify-content: space-between; margin-top: var(--sp-4); }
   .ff-as__back, .ff-as__next {
-    border: 2px solid var(--ff-line); font-weight: 700; padding: 0.55rem 1.4rem; border-radius: var(--r-pill);
+    border: 2px solid var(--ff-line); font-weight: 700; padding: 0.55rem 1.4rem; border-radius: 10px;
     cursor: pointer; font-family: var(--ff-sans);
   }
   .ff-as__back { background: transparent; color: var(--ff-ink); }
   .ff-as__back:hover { border-color: var(--ff-ink); }
-  .ff-as__next { background: var(--ff-accent); border-color: var(--ff-accent); color: var(--ff-white); margin-left: auto; }
-  .ff-as__next:hover:not(:disabled) { background: var(--ff-accent-dk); }
+  .ff-as__next { background: var(--ff-accent); border-color: var(--ff-accent); color: var(--ff-ink); margin-left: auto; }
+  .ff-as__next:hover:not(:disabled) { background: var(--ff-green-soft); }
   .ff-as__next:disabled { background: var(--ff-storm); border-color: var(--ff-storm); cursor: not-allowed; }
-  .ff-as__back:focus-visible, .ff-as__next:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-as__back:focus-visible, .ff-as__next:focus-visible { outline: 3px solid var(--ff-accent-dk); outline-offset: 2px; }
   .ff-as__disclaimer { text-align: center; color: var(--ff-storm); font-size: var(--fs-small); margin: var(--sp-4) 0 0; }
 
   @media (max-width: 560px) {

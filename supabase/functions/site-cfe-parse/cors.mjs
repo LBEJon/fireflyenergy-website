@@ -3,9 +3,11 @@
 // allowed origin or an anchored *.pages.dev preview; otherwise "null". Same policy as
 // site-lead, kept pure + unit-tested under node, imported verbatim by the Deno handler.
 export const PAGES_DEV = /^https:\/\/[a-z0-9-]+\.pages\.dev$/; // anchored — no substring match
+// This site's own Cloudflare Worker and its preview URLs (version + alias), on our account only.
+export const WORKER_PREVIEW = /^https:\/\/([a-z0-9-]+-)?fireflyenergy-website\.jondenne\.workers\.dev$/;
 
 export function corsFor(origin, allowedOrigins) {
-  const ok = !!origin && (allowedOrigins.includes(origin) || PAGES_DEV.test(origin));
+  const ok = !!origin && (allowedOrigins.includes(origin) || PAGES_DEV.test(origin) || WORKER_PREVIEW.test(origin));
   return {
     "Access-Control-Allow-Origin": ok ? origin : "null",
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",

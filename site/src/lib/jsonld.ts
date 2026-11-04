@@ -13,10 +13,13 @@ export function homeGraph(locale: Locale, site: URL | undefined) {
     '@context': 'https://schema.org',
     '@graph': [
       {
-        '@type': 'LocalBusiness',
+        '@type': ['LocalBusiness', 'Electrician'],
         '@id': `${base}#business`,
         name: 'Firefly Energy',
+        legalName: 'Nordic Electric',
         url,
+        logo: new URL('/assets/brand/firefly-logo.svg', base).href,
+        image: new URL('/og/firefly-og.jpg', base).href,
         email: t(locale, 'common.email'),
         telephone: t(locale, 'common.phone'),
         description: t(locale, 'footer.tagline'),
@@ -31,8 +34,9 @@ export function homeGraph(locale: Locale, site: URL | undefined) {
         },
       },
       {
-        '@type': 'Product',
+        '@type': 'Service',
         '@id': `${base}#home-battery-system`,
+        serviceType: locale === 'es' ? 'Instalación de respaldo de baterías y solar' : 'Home battery backup and solar installation',
         name:
           locale === 'es'
             ? 'Sistema de respaldo de batería para el hogar'
@@ -41,7 +45,6 @@ export function homeGraph(locale: Locale, site: URL | undefined) {
           locale === 'es'
             ? 'Respaldo automático de batería con 12 kW de potencia continua y 16 kWh de almacenamiento, listo para solar, con cambio en menos de 20 milisegundos.'
             : 'Automatic battery backup with 12 kW of continuous power and 16 kWh of storage, solar-ready, switching over in under 20 milliseconds.',
-        brand: { '@type': 'Brand', name: 'Firefly Energy' },
         category: locale === 'es' ? 'Respaldo de energía solar' : 'Solar energy storage',
         additionalProperty: [
           {
@@ -64,7 +67,7 @@ export function homeGraph(locale: Locale, site: URL | undefined) {
           { '@type': 'City', name: 'San Miguel de Allende' },
           { '@type': 'Country', name: 'Mexico' },
         ],
-        seller: { '@id': `${base}#business` },
+        provider: { '@id': `${base}#business` },
       },
     ],
   };

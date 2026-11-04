@@ -1,0 +1,49 @@
+---
+import { homeCopy } from '../../content/home';
+import { altUrl, t, type Locale } from '../../lib/i18n';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = homeCopy[locale];
+const wa = `https://wa.me/${t(locale, 'common.whatsapp')}`;
+const phone = t(locale, 'common.phone');
+const email = t(locale, 'common.email');
+---
+<footer class="ft">
+  <div class="wrap ft__grid">
+    <div>
+      <img src="/assets/brand/firefly-logo-ondark.svg" alt="Firefly Energy" width="124" height="30" />
+      <p>{c.footer.tagline}</p>
+      <p class="ft__area">{c.footer.area}</p>
+    </div>
+    <nav aria-label={c.footer.explore}>
+      <h3>{c.footer.explore}</h3>
+      <a href={`${altUrl(locale, '')}#how`}>{c.nav.how}</a>
+      <a href={altUrl(locale, 'calculator')}>{t(locale, 'nav.calculator')}</a>
+      <a href={altUrl(locale, 'industrial')}>{c.nav.business}</a>
+      <a href={`${altUrl(locale, '')}#dealers`}>{c.nav.dealers}</a>
+      <a href={altUrl(locale, 'faq')}>{c.nav.faq}</a>
+    </nav>
+    <div>
+      <h3>{c.footer.contact}</h3>
+      <a href={`tel:${phone.replace(/\s/g, '')}`} data-track="contact_phone">{phone}</a>
+      <a href={`mailto:${email}`} data-track="contact_email">{email}</a>
+      <a href={wa} target="_blank" rel="noopener" data-track="contact_whatsapp">WhatsApp</a>
+    </div>
+  </div>
+  <div class="wrap ft__base">
+    <span>© {new Date().getFullYear()} {c.footer.by}. {c.footer.rights}</span>
+  </div>
+</footer>
+
+<style>
+  .ft { background: var(--night); color: var(--on-night-2); padding: 4.5rem 0 2rem; border-top: 1px solid var(--night-line); }
+  .ft__grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 3rem; }
+  .ft p { margin: 1rem 0 0; max-width: 30ch; line-height: 1.55; }
+  .ft__area { color: var(--ff-green); font-weight: 600; }
+  .ft h3 { margin: 0 0 1rem; font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--on-night); }
+  .ft a { display: block; color: var(--on-night-2); text-decoration: none; padding: .3rem 0; }
+  .ft a:hover { color: var(--on-night); }
+  .ft__base { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--night-line); font-size: .85rem; }
+  @media (max-width: 900px) { .ft__grid { grid-template-columns: 1fr; } }
+</style>

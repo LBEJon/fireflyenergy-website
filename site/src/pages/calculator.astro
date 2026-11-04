@@ -1,8 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
-import Nav from '../components/Nav.astro';
+import SiteNav from '../components/home/SiteNav.astro';
 import AssessmentEntry from '../components/assessment/AssessmentEntry.astro';
-import Footer from '../components/Footer.astro';
+import SiteFooter from '../components/home/SiteFooter.astro';
+import '../styles/v2.css';
 import WhatsAppBubble from '../components/WhatsAppBubble.astro';
 import { t } from '../lib/i18n';
 import { faqGraph } from '../lib/jsonld';
@@ -19,8 +20,8 @@ const faqs = [
 ];
 ---
 <Base title={title} description={description} locale={locale} path="calculator" jsonLd={jsonLd}>
-  <Nav locale={locale} />
-  <main>
+  <SiteNav locale={locale} path="calculator" />
+  <main id="main" class="page-main">
     <section class="ff-calc-intro">
       <div class="ff-calc-intro__inner">
         <h1 class="ff-calc-intro__title display">{t(locale, 'calc.title')}</h1>
@@ -44,7 +45,7 @@ const faqs = [
       </div>
     </section>
   </main>
-  <Footer locale={locale} />
+  <SiteFooter locale={locale} />
   <WhatsAppBubble locale={locale} />
 </Base>
 
