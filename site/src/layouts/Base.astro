@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import { altUrl, type Locale } from '../lib/i18n';
+import Analytics from '../components/Analytics.astro';
 
 interface Props {
   title: string;
@@ -42,6 +43,7 @@ const esHref = new URL(altUrl('es', path), Astro.site).href;
     <meta name="twitter:description" content={description} />
 
     <link rel="icon" type="image/svg+xml" href="/assets/brand/firefly-icon.svg" />
+    <Analytics />
 
     {jsonLd && (
       <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
