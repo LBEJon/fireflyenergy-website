@@ -21,7 +21,7 @@ const ZONES: [number, number, number][] = [
   [0.1, 0.84, 0.14], [0.35, 0.8, 0.13], [0.6, 0.82, 0.13], [0.9, 0.9, 0.13],
 ];
 // The blackout itself runs on a clock, triggered by the first scroll; everything after it follows the scroll.
-const BLACKOUT_MS = 3400, FLICKER = 0.07, MAX_PUSH = 0.25;
+const BLACKOUT_MS = 6000, FLICKER = 0.07, MAX_PUSH = 0.25;
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const smooth = (a: number, b: number, v: number) => { const t = clamp01((v - a) / (b - a)); return t * t * (3 - 2 * t); };
@@ -38,15 +38,13 @@ export function mountNightHero(root: HTMLElement) {
   const tag = root.querySelector<HTMLElement>('.nh__tag');
   const reveal = root.querySelector<HTMLElement>('.nh__reveal');
   const cue = root.querySelector<HTMLElement>('.nh__cue');
-  const gridEl = root.querySelector<HTMLElement>('[data-grid]');
-  const homeEl = root.querySelector<HTMLElement>('[data-home]');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const mask = document.createElement('canvas');
   const mctx = mask.getContext('2d')!;
   let lit: HTMLImageElement, out: HTMLImageElement;
   let W = 0, H = 0, dpr = 1;
-  let target = 0, current = 0, visible = true, raf = 0, gridOff = false;
+  let target = 0, current = 0, visible = true, raf = 0;
   let startedAt = 0; // when the blackout was triggered (0 = not yet)
   const blackout = (now: number) => (startedAt ? clamp01((now - startedAt) / BLACKOUT_MS) : 0);
 
@@ -62,14 +60,6 @@ export function mountNightHero(root: HTMLElement) {
     const run = r.height - window.innerHeight;
     return run > 0 ? clamp01(-r.top / run) : 0;
   };
-  function setStatus(off: boolean) {
-    if (off === gridOff || !gridEl || !homeEl) return;
-    gridOff = off;
-    gridEl.classList.toggle('is-off', off);
-    gridEl.lastChild!.textContent = off ? gridEl.dataset.off! : gridEl.dataset.on!;
-    homeEl.classList.toggle('is-batt', off);
-    homeEl.lastChild!.textContent = off ? homeEl.dataset.batt! : homeEl.dataset.on!;
-  }
   /** How "on" a neighborhood is: 1 = lit photo, 0 = outage photo, with a brownout flicker on the way down. */
   function zoneOn(i: number, b: number, now: number) {
     const offAt = 0.08 + (i / ZONES.length) * 0.8;
@@ -85,7 +75,7 @@ export function mountNightHero(root: HTMLElement) {
     const ox = Math.min(0, Math.max(W - iw * s, W / 2 - HOUSE.x * iw * s));
     const oy = Math.min(0, Math.max(H - ih * s, H * 0.5 - HOUSE.y * ih * s));
     const hx = ox + HOUSE.x * iw * s, hy = oy + HOUSE.y * ih * s;
-    const z = 1 + MAX_PUSH * smooth(0.05, 0.6, p);
+    const z = 1 + MAX_PUSH * smooth(0.1, 0.72, p);
     const dx = hx + (ox - hx) * z, dy = hy + (oy - hy) * z, dw = iw * s * z, dh = ih * s * z;
 
     ctx!.globalCompositeOperation = 'source-over';
@@ -118,22 +108,21 @@ export function mountNightHero(root: HTMLElement) {
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
-    setStatus(b > 0.06);
     if (reduced) return;
     if (copy) {
-      const f = smooth(0.38, 0.48, p);
+      const f = smooth(0.46, 0.56, p);
       copy.style.opacity = String(1 - f);
       copy.style.transform = `translateY(${-16 * f}px)`;
       copy.style.visibility = f > 0.99 ? 'hidden' : '';
     }
     if (cue) cue.style.opacity = String(1 - smooth(0, 0.04, p) - (startedAt ? 1 : 0));
     if (tag) {
-      tag.style.opacity = String(smooth(0.85, 1, b) * (1 - smooth(0.5, 0.56, p)));
+      tag.style.opacity = String(smooth(0.85, 1, b) * (1 - smooth(0.6, 0.66, p)));
       tag.style.left = `${hx}px`;
       tag.style.top = `${hy - 0.035 * dh}px`;
     }
     if (reveal) {
-      const rv = smooth(0.56, 0.82, p);
+      const rv = smooth(0.68, 0.9, p);
       reveal.style.opacity = String(rv);
       reveal.style.visibility = rv > 0 ? 'visible' : 'hidden';
       reveal.style.setProperty('--rv', rv.toFixed(3));
