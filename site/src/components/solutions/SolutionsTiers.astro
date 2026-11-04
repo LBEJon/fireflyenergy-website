@@ -107,7 +107,7 @@ const hrs = (h: number) => t(locale, 'solutions.runtime_hours').replace('{h}', S
     border-color: var(--ff-accent); box-shadow: var(--shadow-md);
   }
   .ff-sol__badge {
-    position: absolute; top: -0.8rem; right: var(--sp-3); background: var(--ff-accent); color: var(--ff-white);
+    position: absolute; top: -0.8rem; right: var(--sp-3); background: var(--ff-accent); color: var(--ff-ink);
     font-size: var(--fs-eyebrow); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
     padding: 0.25rem 0.7rem; border-radius: var(--r-pill);
   }
@@ -149,11 +149,11 @@ const hrs = (h: number) => t(locale, 'solutions.runtime_hours').replace('{h}', S
     padding: 0.7rem 1.2rem; border: 2px solid transparent;
     transition: background var(--dur) var(--ease), transform var(--dur) var(--ease);
   }
-  .ff-sol__cta--primary { background: var(--ff-accent); color: var(--ff-white); }
-  .ff-sol__cta--primary:hover { background: var(--ff-accent-dk); transform: translateY(-1px); }
+  .ff-sol__cta--primary { background: var(--ff-accent); color: var(--ff-ink); }
+  .ff-sol__cta--primary:hover { background: var(--ff-green-soft); transform: translateY(-1px); }
   .ff-sol__cta--ghost { background: transparent; color: var(--ff-ink); border-color: var(--ff-line); }
   .ff-sol__cta--ghost:hover { border-color: var(--ff-ink); }
-  .ff-sol__cta:focus-visible { outline: 3px solid var(--ff-accent); outline-offset: 2px; }
+  .ff-sol__cta:focus-visible { outline: 3px solid var(--ff-accent-dk); outline-offset: 2px; }
 
   .ff-sol__microcopy { text-align: center; margin: 0; max-width: 62ch; margin-inline: auto; line-height: var(--lh-body); }
   .ff-sol__micro-solar { display: block; color: var(--ff-accent-dk); font-weight: 700; font-size: var(--fs-lead); margin: 0 0 0.35rem; }

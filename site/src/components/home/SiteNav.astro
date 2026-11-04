@@ -2,8 +2,8 @@
 import { homeCopy } from '../../content/home';
 import { altUrl, t, type Locale } from '../../lib/i18n';
 
-interface Props { locale: Locale }
-const { locale } = Astro.props;
+interface Props { locale: Locale; path?: string }
+const { locale, path = '' } = Astro.props;
 const c = homeCopy[locale].nav;
 const other: Locale = locale === 'es' ? 'en' : 'es';
 const home = altUrl(locale, '');
@@ -26,7 +26,7 @@ const links = [
       {links.map((l) => <a href={l.href}>{l.label}</a>)}
     </nav>
     <div class="sn__right">
-      <a class="sn__lang" href={altUrl(other, '')} hreflang={other} aria-label={t(locale, 'common.locale_aria')}>{t(locale, 'common.locale_label')}</a>
+      <a class="sn__lang" href={altUrl(other, path)} hreflang={other} aria-label={t(locale, 'common.locale_aria')}>{t(locale, 'common.locale_label')}</a>
       <a class="btn btn--primary sn__cta" href={altUrl(locale, 'calculator')} data-track="begin_assessment">{c.cta}</a>
       <details class="sn__menu">
         <summary aria-label={t(locale, 'common.menu')}><span></span><span></span></summary>
